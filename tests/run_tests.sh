@@ -396,6 +396,18 @@ dtc_tests () {
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label5.dts
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label6.dts
 
+    # Check warning options
+    run_sh_test dtc-checkfails.sh address_cells_is_cell interrupt_cells_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb bad-ncells.dts
+    run_sh_test dtc-fails.sh -n test-warn-output.test.dtb -I dts -O dtb bad-ncells.dts
+    run_sh_test dtc-fails.sh test-error-output.test.dtb -I dts -O dtb bad-ncells.dts -Esize_cells_is_cell
+    run_sh_test dtc-checkfails.sh always_fail -- -Walways_fail -I dts -O dtb test_tree1.dts
+    run_sh_test dtc-checkfails.sh -n always_fail -- -Walways_fail -Wno_always_fail -I dts -O dtb test_tree1.dts
+    run_sh_test dtc-fails.sh test-negation-1.test.dtb -Ealways_fail -I dts -O dtb test_tree1.dts
+    run_sh_test dtc-fails.sh -n test-negation-2.test.dtb -Ealways_fail -Eno_always_fail -I dts -O dtb test_tree1.dts
+    run_sh_test dtc-fails.sh test-negation-3.test.dtb -Ealways_fail -Wno_always_fail -I dts -O dtb test_tree1.dts
+    run_sh_test dtc-fails.sh -n test-negation-4.test.dtb -Esize_cells_is_cell -Eno_size_cells_is_cell -I dts -O dtb bad-ncells.dts
+    run_sh_test dtc-checkfails.sh size_cells_is_cell -- -Esize_cells_is_cell -Eno_size_cells_is_cell -I dts -O dtb bad-ncells.dts
+
     # Check for proper behaviour reading from stdin
     run_dtc_test -I dts -O dtb -o stdin_dtc_tree1.test.dtb - < test_tree1.dts
     run_wrap_test cmp stdin_dtc_tree1.test.dtb dtc_tree1.test.dtb

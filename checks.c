@@ -58,7 +58,7 @@ struct check {
 	struct check **prereq;
 };
 
-#define CHECK(nm, tfn, nfn, pfn, d, w, e, ...)	       \
+#define CHECK_ENTRY(nm, tfn, nfn, pfn, d, w, e, ...)	       \
 	static struct check *nm##_prereqs[] = { __VA_ARGS__ }; \
 	static struct check nm = { \
 		.name = #nm, \
@@ -73,22 +73,30 @@ struct check {
 		.prereq = nm##_prereqs, \
 	};
 #define WARNING(nm, tfn, nfn, pfn, d, ...) \
-	CHECK(nm, tfn, nfn, pfn, d, true, false, __VA_ARGS__)
+	CHECK_ENTRY(nm, tfn, nfn, pfn, d, true, false, __VA_ARGS__)
 #define ERROR(nm, tfn, nfn, pfn, d, ...) \
-	CHECK(nm, tfn, nfn, pfn, d, false, true, __VA_ARGS__)
+	CHECK_ENTRY(nm, tfn, nfn, pfn, d, false, true, __VA_ARGS__)
+#define CHECK(nm, tfn, nfn, pfn, d, ...) \
+	CHECK_ENTRY(nm, tfn, nfn, pfn, d, false, false, __VA_ARGS__)
 
 #define TREE_WARNING(nm, d, ...) \
 	WARNING(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
 #define TREE_ERROR(nm, d, ...) \
 	ERROR(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
+#define TREE_CHECK(nm, d, ...) \
+	CHECK(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
 #define NODE_WARNING(nm, d, ...) \
 	WARNING(nm, NULL, check_##nm, NULL, d,  __VA_ARGS__)
 #define NODE_ERROR(nm, d, ...) \
 	ERROR(nm, NULL, check_##nm, NULL, d, __VA_ARGS__)
+#define NODE_CHECK(nm, d, ...) \
+	CHECK(nm, NULL, check_##nm, NULL, d, __VA_ARGS__)
 #define PROP_WARNING(nm, d, ...) \
 	WARNING(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
 #define PROP_ERROR(nm, d, ...) \
 	ERROR(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
+#define PROP_CHECK(nm, d, ...) \
+	CHECK(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
 
 #ifdef __GNUC__
 static inline void check_msg(struct check *c, const char *fmt, ...) __attribute__((format (printf, 2, 3)));
@@ -178,6 +186,13 @@ out:
 /*
  * Utility check functions
  */
+
+/* A check which always fails, for testing purposes only */
+static inline void check_always_fail(struct check *c, struct node *dt)
+{
+	FAIL(c, "always_fail check");
+}
+TREE_CHECK(always_fail, NULL);
 
 static void check_is_string(struct check *c, struct node *root,
 			    struct node *node)
@@ -649,7 +664,70 @@ static struct check *check_table[] = {
 
 	&avoid_default_addr_size,
 	&obsolete_chosen_interrupt_controller,
+
+	&always_fail,
 };
+
+static void enable_warning_error(struct check *c, bool warn, bool error)
+{
+	int i;
+
+	/* Raising level, also raise it for prereqs */
+	if ((warn && !c->warn) || (error && !c->error))
+		for (i = 0; i < c->num_prereqs; i++)
+			enable_warning_error(c->prereq[i], warn, error);
+
+	c->warn = c->warn || warn;
+	c->error = c->error || error;
+}
+
+static void disable_warning_error(struct check *c, bool warn, bool error)
+{
+	int i;
+
+	/* Lowering level, also lower it for things this is the prereq
+	 * for */
+	if ((warn && c->warn) || (error && c->error)) {
+		for (i = 0; i < ARRAY_SIZE(check_table); i++) {
+			struct check *cc = check_table[i];
+			int j;
+
+			for (j = 0; j < cc->num_prereqs; j++)
+				if (cc->prereq[j] == c)
+					disable_warning_error(cc, warn, error);
+		}
+	}
+
+	c->warn = c->warn && !warn;
+	c->error = c->error && !error;
+}
+
+void parse_checks_option(bool warn, bool error, const char *optarg)
+{
+	int i;
+	const char *name = optarg;
+	bool enable = true;
+
+	if ((strncmp(optarg, "no-", 3) == 0)
+	    || (strncmp(optarg, "no_", 3) == 0)) {
+		name = optarg + 3;
+		enable = false;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(check_table); i++) {
+		struct check *c = check_table[i];
+
+		if (streq(c->name, name)) {
+			if (enable)
+				enable_warning_error(c, warn, error);
+			else
+				disable_warning_error(c, warn, error);
+			return;
+		}
+	}
+
+	die("Unrecognized check name \"%s\"\n", name);
+}
 
 void process_checks(int force, struct boot_info *bi)
 {

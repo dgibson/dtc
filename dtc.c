@@ -93,6 +93,9 @@ static void  __attribute__ ((noreturn)) usage(void)
 	fprintf(stderr, "\t\t\tlegacy - \"linux,phandle\" properties only\n");
 	fprintf(stderr, "\t\t\tepapr - \"phandle\" properties only\n");
 	fprintf(stderr, "\t\t\tboth - Both \"linux,phandle\" and \"phandle\" properties\n");
+	fprintf(stderr, "\t-W [no-]<checkname>\n");
+	fprintf(stderr, "\t-E [no-]<checkname>\n");
+	fprintf(stderr, "\t\t\tenable or disable warnings and errors\n");
 	exit(3);
 }
 
@@ -115,7 +118,7 @@ int main(int argc, char *argv[])
 	minsize    = 0;
 	padsize    = 0;
 
-	while ((opt = getopt(argc, argv, "hI:O:o:V:d:R:S:p:fqb:i:vH:s"))
+	while ((opt = getopt(argc, argv, "hI:O:o:V:d:R:S:p:fqb:i:vH:sW:E:"))
 			!= EOF) {
 		switch (opt) {
 		case 'I':
@@ -171,6 +174,14 @@ int main(int argc, char *argv[])
 
 		case 's':
 			sort = 1;
+			break;
+
+		case 'W':
+			parse_checks_option(true, false, optarg);
+			break;
+
+		case 'E':
+			parse_checks_option(false, true, optarg);
 			break;
 
 		case 'h':
