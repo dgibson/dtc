@@ -162,7 +162,7 @@ static const char *usage_msg =
 	"The command line arguments are joined together into a single value.\n"
 	"\n"
 	"Usage:\n"
-	"	fdtput <options> <dt file> <<node> <property> [<value>...]\n"
+	"	fdtput <options> <dt file> <node> <property> [<value>...]\n"
 	"Options:\n"
 	"\t-t <type>\tType of data\n"
 	"\t-v\t\tVerbose: display each value decoded from command line\n"
