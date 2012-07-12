@@ -28,7 +28,13 @@
 
 #include "util.h"
 
+/* These are the operations we support */
+enum oper_type {
+	OPER_WRITE_PROP,		/* Write a property in a node */
+};
+
 struct display_info {
+	enum oper_type oper;	/* operation to perform */
 	int type;		/* data type (s/i/u/x or 0 for default) */
 	int size;		/* data size (1/2/4) */
 	int verbose;		/* verbose output */
@@ -143,13 +149,19 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 	if (!blob)
 		return -1;
 
-	/* convert the arguments into a single binary value, then store */
-	assert(arg_count >= 2);
-	if (encode_value(disp, arg + 2, arg_count - 2, &value, &len) ||
-		store_key_value(blob, *arg, arg[1], value, len))
-		ret = -1;
-
-	if (!ret)
+	switch (disp->oper) {
+	case OPER_WRITE_PROP:
+		/*
+		 * Convert the arguments into a single binary value, then
+		 * store them into the property.
+		 */
+		assert(arg_count >= 2);
+		if (encode_value(disp, arg + 2, arg_count - 2, &value, &len) ||
+			store_key_value(blob, *arg, arg[1], value, len))
+			ret = -1;
+		break;
+	}
+	if (ret >= 0)
 		ret = utilfdt_write(filename, blob);
 
 	free(blob);
@@ -185,6 +197,7 @@ int main(int argc, char *argv[])
 
 	memset(&disp, '\0', sizeof(disp));
 	disp.size = -1;
+	disp.oper = OPER_WRITE_PROP;
 	for (;;) {
 		int c = getopt(argc, argv, "ht:v");
 		if (c == -1)
@@ -224,10 +237,12 @@ int main(int argc, char *argv[])
 	argv += optind;
 	argc -= optind;
 
-	if (argc < 1)
-		usage("Missing node");
-	if (argc < 2)
-		usage("Missing property");
+	if (disp.oper == OPER_WRITE_PROP) {
+		if (argc < 1)
+			usage("Missing node");
+		if (argc < 2)
+			usage("Missing property");
+	}
 
 	if (do_fdtput(&disp, filename, argv, argc))
 		return 1;
