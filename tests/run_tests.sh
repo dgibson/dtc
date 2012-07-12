@@ -549,6 +549,19 @@ fdtput_tests () {
     run_wrap_error_test $DTPUT $dtb -c /chosen
     run_wrap_error_test $DTPUT $dtb -c /chosen/son
 
+    # Automatic node creation
+    run_wrap_test $DTPUT $dtb -cp /blackadder/the-second/turnip \
+	/blackadder/the-second/potato
+    run_fdtput_test 1000 $dtb /blackadder/the-second/turnip cost "" 1000
+    run_fdtput_test "fine wine" $dtb /blackadder/the-second/potato drink \
+	"-ts" "fine wine"
+    run_wrap_test $DTPUT $dtb -p /you/are/drunk/sir/winston slurp -ts twice
+    run_wrap_error_test $DTPUT $dtb -cp "$(cat $text $text)/longish"
+
+    # Allowed to create an existing node with -p
+    run_wrap_test $DTPUT $dtb -cp /chosen
+    run_wrap_test $DTPUT $dtb -cp /chosen/son
+
     # TODO: Add tests for verbose mode?
 }
 

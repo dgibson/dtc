@@ -39,6 +39,7 @@ struct display_info {
 	int type;		/* data type (s/i/u/x or 0 for default) */
 	int size;		/* data size (1/2/4) */
 	int verbose;		/* verbose output */
+	int auto_path;		/* automatically create all path components */
 };
 
 
@@ -151,6 +152,47 @@ static int store_key_value(void *blob, const char *node_name,
 }
 
 /**
+ * Create paths as needed for all components of a path
+ *
+ * Any components of the path that do not exist are created. Errors are
+ * reported.
+ *
+ * @param blob		FDT blob to write into
+ * @param in_path	Path to process
+ * @return 0 if ok, -1 on error
+ */
+static int create_paths(void *blob, const char *in_path)
+{
+	const char *path = in_path;
+	const char *sep;
+	int node, offset = 0;
+
+	/* skip leading '/' */
+	while (*path == '/')
+		path++;
+
+	for (sep = path; *sep; path = sep + 1, offset = node) {
+		/* equivalent to strchrnul(), but it requires _GNU_SOURCE */
+		sep = strchr(path, '/');
+		if (!sep)
+			sep = path + strlen(path);
+
+		node = fdt_subnode_offset_namelen(blob, offset, path,
+				sep - path);
+		if (node == -FDT_ERR_NOTFOUND) {
+			node = fdt_add_subnode_namelen(blob, offset, path,
+						       sep - path);
+		}
+		if (node < 0) {
+			report_error(path, sep - path, node);
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * Create a new node in the fdt.
  *
  * This will overwrite the node_name string. Any error is reported.
@@ -208,13 +250,19 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 		 * store them into the property.
 		 */
 		assert(arg_count >= 2);
+		if (disp->auto_path && create_paths(blob, *arg))
+			return -1;
 		if (encode_value(disp, arg + 2, arg_count - 2, &value, &len) ||
 			store_key_value(blob, *arg, arg[1], value, len))
 			ret = -1;
 		break;
 	case OPER_CREATE_NODE:
-		for (; ret >= 0 && arg_count--; arg++)
-			ret = create_node(blob, *arg);
+		for (; ret >= 0 && arg_count--; arg++) {
+			if (disp->auto_path)
+				ret = create_paths(blob, *arg);
+			else
+				ret = create_node(blob, *arg);
+		}
 		break;
 	}
 	if (ret >= 0)
@@ -234,6 +282,7 @@ static const char *usage_msg =
 	"	fdtput -c <options> <dt file> [<node>...]\n"
 	"Options:\n"
 	"\t-c\t\tCreate nodes if they don't already exist\n"
+	"\t-p\t\tAutomatically create nodes as needed for the node path\n"
 	"\t-t <type>\tType of data\n"
 	"\t-v\t\tVerbose: display each value decoded from command line\n"
 	"\t-h\t\tPrint this help\n\n"
@@ -257,7 +306,7 @@ int main(int argc, char *argv[])
 	disp.size = -1;
 	disp.oper = OPER_WRITE_PROP;
 	for (;;) {
-		int c = getopt(argc, argv, "cht:v");
+		int c = getopt(argc, argv, "chpt:v");
 		if (c == -1)
 			break;
 
@@ -277,7 +326,9 @@ int main(int argc, char *argv[])
 		case 'h':
 		case '?':
 			usage(NULL);
-
+		case 'p':
+			disp.auto_path = 1;
+			break;
 		case 't':
 			if (utilfdt_decode_type(optarg, &disp.type,
 					&disp.size))
