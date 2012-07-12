@@ -31,6 +31,7 @@
 /* These are the operations we support */
 enum oper_type {
 	OPER_WRITE_PROP,		/* Write a property in a node */
+	OPER_CREATE_NODE,		/* Create a new node */
 };
 
 struct display_info {
@@ -138,6 +139,46 @@ static int store_key_value(void *blob, const char *node_name,
 	return 0;
 }
 
+/**
+ * Create a new node in the fdt.
+ *
+ * This will overwrite the node_name string. Any error is reported.
+ *
+ * TODO: Perhaps create fdt_path_offset_namelen() so we don't need to do this.
+ *
+ * @param blob		FDT blob to write into
+ * @param node_name	Name of node to create
+ * @return new node offset if found, or -1 on failure
+ */
+static int create_node(void *blob, const char *node_name)
+{
+	int node = 0;
+	char *p;
+
+	p = strrchr(node_name, '/');
+	if (!p) {
+		report_error(node_name, -FDT_ERR_BADPATH);
+		return -1;
+	}
+	*p = '\0';
+
+	if (p > node_name) {
+		node = fdt_path_offset(blob, node_name);
+		if (node < 0) {
+			report_error(node_name, node);
+			return -1;
+		}
+	}
+
+	node = fdt_add_subnode(blob, node, p + 1);
+	if (node < 0) {
+		report_error(p + 1, node);
+		return -1;
+	}
+
+	return 0;
+}
+
 static int do_fdtput(struct display_info *disp, const char *filename,
 		    char **arg, int arg_count)
 {
@@ -160,6 +201,10 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 			store_key_value(blob, *arg, arg[1], value, len))
 			ret = -1;
 		break;
+	case OPER_CREATE_NODE:
+		for (; ret >= 0 && arg_count--; arg++)
+			ret = create_node(blob, *arg);
+		break;
 	}
 	if (ret >= 0)
 		ret = utilfdt_write(filename, blob);
@@ -175,7 +220,9 @@ static const char *usage_msg =
 	"\n"
 	"Usage:\n"
 	"	fdtput <options> <dt file> <node> <property> [<value>...]\n"
+	"	fdtput -c <options> <dt file> [<node>...]\n"
 	"Options:\n"
+	"\t-c\t\tCreate nodes if they don't already exist\n"
 	"\t-t <type>\tType of data\n"
 	"\t-v\t\tVerbose: display each value decoded from command line\n"
 	"\t-h\t\tPrint this help\n\n"
@@ -199,7 +246,7 @@ int main(int argc, char *argv[])
 	disp.size = -1;
 	disp.oper = OPER_WRITE_PROP;
 	for (;;) {
-		int c = getopt(argc, argv, "ht:v");
+		int c = getopt(argc, argv, "cht:v");
 		if (c == -1)
 			break;
 
@@ -213,6 +260,9 @@ int main(int argc, char *argv[])
 		 * - expand fdt if value doesn't fit
 		 */
 		switch (c) {
+		case 'c':
+			disp.oper = OPER_CREATE_NODE;
+			break;
 		case 'h':
 		case '?':
 			usage(NULL);

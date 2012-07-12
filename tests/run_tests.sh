@@ -536,6 +536,19 @@ fdtput_tests () {
     # This should be larger than available space in the fdt
     run_wrap_error_test $DTPUT $dtb /randomnode blob -ts "$(cat $text $text)"
 
+    # Start again with a fresh dtb
+    run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
+
+    # Node creation
+    run_wrap_error_test $DTPUT $dtb -c /baldrick sod
+    run_wrap_test $DTPUT $dtb -c /chosen/son /chosen/daughter
+    run_fdtput_test "eva" $dtb /chosen/daughter name "" -ts "eva"
+    run_fdtput_test "adam" $dtb /chosen/son name "" -ts "adam"
+
+    # Not allowed to create an existing node
+    run_wrap_error_test $DTPUT $dtb -c /chosen
+    run_wrap_error_test $DTPUT $dtb -c /chosen/son
+
     # TODO: Add tests for verbose mode?
 }
 
