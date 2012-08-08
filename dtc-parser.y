@@ -62,6 +62,8 @@ static unsigned char eval_char_literal(const char *s);
 %token DT_MEMRESERVE
 %token DT_LSHIFT DT_RSHIFT DT_LE DT_GE DT_EQ DT_NE DT_AND DT_OR
 %token DT_BITS
+%token DT_DEL_PROP
+%token DT_DEL_NODE
 %token <propnodename> DT_PROPNODENAME
 %token <literal> DT_LITERAL
 %token <literal> DT_CHAR_LITERAL
@@ -153,6 +155,17 @@ devicetree:
 				print_error("label or path, '%s', not found", $2);
 			$$ = $1;
 		}
+	| devicetree DT_DEL_NODE DT_REF ';'
+		{
+			struct node *target = get_node_by_ref($1, $3);
+
+			if (!target)
+				print_error("label or path, '%s', not found", $3);
+			else
+				delete_node(target);
+
+			$$ = $1;
+		}
 	;
 
 nodedef:
@@ -181,6 +194,10 @@ propdef:
 	| DT_PROPNODENAME ';'
 		{
 			$$ = build_property($1, empty_data);
+		}
+	| DT_DEL_PROP DT_PROPNODENAME ';'
+		{
+			$$ = build_property_delete($2);
 		}
 	| DT_LABEL propdef
 		{
@@ -439,6 +456,10 @@ subnode:
 	  DT_PROPNODENAME nodedef
 		{
 			$$ = name_node($2, $1);
+		}
+	| DT_DEL_NODE DT_PROPNODENAME ';'
+		{
+			$$ = name_node(build_node_delete(), $2);
 		}
 	| DT_LABEL subnode
 		{

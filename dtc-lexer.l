@@ -103,6 +103,20 @@ static int pop_input_file(void);
 			return DT_BITS;
 		}
 
+<*>"/delete-property/"	{
+			DPRINT("Keyword: /delete-property/\n");
+			DPRINT("<PROPNODENAME>\n");
+			BEGIN(PROPNODENAME);
+			return DT_DEL_PROP;
+		}
+
+<*>"/delete-node/"	{
+			DPRINT("Keyword: /delete-node/\n");
+			DPRINT("<PROPNODENAME>\n");
+			BEGIN(PROPNODENAME);
+			return DT_DEL_NODE;
+		}
+
 <*>{LABEL}:	{
 			DPRINT("Label: %s\n", yytext);
 			yylval.labelref = xstrdup(yytext);
