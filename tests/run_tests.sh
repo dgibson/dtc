@@ -254,6 +254,9 @@ dtc_tests () {
     tree1_tests_rw dtc_tree1.test.dtb
     run_test dtbs_equal_ordered dtc_tree1.test.dtb test_tree1.dtb
 
+    run_dtc_test -I dts -O dtb -o dtc_escapes.test.dtb propname_escapes.dts
+    run_test propname_escapes dtc_escapes.test.dtb
+
     run_dtc_test -I dts -O dtb -o dtc_escapes.test.dtb escapes.dts
     run_test string_escapes dtc_escapes.test.dtb
 

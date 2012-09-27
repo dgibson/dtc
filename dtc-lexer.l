@@ -162,9 +162,10 @@ static int pop_input_file(void);
 			return ']';
 		}
 
-<PROPNODENAME>{PROPNODECHAR}+ {
+<PROPNODENAME>\\?{PROPNODECHAR}+ {
 			DPRINT("PropNodeName: %s\n", yytext);
-			yylval.propnodename = xstrdup(yytext);
+			yylval.propnodename = xstrdup((yytext[0] == '\\') ?
+							yytext + 1 : yytext);
 			BEGIN_DEFAULT();
 			return DT_PROPNODENAME;
 		}

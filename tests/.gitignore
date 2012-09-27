@@ -39,6 +39,7 @@ tmp.*
 /path_offset
 /path_offset_aliases
 /phandle_format
+/propname_escapes
 /references
 /root_node
 /rw_tree1
