@@ -113,4 +113,6 @@ extern void srcpos_error(struct srcpos *pos, char const *, ...)
 extern void srcpos_warn(struct srcpos *pos, char const *, ...)
      __attribute__((format(printf, 2, 3)));
 
+extern void srcpos_set_line(char *f, int l);
+
 #endif /* _SRCPOS_H_ */

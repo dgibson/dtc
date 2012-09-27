@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/* common format */
+#line 3 "foo.dts"
+/* newer gcc format */
+# 9 "baz.dts" 1
+/* flags are optional */
+# 6 "bar.dts"
+
+/ {
+};

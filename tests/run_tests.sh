@@ -257,6 +257,8 @@ dtc_tests () {
     run_dtc_test -I dts -O dtb -o dtc_escapes.test.dtb propname_escapes.dts
     run_test propname_escapes dtc_escapes.test.dtb
 
+    run_dtc_test -I dts -O dtb -o line_directives.test.dtb line_directives.dts
+
     run_dtc_test -I dts -O dtb -o dtc_escapes.test.dtb escapes.dts
     run_test string_escapes dtc_escapes.test.dtb
 
