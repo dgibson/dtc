@@ -36,6 +36,7 @@ void add_label(struct label **labels, char *label)
 		}
 
 	new = xmalloc(sizeof(*new));
+	memset(new, 0, sizeof(*new));
 	new->label = label;
 	new->next = *labels;
 	*labels = new;
