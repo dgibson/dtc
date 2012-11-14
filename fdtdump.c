@@ -8,8 +8,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <fdt.h>
 #include <libfdt_env.h>
+#include <fdt.h>
 
 #include "util.h"
 
