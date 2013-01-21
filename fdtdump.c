@@ -17,41 +17,6 @@
 #define PALIGN(p, a)	((void *)(ALIGN((unsigned long)(p), (a))))
 #define GET_CELL(p)	(p += 4, *((const uint32_t *)(p-4)))
 
-static void print_data(const char *data, int len)
-{
-	int i;
-	const char *p = data;
-	const char *s;
-
-	/* no data, don't print */
-	if (len == 0)
-		return;
-
-	if (util_is_printable_string(data, len)) {
-		printf(" = ");
-
-		s = data;
-		do {
-			printf("\"%s\"", s);
-			s += strlen(s) + 1;
-			if (s < data + len)
-				printf(", ");
-		} while (s < data + len);
-
-	} else if ((len % 4) == 0) {
-		printf(" = <");
-		for (i = 0; i < len; i += 4)
-			printf("0x%08x%s", fdt32_to_cpu(GET_CELL(p)),
-			       i < (len - 4) ? " " : "");
-		printf(">");
-	} else {
-		printf(" = [");
-		for (i = 0; i < len; i++)
-			printf("%02x%s", *p++, i < len - 1 ? " " : "");
-		printf("]");
-	}
-}
-
 static void dump_blob(void *blob)
 {
 	struct fdt_header *bph = blob;
@@ -147,7 +112,7 @@ static void dump_blob(void *blob)
 		p = PALIGN(p + sz, 4);
 
 		printf("%*s%s", depth * shift, "", s);
-		print_data(t, sz);
+		utilfdt_print_data(t, sz);
 		printf(";\n");
 	}
 }

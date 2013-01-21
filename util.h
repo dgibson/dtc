@@ -152,4 +152,18 @@ int utilfdt_decode_type(const char *fmt, int *type, int *size);
 	"\tOptional modifier prefix:\n" \
 	"\t\thh or b=byte, h=2 byte, l=4 byte (default)\n";
 
+/**
+ * Print property data in a readable format to stdout
+ *
+ * Properties that look like strings will be printed as strings. Otherwise
+ * the data will be displayed either as cells (if len is a multiple of 4
+ * bytes) or bytes.
+ *
+ * If len is 0 then this function does nothing.
+ *
+ * @param data	Pointers to property data
+ * @param len	Length of property data
+ */
+void utilfdt_print_data(const char *data, int len);
+
 #endif /* _UTIL_H */
