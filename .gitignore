@@ -1,6 +1,7 @@
 *.o
 *.d
 *.a
+*.patch
 *.so
 *~
 *.tab.[ch]
