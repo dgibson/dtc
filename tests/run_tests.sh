@@ -498,9 +498,10 @@ fdtget_tests () {
 
     # run_fdtget_test <expected-result> [<flags>] <file> <node> <property>
     run_fdtget_test "MyBoardName" $dtb / model
+    run_fdtget_test "MyBoardName MyBoardFamilyName" $dtb / compatible
     run_fdtget_test "77 121 66 111 \
 97 114 100 78 97 109 101 0 77 121 66 111 97 114 100 70 97 109 105 \
-108 121 78 97 109 101 0" $dtb / compatible
+108 121 78 97 109 101 0" -t bu $dtb / compatible
     run_fdtget_test "MyBoardName MyBoardFamilyName" -t s $dtb / compatible
     run_fdtget_test 32768 $dtb /cpus/PowerPC,970@1 d-cache-size
     run_fdtget_test 8000 -tx $dtb /cpus/PowerPC,970@1 d-cache-size

@@ -57,12 +57,14 @@ extern char *xstrdup(const char *s);
 extern char *join_path(const char *path, const char *name);
 
 /**
- * Check a string of a given length to see if it is all printable and
- * has a valid terminator.
+ * Check a property of a given length to see if it is all printable and
+ * has a valid terminator. The property can contain either a single string,
+ * or multiple strings each of non-zero length.
  *
  * @param data	The string to check
  * @param len	The string length including terminator
- * @return 1 if a valid printable string, 0 if not */
+ * @return 1 if a valid printable string, 0 if not
+ */
 int util_is_printable_string(const void *data, int len);
 
 /*
