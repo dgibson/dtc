@@ -160,7 +160,7 @@ int nodename_eq(const char *s1, const char *s2)
 void *load_blob(const char *filename)
 {
 	char *blob;
-	int ret = utilfdt_read_err(filename, &blob);
+	int ret = utilfdt_read_err(filename, &blob, NULL);
 
 	if (ret)
 		CONFIG("Couldn't open blob from \"%s\": %s", filename,
