@@ -34,6 +34,7 @@
 
 #include "libfdt.h"
 #include "util.h"
+#include "version_gen.h"
 
 char *xstrdup(const char *s)
 {
@@ -373,4 +374,10 @@ void utilfdt_print_data(const char *data, int len)
 			printf("%02x%s", *p++, i < len - 1 ? " " : "");
 		printf("]");
 	}
+}
+
+void util_version(void)
+{
+	printf("Version: %s\n", DTC_VERSION);
+	exit(0);
 }

@@ -168,4 +168,9 @@ int utilfdt_decode_type(const char *fmt, int *type, int *size);
  */
 void utilfdt_print_data(const char *data, int len);
 
+/**
+ * Show source version and exit
+ */
+void util_version(void) __attribute__((noreturn));
+
 #endif /* _UTIL_H */
