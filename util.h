@@ -23,7 +23,7 @@
  *                                                                   USA
  */
 
-static inline void __attribute__((noreturn)) die(char * str, ...)
+static inline void __attribute__((noreturn)) die(const char *str, ...)
 {
 	va_list ap;
 
