@@ -212,12 +212,12 @@ int utilfdt_read_err(const char *filename, char **buffp)
 	}
 
 	/* Loop until we have read everything */
-	buf = malloc(bufsize);
+	buf = xmalloc(bufsize);
 	do {
 		/* Expand the buffer to hold the next chunk */
 		if (offset == bufsize) {
 			bufsize *= 2;
-			buf = realloc(buf, bufsize);
+			buf = xrealloc(buf, bufsize);
 			if (!buf) {
 				ret = ENOMEM;
 				break;
