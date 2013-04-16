@@ -117,21 +117,36 @@ static void dump_blob(void *blob)
 	}
 }
 
+/* Usage related data. */
+static const char usage_synopsis[] = "fdtdump [options] <file>";
+static const char usage_short_opts[] = USAGE_COMMON_SHORT_OPTS;
+static struct option const usage_long_opts[] = {
+	USAGE_COMMON_LONG_OPTS
+};
+static const char * const usage_opts_help[] = {
+	USAGE_COMMON_OPTS_HELP
+};
 
 int main(int argc, char *argv[])
 {
+	int opt;
+	const char *file;
 	char *buf;
 
-	if (argc < 2) {
-		fprintf(stderr, "supply input filename\n");
-		return 5;
+	while ((opt = util_getopt_long()) != EOF) {
+		switch (opt) {
+		case_USAGE_COMMON_FLAGS
+		}
 	}
+	if (optind != argc - 1)
+		long_usage("missing input filename");
+	file = argv[optind];
 
-	buf = utilfdt_read(argv[1]);
-	if (buf)
-		dump_blob(buf);
-	else
-		return 10;
+	buf = utilfdt_read(file);
+	if (!buf)
+		die("could not read: %s\n", file);
+
+	dump_blob(buf);
 
 	return 0;
 }

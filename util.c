@@ -392,3 +392,57 @@ void util_version(void)
 	printf("Version: %s\n", DTC_VERSION);
 	exit(0);
 }
+
+void util_long_usage(const char *errmsg, const char *synopsis,
+		     const char *short_opts, struct option const long_opts[],
+		     const char * const opts_help[])
+{
+	FILE *fp = errmsg ? stderr : stdout;
+	const char a_arg[] = "<arg>";
+	size_t a_arg_len = strlen(a_arg) + 1;
+	size_t i;
+	int optlen;
+
+	fprintf(fp,
+		"Usage: %s\n"
+		"\n"
+		"Options: -[%s]\n", synopsis, short_opts);
+
+	/* prescan the --long opt length to auto-align */
+	optlen = 0;
+	for (i = 0; long_opts[i].name; ++i) {
+		/* +1 is for space between --opt and help text */
+		int l = strlen(long_opts[i].name) + 1;
+		if (long_opts[i].has_arg == a_argument)
+			l += a_arg_len;
+		if (optlen < l)
+			optlen = l;
+	}
+
+	for (i = 0; long_opts[i].name; ++i) {
+		/* helps when adding new applets or options */
+		assert(opts_help[i] != NULL);
+
+		/* first output the short flag if it has one */
+		if (long_opts[i].val > '~')
+			fprintf(fp, "      ");
+		else
+			fprintf(fp, "  -%c, ", long_opts[i].val);
+
+		/* then the long flag */
+		if (long_opts[i].has_arg == no_argument)
+			fprintf(fp, "--%-*s", optlen, long_opts[i].name);
+		else
+			fprintf(fp, "--%s %s%*s", long_opts[i].name, a_arg,
+				(int)(optlen - strlen(long_opts[i].name) - a_arg_len), "");
+
+		/* finally the help text */
+		fprintf(fp, "%s\n", opts_help[i]);
+	}
+
+	if (errmsg) {
+		fprintf(fp, "\nError: %s\n", errmsg);
+		exit(EXIT_FAILURE);
+	} else
+		exit(EXIT_SUCCESS);
+}

@@ -2,6 +2,7 @@
 #define _UTIL_H
 
 #include <stdarg.h>
+#include <getopt.h>
 
 /*
  * Copyright 2011 The Chromium Authors, All Rights Reserved.
@@ -183,5 +184,65 @@ void utilfdt_print_data(const char *data, int len);
  * Show source version and exit
  */
 void util_version(void) __attribute__((noreturn));
+
+/**
+ * Show usage and exit
+ *
+ * This helps standardize the output of various utils.  You most likely want
+ * to use the long_usage() helper below rather than call this.
+ *
+ * @param errmsg	If non-NULL, an error message to display
+ * @param synopsis	The initial example usage text (and possible examples)
+ * @param short_opts	The string of short options
+ * @param long_opts	The structure of long options
+ * @param opts_help	An array of help strings (should align with long_opts)
+ */
+void util_long_usage(const char *errmsg, const char *synopsis,
+		     const char *short_opts, struct option const long_opts[],
+		     const char * const opts_help[]) __attribute__((noreturn));
+
+/**
+ * Show usage and exit
+ *
+ * If you name all your usage variables with usage_xxx, then you can call this
+ * help macro rather than expanding all arguments yourself.
+ *
+ * @param errmsg	If non-NULL, an error message to display
+ */
+#define long_usage(errmsg) \
+	util_long_usage(errmsg, usage_synopsis, usage_short_opts, \
+			usage_long_opts, usage_opts_help)
+
+/**
+ * Call getopt_long() with standard options
+ *
+ * Since all util code runs getopt in the same way, provide a helper.
+ */
+#define util_getopt_long() getopt_long(argc, argv, usage_short_opts, \
+				       usage_long_opts, NULL)
+
+/* Helper for aligning long_opts array */
+#define a_argument required_argument
+
+/* Helper for usage_short_opts string constant */
+#define USAGE_COMMON_SHORT_OPTS "hV"
+
+/* Helper for usage_long_opts option array */
+#define USAGE_COMMON_LONG_OPTS \
+	{"help",      no_argument, NULL, 'h'}, \
+	{"version",   no_argument, NULL, 'V'}, \
+	{NULL,        no_argument, NULL, 0x0}
+
+/* Helper for usage_opts_help array */
+#define USAGE_COMMON_OPTS_HELP \
+	"Print this help and exit", \
+	"Print version and exit", \
+	NULL
+
+/* Helper for getopt case statements */
+#define case_USAGE_COMMON_FLAGS \
+	case 'h': long_usage(NULL); \
+	case 'V': util_version(); \
+	case '?': long_usage("unknown option");
 
 #endif /* _UTIL_H */
