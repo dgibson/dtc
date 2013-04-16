@@ -24,6 +24,8 @@
  *                                                                   USA
  */
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 static inline void __attribute__((noreturn)) die(const char *str, ...)
 {
 	va_list ap;

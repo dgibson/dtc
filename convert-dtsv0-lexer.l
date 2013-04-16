@@ -50,8 +50,6 @@ static int saw_hyphen; /* = 0 */
 static unsigned long long last_val;
 static char *last_name; /* = NULL */
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 const struct {
 	const char *pattern;
 	int obase, width;
