@@ -239,7 +239,7 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 	char *blob;
 	int len, ret = 0;
 
-	blob = utilfdt_read(filename, NULL);
+	blob = utilfdt_read(filename);
 	if (!blob)
 		return -1;
 
