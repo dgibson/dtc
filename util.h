@@ -164,7 +164,7 @@ int utilfdt_decode_type(const char *fmt, int *type, int *size);
 #define USAGE_TYPE_MSG \
 	"<type>\ts=string, i=int, u=unsigned, x=hex\n" \
 	"\tOptional modifier prefix:\n" \
-	"\t\thh or b=byte, h=2 byte, l=4 byte (default)\n";
+	"\t\thh or b=byte, h=2 byte, l=4 byte (default)";
 
 /**
  * Print property data in a readable format to stdout

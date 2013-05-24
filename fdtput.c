@@ -272,44 +272,40 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 	return ret;
 }
 
-static const char *usage_msg =
-	"fdtput - write a property value to a device tree\n"
-	"\n"
-	"The command line arguments are joined together into a single value.\n"
-	"\n"
-	"Usage:\n"
+/* Usage related data. */
+static const char usage_synopsis[] =
+	"write a property value to a device tree\n"
 	"	fdtput <options> <dt file> <node> <property> [<value>...]\n"
 	"	fdtput -c <options> <dt file> [<node>...]\n"
-	"Options:\n"
-	"\t-c\t\tCreate nodes if they don't already exist\n"
-	"\t-p\t\tAutomatically create nodes as needed for the node path\n"
-	"\t-t <type>\tType of data\n"
-	"\t-v\t\tVerbose: display each value decoded from command line\n"
-	"\t-h\t\tPrint this help\n\n"
+	"\n"
+	"The command line arguments are joined together into a single value.\n"
 	USAGE_TYPE_MSG;
-
-static void usage(const char *msg)
-{
-	if (msg)
-		fprintf(stderr, "Error: %s\n\n", msg);
-
-	fprintf(stderr, "%s", usage_msg);
-	exit(2);
-}
+static const char usage_short_opts[] = "cpt:v" USAGE_COMMON_SHORT_OPTS;
+static struct option const usage_long_opts[] = {
+	{"create",           no_argument, NULL, 'c'},
+	{"auto-path",        no_argument, NULL, 'p'},
+	{"type",              a_argument, NULL, 't'},
+	{"verbose",          no_argument, NULL, 'v'},
+	USAGE_COMMON_LONG_OPTS,
+};
+static const char * const usage_opts_help[] = {
+	"Create nodes if they don't already exist",
+	"Automatically create nodes as needed for the node path",
+	"Type of data",
+	"Display each value decoded from command line",
+	USAGE_COMMON_OPTS_HELP
+};
 
 int main(int argc, char *argv[])
 {
+	int opt;
 	struct display_info disp;
 	char *filename = NULL;
 
 	memset(&disp, '\0', sizeof(disp));
 	disp.size = -1;
 	disp.oper = OPER_WRITE_PROP;
-	for (;;) {
-		int c = getopt(argc, argv, "chpt:v");
-		if (c == -1)
-			break;
-
+	while ((opt = util_getopt_long()) != EOF) {
 		/*
 		 * TODO: add options to:
 		 * - delete property
@@ -319,20 +315,19 @@ int main(int argc, char *argv[])
 		 * - set amount of free space when writing
 		 * - expand fdt if value doesn't fit
 		 */
-		switch (c) {
+		switch (opt) {
+		case_USAGE_COMMON_FLAGS
+
 		case 'c':
 			disp.oper = OPER_CREATE_NODE;
 			break;
-		case 'h':
-		case '?':
-			usage(NULL);
 		case 'p':
 			disp.auto_path = 1;
 			break;
 		case 't':
 			if (utilfdt_decode_type(optarg, &disp.type,
 					&disp.size))
-				usage("Invalid type string");
+				long_usage("Invalid type string");
 			break;
 
 		case 'v':
@@ -344,16 +339,16 @@ int main(int argc, char *argv[])
 	if (optind < argc)
 		filename = argv[optind++];
 	if (!filename)
-		usage("Missing filename");
+		long_usage("missing filename");
 
 	argv += optind;
 	argc -= optind;
 
 	if (disp.oper == OPER_WRITE_PROP) {
 		if (argc < 1)
-			usage("Missing node");
+			long_usage("missing node");
 		if (argc < 2)
-			usage("Missing property");
+			long_usage("missing property");
 	}
 
 	if (do_fdtput(&disp, filename, argv, argc))
