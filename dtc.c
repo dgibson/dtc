@@ -186,14 +186,14 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'h':
-			long_usage(NULL);
+			usage(NULL);
 		default:
-			long_usage("unknown option");
+			usage("unknown option");
 		}
 	}
 
 	if (argc > (optind+1))
-		long_usage("missing files");
+		usage("missing files");
 	else if (argc < (optind+1))
 		arg = "-";
 	else

@@ -393,9 +393,9 @@ void util_version(void)
 	exit(0);
 }
 
-void util_long_usage(const char *errmsg, const char *synopsis,
-		     const char *short_opts, struct option const long_opts[],
-		     const char * const opts_help[])
+void util_usage(const char *errmsg, const char *synopsis,
+		const char *short_opts, struct option const long_opts[],
+		const char * const opts_help[])
 {
 	FILE *fp = errmsg ? stderr : stdout;
 	const char a_arg[] = "<arg>";

@@ -189,7 +189,7 @@ void util_version(void) __attribute__((noreturn));
  * Show usage and exit
  *
  * This helps standardize the output of various utils.  You most likely want
- * to use the long_usage() helper below rather than call this.
+ * to use the usage() helper below rather than call this.
  *
  * @param errmsg	If non-NULL, an error message to display
  * @param synopsis	The initial example usage text (and possible examples)
@@ -197,9 +197,9 @@ void util_version(void) __attribute__((noreturn));
  * @param long_opts	The structure of long options
  * @param opts_help	An array of help strings (should align with long_opts)
  */
-void util_long_usage(const char *errmsg, const char *synopsis,
-		     const char *short_opts, struct option const long_opts[],
-		     const char * const opts_help[]) __attribute__((noreturn));
+void util_usage(const char *errmsg, const char *synopsis,
+		const char *short_opts, struct option const long_opts[],
+		const char * const opts_help[]) __attribute__((noreturn));
 
 /**
  * Show usage and exit
@@ -209,9 +209,9 @@ void util_long_usage(const char *errmsg, const char *synopsis,
  *
  * @param errmsg	If non-NULL, an error message to display
  */
-#define long_usage(errmsg) \
-	util_long_usage(errmsg, usage_synopsis, usage_short_opts, \
-			usage_long_opts, usage_opts_help)
+#define usage(errmsg) \
+	util_usage(errmsg, usage_synopsis, usage_short_opts, \
+		   usage_long_opts, usage_opts_help)
 
 /**
  * Call getopt_long() with standard options
@@ -241,8 +241,8 @@ void util_long_usage(const char *errmsg, const char *synopsis,
 
 /* Helper for getopt case statements */
 #define case_USAGE_COMMON_FLAGS \
-	case 'h': long_usage(NULL); \
+	case 'h': usage(NULL); \
 	case 'V': util_version(); \
-	case '?': long_usage("unknown option");
+	case '?': usage("unknown option");
 
 #endif /* _UTIL_H */

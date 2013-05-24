@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 		case 't':
 			if (utilfdt_decode_type(optarg, &disp.type,
 					&disp.size))
-				long_usage("invalid type string");
+				usage("invalid type string");
 			break;
 
 		case 'p':
@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 	if (optind < argc)
 		filename = argv[optind++];
 	if (!filename)
-		long_usage("missing filename");
+		usage("missing filename");
 
 	argv += optind;
 	argc -= optind;
@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 
 	/* Check for node, property arguments */
 	if (args_per_step == 2 && (argc % 2))
-		long_usage("must have an even number of arguments");
+		usage("must have an even number of arguments");
 
 	if (do_fdtget(&disp, filename, argv, argc, args_per_step))
 		return 1;

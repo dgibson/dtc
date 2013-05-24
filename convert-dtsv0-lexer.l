@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	if (argc < 2)
-		long_usage("missing filename");
+		usage("missing filename");
 
 	for (i = 1; i < argc; i++) {
 		fprintf(stderr, "Converting %s from dts v0 to dts v1\n", argv[i]);

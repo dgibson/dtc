@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
 		case 't':
 			if (utilfdt_decode_type(optarg, &disp.type,
 					&disp.size))
-				long_usage("Invalid type string");
+				usage("Invalid type string");
 			break;
 
 		case 'v':
@@ -339,16 +339,16 @@ int main(int argc, char *argv[])
 	if (optind < argc)
 		filename = argv[optind++];
 	if (!filename)
-		long_usage("missing filename");
+		usage("missing filename");
 
 	argv += optind;
 	argc -= optind;
 
 	if (disp.oper == OPER_WRITE_PROP) {
 		if (argc < 1)
-			long_usage("missing node");
+			usage("missing node");
 		if (argc < 2)
-			long_usage("missing property");
+			usage("missing property");
 	}
 
 	if (do_fdtput(&disp, filename, argv, argc))

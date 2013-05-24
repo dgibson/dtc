@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	if (optind != argc - 1)
-		long_usage("missing input filename");
+		usage("missing input filename");
 	file = argv[optind];
 
 	buf = utilfdt_read_len(file, &len);
