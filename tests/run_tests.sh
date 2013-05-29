@@ -80,7 +80,7 @@ wrap_test () {
 }
 
 run_wrap_test () {
-    echo -n "$@:	"
+    shorten_echo "$@:	"
     base_run_test wrap_test "$@"
 }
 
