@@ -549,9 +549,6 @@ fdtput_tests () {
 	-tx "a0b0c0d deeaae ef000000"
     run_fdtput_test "$(cat $text)" $dtb /randomnode blob -ts "$(cat $text)"
 
-    # This should be larger than available space in the fdt
-    run_wrap_error_test $DTPUT $dtb /randomnode blob -ts "$(cat $text $text)"
-
     # Start again with a fresh dtb
     run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
 
@@ -572,7 +569,6 @@ fdtput_tests () {
     run_fdtput_test "fine wine" $dtb /blackadder/the-second/potato drink \
 	"-ts" "fine wine"
     run_wrap_test $DTPUT $dtb -p /you/are/drunk/sir/winston slurp -ts twice
-    run_wrap_error_test $DTPUT $dtb -cp "$(cat $text $text)/longish"
 
     # Allowed to create an existing node with -p
     run_wrap_test $DTPUT $dtb -cp /chosen
