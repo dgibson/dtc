@@ -57,9 +57,12 @@ int main(int argc, char *argv[])
 	CHECK(fdt_property_u32(fdt, "prop-int", TEST_VALUE_1));
 	CHECK(fdt_property_u64(fdt, "prop-int64", TEST_VALUE64_1));
 	CHECK(fdt_property_string(fdt, "prop-str", TEST_STRING_1));
+	CHECK(fdt_property_u32(fdt, "#address-cells", 1));
+	CHECK(fdt_property_u32(fdt, "#size-cells", 0));
 
 	CHECK(fdt_begin_node(fdt, "subnode@1"));
 	CHECK(fdt_property_string(fdt, "compatible", "subnode1"));
+	CHECK(fdt_property_u32(fdt, "reg", 1));
 	CHECK(fdt_property_cell(fdt, "prop-int", TEST_VALUE_1));
 	CHECK(fdt_begin_node(fdt, "subsubnode"));
 	CHECK(fdt_property(fdt, "compatible", "subsubnode1\0subsubnode",
@@ -71,9 +74,13 @@ int main(int argc, char *argv[])
 	CHECK(fdt_end_node(fdt));
 
 	CHECK(fdt_begin_node(fdt, "subnode@2"));
+	CHECK(fdt_property_u32(fdt, "reg", 2));
 	CHECK(fdt_property_cell(fdt, "linux,phandle", PHANDLE_1));
 	CHECK(fdt_property_cell(fdt, "prop-int", TEST_VALUE_2));
+	CHECK(fdt_property_u32(fdt, "#address-cells", 1));
+	CHECK(fdt_property_u32(fdt, "#size-cells", 0));
 	CHECK(fdt_begin_node(fdt, "subsubnode@0"));
+	CHECK(fdt_property_u32(fdt, "reg", 0));
 	CHECK(fdt_property_cell(fdt, "phandle", PHANDLE_2));
 	CHECK(fdt_property(fdt, "compatible", "subsubnode2\0subsubnode",
 			   23));
