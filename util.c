@@ -376,7 +376,7 @@ void utilfdt_print_data(const char *data, int len)
 
 		printf(" = <");
 		for (i = 0; i < len; i += 4)
-			printf("0x%08x%s", fdt32_to_cpu(cell[i]),
+			printf("0x%08x%s", fdt32_to_cpu(cell[i / 4]),
 			       i < (len - 4) ? " " : "");
 		printf(">");
 	} else {
