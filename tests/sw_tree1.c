@@ -31,22 +31,87 @@
 
 #define SPACE	65536
 
-#define CHECK(code) \
-	{ \
-		err = (code); \
-		if (err) \
-			FAIL(#code ": %s", fdt_strerror(err)); \
+static enum {
+	FIXED = 0,
+	RESIZE,
+	REALLOC,
+} alloc_mode;
+
+static void realloc_fdt(void **fdt, size_t *size)
+{
+	switch (alloc_mode) {
+	case FIXED:
+		if (!(*fdt))
+			fdt = xmalloc(*size);
+		else
+			FAIL("Ran out of space");
+		return;
+
+	case RESIZE:
+		if (!(*fdt)) {
+			fdt = xmalloc(SPACE);
+		} else if (*size < SPACE) {
+			*size += 1;
+			fdt_resize(*fdt, *fdt, *size);
+		} else {
+			FAIL("Ran out of space");
+		}		
+		return;
+
+	case REALLOC:
+		*size += 1;
+		*fdt = xrealloc(*fdt, *size);
+		fdt_resize(*fdt, *fdt, *size);
+		return;
+
+	default:
+		CONFIG("Bad allocation mode");
 	}
+}
+
+#define CHECK(code) \
+	do {			      \
+		err = (code);			     \
+		if (err == -FDT_ERR_NOSPACE)			\
+			realloc_fdt(&fdt, &size);			\
+		else if (err)						\
+			FAIL(#code ": %s", fdt_strerror(err));		\
+	} while (err != 0)
 
 int main(int argc, char *argv[])
 {
-	void *fdt;
+	void *fdt = NULL;
+	size_t size;
 	int err;
 
 	test_init(argc, argv);
 
-	fdt = xmalloc(SPACE);
-	CHECK(fdt_create(fdt, SPACE));
+	if (argc == 1) {
+		alloc_mode = FIXED;
+		size = SPACE;
+	} else if (argc == 2) {
+		if (streq(argv[1], "resize")) {
+			alloc_mode = REALLOC;
+			size = 0;
+		} else if (streq(argv[1], "realloc")) {
+			alloc_mode = REALLOC;
+			size = 0;
+		} else {
+			char *endp;
+
+			size = strtoul(argv[1], &endp, 0);
+			if (*endp == '\0')
+				alloc_mode = FIXED;
+			else 
+				CONFIG("Bad allocation mode \"%s\" specified",
+				       argv[1]);
+		}
+	}
+
+	realloc_fdt(&fdt, &size);
+	
+	fdt = xmalloc(size);
+	CHECK(fdt_create(fdt, size));
 
 	CHECK(fdt_add_reservemap_entry(fdt, TEST_ADDR_1, TEST_SIZE_1));
 	CHECK(fdt_add_reservemap_entry(fdt, TEST_ADDR_2, TEST_SIZE_2));

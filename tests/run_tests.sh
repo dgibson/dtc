@@ -190,6 +190,14 @@ libfdt_tests () {
     tree1_tests unfinished_tree1.test.dtb
     run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
 
+    # Resizing tests
+    for mode in resize realloc; do
+	run_test sw_tree1 $mode
+	tree1_tests sw_tree1.test.dtb
+	tree1_tests unfinished_tree1.test.dtb
+	run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
+    done
+
     # fdt_move tests
     for tree in test_tree1.dtb sw_tree1.test.dtb unfinished_tree1.test.dtb; do
 	rm -f moved.$tree shunted.$tree deshunted.$tree

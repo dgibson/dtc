@@ -1023,6 +1023,7 @@ int fdt_nop_node(void *fdt, int nodeoffset);
 /**********************************************************************/
 
 int fdt_create(void *buf, int bufsize);
+int fdt_resize(void *fdt, void *buf, int bufsize);
 int fdt_add_reservemap_entry(void *fdt, uint64_t addr, uint64_t size);
 int fdt_finish_reservemap(void *fdt);
 int fdt_begin_node(void *fdt, const char *name);
