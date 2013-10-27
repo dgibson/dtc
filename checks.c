@@ -40,14 +40,12 @@ enum checkstatus {
 
 struct check;
 
-typedef void (*tree_check_fn)(struct check *c, struct node *dt);
 typedef void (*node_check_fn)(struct check *c, struct node *dt, struct node *node);
 typedef void (*prop_check_fn)(struct check *c, struct node *dt,
 			      struct node *node, struct property *prop);
 
 struct check {
 	const char *name;
-	tree_check_fn tree_fn;
 	node_check_fn node_fn;
 	prop_check_fn prop_fn;
 	void *data;
@@ -58,11 +56,10 @@ struct check {
 	struct check **prereq;
 };
 
-#define CHECK_ENTRY(nm, tfn, nfn, pfn, d, w, e, ...)	       \
+#define CHECK_ENTRY(nm, nfn, pfn, d, w, e, ...)	       \
 	static struct check *nm##_prereqs[] = { __VA_ARGS__ }; \
 	static struct check nm = { \
 		.name = #nm, \
-		.tree_fn = (tfn), \
 		.node_fn = (nfn), \
 		.prop_fn = (pfn), \
 		.data = (d), \
@@ -72,31 +69,25 @@ struct check {
 		.num_prereqs = ARRAY_SIZE(nm##_prereqs), \
 		.prereq = nm##_prereqs, \
 	};
-#define WARNING(nm, tfn, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, tfn, nfn, pfn, d, true, false, __VA_ARGS__)
-#define ERROR(nm, tfn, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, tfn, nfn, pfn, d, false, true, __VA_ARGS__)
-#define CHECK(nm, tfn, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, tfn, nfn, pfn, d, false, false, __VA_ARGS__)
+#define WARNING(nm, nfn, pfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, pfn, d, true, false, __VA_ARGS__)
+#define ERROR(nm, nfn, pfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, pfn, d, false, true, __VA_ARGS__)
+#define CHECK(nm, nfn, pfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, pfn, d, false, false, __VA_ARGS__)
 
-#define TREE_WARNING(nm, d, ...) \
-	WARNING(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
-#define TREE_ERROR(nm, d, ...) \
-	ERROR(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
-#define TREE_CHECK(nm, d, ...) \
-	CHECK(nm, check_##nm, NULL, NULL, d, __VA_ARGS__)
 #define NODE_WARNING(nm, d, ...) \
-	WARNING(nm, NULL, check_##nm, NULL, d,  __VA_ARGS__)
+	WARNING(nm, check_##nm, NULL, d,  __VA_ARGS__)
 #define NODE_ERROR(nm, d, ...) \
-	ERROR(nm, NULL, check_##nm, NULL, d, __VA_ARGS__)
+	ERROR(nm, check_##nm, NULL, d, __VA_ARGS__)
 #define NODE_CHECK(nm, d, ...) \
-	CHECK(nm, NULL, check_##nm, NULL, d, __VA_ARGS__)
+	CHECK(nm, check_##nm, NULL, d, __VA_ARGS__)
 #define PROP_WARNING(nm, d, ...) \
-	WARNING(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
+	WARNING(nm, NULL, check_##nm, d, __VA_ARGS__)
 #define PROP_ERROR(nm, d, ...) \
-	ERROR(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
+	ERROR(nm, NULL, check_##nm, d, __VA_ARGS__)
 #define PROP_CHECK(nm, d, ...) \
-	CHECK(nm, NULL, NULL, check_##nm, d, __VA_ARGS__)
+	CHECK(nm, NULL, check_##nm, d, __VA_ARGS__)
 
 #ifdef __GNUC__
 static inline void check_msg(struct check *c, const char *fmt, ...) __attribute__((format (printf, 2, 3)));
@@ -170,8 +161,6 @@ static bool run_check(struct check *c, struct node *dt)
 	if (c->node_fn || c->prop_fn)
 		check_nodes_props(c, dt, dt);
 
-	if (c->tree_fn)
-		c->tree_fn(c, dt);
 	if (c->status == UNCHECKED)
 		c->status = PASSED;
 
@@ -189,11 +178,12 @@ out:
  */
 
 /* A check which always fails, for testing purposes only */
-static inline void check_always_fail(struct check *c, struct node *dt)
+static inline void check_always_fail(struct check *c, struct node *dt,
+				     struct node *node)
 {
 	FAIL(c, "always_fail check");
 }
-TREE_CHECK(always_fail, NULL);
+NODE_CHECK(always_fail, NULL);
 
 static void check_is_string(struct check *c, struct node *root,
 			    struct node *node)
@@ -210,9 +200,9 @@ static void check_is_string(struct check *c, struct node *root,
 		     propname, node->fullpath);
 }
 #define WARNING_IF_NOT_STRING(nm, propname) \
-	WARNING(nm, NULL, check_is_string, NULL, (propname))
+	WARNING(nm, check_is_string, NULL, (propname))
 #define ERROR_IF_NOT_STRING(nm, propname) \
-	ERROR(nm, NULL, check_is_string, NULL, (propname))
+	ERROR(nm, check_is_string, NULL, (propname))
 
 static void check_is_cell(struct check *c, struct node *root,
 			  struct node *node)
@@ -229,9 +219,9 @@ static void check_is_cell(struct check *c, struct node *root,
 		     propname, node->fullpath);
 }
 #define WARNING_IF_NOT_CELL(nm, propname) \
-	WARNING(nm, NULL, check_is_cell, NULL, (propname))
+	WARNING(nm, check_is_cell, NULL, (propname))
 #define ERROR_IF_NOT_CELL(nm, propname) \
-	ERROR(nm, NULL, check_is_cell, NULL, (propname))
+	ERROR(nm, check_is_cell, NULL, (propname))
 
 /*
  * Structural check functions
@@ -382,7 +372,7 @@ static void check_duplicate_label_prop(struct check *c, struct node *dt,
 	for_each_marker_of_type(m, LABEL)
 		check_duplicate_label(c, dt, m->ref, node, prop, m);
 }
-ERROR(duplicate_label, NULL, check_duplicate_label_node,
+ERROR(duplicate_label, check_duplicate_label_node,
       check_duplicate_label_prop, NULL);
 
 static void check_explicit_phandles(struct check *c, struct node *root,
@@ -499,7 +489,7 @@ static void fixup_phandle_references(struct check *c, struct node *dt,
 		*((cell_t *)(prop->val.val + m->offset)) = cpu_to_fdt32(phandle);
 	}
 }
-ERROR(phandle_references, NULL, NULL, fixup_phandle_references, NULL,
+ERROR(phandle_references, NULL, fixup_phandle_references, NULL,
       &duplicate_node_names, &explicit_phandles);
 
 static void fixup_path_references(struct check *c, struct node *dt,
@@ -524,7 +514,7 @@ static void fixup_path_references(struct check *c, struct node *dt,
 						  strlen(path) + 1);
 	}
 }
-ERROR(path_references, NULL, NULL, fixup_path_references, NULL,
+ERROR(path_references, NULL, fixup_path_references, NULL,
       &duplicate_node_names);
 
 /*
@@ -554,7 +544,7 @@ static void fixup_addr_size_cells(struct check *c, struct node *dt,
 	if (prop)
 		node->size_cells = propval_cell(prop);
 }
-WARNING(addr_size_cells, NULL, fixup_addr_size_cells, NULL, NULL,
+WARNING(addr_size_cells, fixup_addr_size_cells, NULL, NULL,
 	&address_cells_is_cell, &size_cells_is_cell);
 
 #define node_addr_cells(n) \
@@ -660,10 +650,15 @@ static void check_avoid_default_addr_size(struct check *c, struct node *dt,
 NODE_WARNING(avoid_default_addr_size, NULL, &addr_size_cells);
 
 static void check_obsolete_chosen_interrupt_controller(struct check *c,
-						       struct node *dt)
+						       struct node *dt,
+						       struct node *node)
 {
 	struct node *chosen;
 	struct property *prop;
+
+	if (node != dt)
+		return;
+
 
 	chosen = get_node_by_path(dt, "/chosen");
 	if (!chosen)
@@ -674,7 +669,7 @@ static void check_obsolete_chosen_interrupt_controller(struct check *c,
 		FAIL(c, "/chosen has obsolete \"interrupt-controller\" "
 		     "property");
 }
-TREE_WARNING(obsolete_chosen_interrupt_controller, NULL);
+NODE_WARNING(obsolete_chosen_interrupt_controller, NULL);
 
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
