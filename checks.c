@@ -41,13 +41,10 @@ enum checkstatus {
 struct check;
 
 typedef void (*node_check_fn)(struct check *c, struct node *dt, struct node *node);
-typedef void (*prop_check_fn)(struct check *c, struct node *dt,
-			      struct node *node, struct property *prop);
 
 struct check {
 	const char *name;
 	node_check_fn node_fn;
-	prop_check_fn prop_fn;
 	void *data;
 	bool warn, error;
 	enum checkstatus status;
@@ -56,12 +53,11 @@ struct check {
 	struct check **prereq;
 };
 
-#define CHECK_ENTRY(nm, nfn, pfn, d, w, e, ...)	       \
+#define CHECK_ENTRY(nm, nfn, d, w, e, ...)	       \
 	static struct check *nm##_prereqs[] = { __VA_ARGS__ }; \
 	static struct check nm = { \
 		.name = #nm, \
 		.node_fn = (nfn), \
-		.prop_fn = (pfn), \
 		.data = (d), \
 		.warn = (w), \
 		.error = (e), \
@@ -69,25 +65,19 @@ struct check {
 		.num_prereqs = ARRAY_SIZE(nm##_prereqs), \
 		.prereq = nm##_prereqs, \
 	};
-#define WARNING(nm, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, pfn, d, true, false, __VA_ARGS__)
-#define ERROR(nm, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, pfn, d, false, true, __VA_ARGS__)
-#define CHECK(nm, nfn, pfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, pfn, d, false, false, __VA_ARGS__)
+#define WARNING(nm, nfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, d, true, false, __VA_ARGS__)
+#define ERROR(nm, nfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, d, false, true, __VA_ARGS__)
+#define CHECK(nm, nfn, d, ...) \
+	CHECK_ENTRY(nm, nfn, d, false, false, __VA_ARGS__)
 
 #define NODE_WARNING(nm, d, ...) \
-	WARNING(nm, check_##nm, NULL, d,  __VA_ARGS__)
+	WARNING(nm, check_##nm, d, __VA_ARGS__)
 #define NODE_ERROR(nm, d, ...) \
-	ERROR(nm, check_##nm, NULL, d, __VA_ARGS__)
+	ERROR(nm, check_##nm, d, __VA_ARGS__)
 #define NODE_CHECK(nm, d, ...) \
-	CHECK(nm, check_##nm, NULL, d, __VA_ARGS__)
-#define PROP_WARNING(nm, d, ...) \
-	WARNING(nm, NULL, check_##nm, d, __VA_ARGS__)
-#define PROP_ERROR(nm, d, ...) \
-	ERROR(nm, NULL, check_##nm, d, __VA_ARGS__)
-#define PROP_CHECK(nm, d, ...) \
-	CHECK(nm, NULL, check_##nm, d, __VA_ARGS__)
+	CHECK(nm, check_##nm, d, __VA_ARGS__)
 
 #ifdef __GNUC__
 static inline void check_msg(struct check *c, const char *fmt, ...) __attribute__((format (printf, 2, 3)));
@@ -117,17 +107,10 @@ static inline void check_msg(struct check *c, const char *fmt, ...)
 static void check_nodes_props(struct check *c, struct node *dt, struct node *node)
 {
 	struct node *child;
-	struct property *prop;
 
 	TRACE(c, "%s", node->fullpath);
 	if (c->node_fn)
 		c->node_fn(c, dt, node);
-
-	if (c->prop_fn)
-		for_each_property(node, prop) {
-			TRACE(c, "%s\t'%s'", node->fullpath, prop->name);
-			c->prop_fn(c, dt, node, prop);
-		}
 
 	for_each_child(node, child)
 		check_nodes_props(c, dt, child);
@@ -158,7 +141,7 @@ static bool run_check(struct check *c, struct node *dt)
 	if (c->status != UNCHECKED)
 		goto out;
 
-	if (c->node_fn || c->prop_fn)
+	if (c->node_fn)
 		check_nodes_props(c, dt, dt);
 
 	if (c->status == UNCHECKED)
@@ -200,9 +183,9 @@ static void check_is_string(struct check *c, struct node *root,
 		     propname, node->fullpath);
 }
 #define WARNING_IF_NOT_STRING(nm, propname) \
-	WARNING(nm, check_is_string, NULL, (propname))
+	WARNING(nm, check_is_string, (propname))
 #define ERROR_IF_NOT_STRING(nm, propname) \
-	ERROR(nm, check_is_string, NULL, (propname))
+	ERROR(nm, check_is_string, (propname))
 
 static void check_is_cell(struct check *c, struct node *root,
 			  struct node *node)
@@ -219,9 +202,9 @@ static void check_is_cell(struct check *c, struct node *root,
 		     propname, node->fullpath);
 }
 #define WARNING_IF_NOT_CELL(nm, propname) \
-	WARNING(nm, check_is_cell, NULL, (propname))
+	WARNING(nm, check_is_cell, (propname))
 #define ERROR_IF_NOT_CELL(nm, propname) \
-	ERROR(nm, check_is_cell, NULL, (propname))
+	ERROR(nm, check_is_cell, (propname))
 
 /*
  * Structural check functions
@@ -309,15 +292,19 @@ static void check_unit_address_vs_reg(struct check *c, struct node *dt,
 NODE_WARNING(unit_address_vs_reg, NULL);
 
 static void check_property_name_chars(struct check *c, struct node *dt,
-				      struct node *node, struct property *prop)
+				      struct node *node)
 {
-	int n = strspn(prop->name, c->data);
+	struct property *prop;
 
-	if (n < strlen(prop->name))
-		FAIL(c, "Bad character '%c' in property name \"%s\", node %s",
-		     prop->name[n], prop->name, node->fullpath);
+	for_each_property(node, prop) {
+		int n = strspn(prop->name, c->data);
+
+		if (n < strlen(prop->name))
+			FAIL(c, "Bad character '%c' in property name \"%s\", node %s",
+			     prop->name[n], prop->name, node->fullpath);
+	}
 }
-PROP_ERROR(property_name_chars, PROPNODECHARS);
+NODE_ERROR(property_name_chars, PROPNODECHARS);
 
 #define DESCLABEL_FMT	"%s%s%s%s%s"
 #define DESCLABEL_ARGS(node,prop,mark)		\
@@ -356,40 +343,38 @@ static void check_duplicate_label_node(struct check *c, struct node *dt,
 				       struct node *node)
 {
 	struct label *l;
+	struct property *prop;
 
 	for_each_label(node->labels, l)
 		check_duplicate_label(c, dt, l->label, node, NULL, NULL);
+
+	for_each_property(node, prop) {
+		struct marker *m = prop->val.markers;
+
+		for_each_label(prop->labels, l)
+			check_duplicate_label(c, dt, l->label, node, prop, NULL);
+
+		for_each_marker_of_type(m, LABEL)
+			check_duplicate_label(c, dt, m->ref, node, prop, m);
+	}
 }
-static void check_duplicate_label_prop(struct check *c, struct node *dt,
-				       struct node *node, struct property *prop)
+ERROR(duplicate_label, check_duplicate_label_node, NULL);
+
+static cell_t check_phandle_prop(struct check *c, struct node *root,
+				 struct node *node, const char *propname)
 {
-	struct marker *m = prop->val.markers;
-	struct label *l;
-
-	for_each_label(prop->labels, l)
-		check_duplicate_label(c, dt, l->label, node, prop, NULL);
-
-	for_each_marker_of_type(m, LABEL)
-		check_duplicate_label(c, dt, m->ref, node, prop, m);
-}
-ERROR(duplicate_label, check_duplicate_label_node,
-      check_duplicate_label_prop, NULL);
-
-static void check_explicit_phandles(struct check *c, struct node *root,
-				    struct node *node, struct property *prop)
-{
+	struct property *prop;
 	struct marker *m;
-	struct node *other;
 	cell_t phandle;
 
-	if (!streq(prop->name, "phandle")
-	    && !streq(prop->name, "linux,phandle"))
-		return;
+	prop = get_property(node, propname);
+	if (!prop)
+		return 0;
 
 	if (prop->val.len != sizeof(cell_t)) {
 		FAIL(c, "%s has bad length (%d) %s property",
 		     node->fullpath, prop->val.len, prop->name);
-		return;
+		return 0;
 	}
 
 	m = prop->val.markers;
@@ -401,14 +386,13 @@ static void check_explicit_phandles(struct check *c, struct node *root,
 			 * by construction. */ {
 			FAIL(c, "%s in %s is a reference to another node",
 			     prop->name, node->fullpath);
-			return;
 		}
 		/* But setting this node's phandle equal to its own
 		 * phandle is allowed - that means allocate a unique
 		 * phandle for this node, even if it's not otherwise
 		 * referenced.  The value will be filled in later, so
-		 * no further checking for now. */
-		return;
+		 * we treat it as having no phandle data for now. */
+		return 0;
 	}
 
 	phandle = propval_cell(prop);
@@ -416,12 +400,35 @@ static void check_explicit_phandles(struct check *c, struct node *root,
 	if ((phandle == 0) || (phandle == -1)) {
 		FAIL(c, "%s has bad value (0x%x) in %s property",
 		     node->fullpath, phandle, prop->name);
-		return;
+		return 0;
 	}
 
-	if (node->phandle && (node->phandle != phandle))
-		FAIL(c, "%s has %s property which replaces existing phandle information",
-		     node->fullpath, prop->name);
+	return phandle;
+}
+
+static void check_explicit_phandles(struct check *c, struct node *root,
+				    struct node *node)
+{
+	struct node *other;
+	cell_t phandle, linux_phandle;
+
+	/* Nothing should have assigned phandles yet */
+	assert(!node->phandle);
+
+	phandle = check_phandle_prop(c, root, node, "phandle");
+
+	linux_phandle = check_phandle_prop(c, root, node, "linux,phandle");
+
+	if (!phandle && !linux_phandle)
+		/* No valid phandles; nothing further to check */
+		return;
+
+	if (linux_phandle && phandle && (phandle != linux_phandle))
+		FAIL(c, "%s has mismatching 'phandle' and 'linux,phandle'"
+		     " properties", node->fullpath);
+
+	if (linux_phandle && !phandle)
+		phandle = linux_phandle;
 
 	other = get_node_by_phandle(root, phandle);
 	if (other && (other != node)) {
@@ -432,7 +439,7 @@ static void check_explicit_phandles(struct check *c, struct node *root,
 
 	node->phandle = phandle;
 }
-PROP_ERROR(explicit_phandles, NULL);
+NODE_ERROR(explicit_phandles, NULL);
 
 static void check_name_properties(struct check *c, struct node *root,
 				  struct node *node)
@@ -469,53 +476,60 @@ NODE_ERROR(name_properties, NULL, &name_is_string);
  */
 
 static void fixup_phandle_references(struct check *c, struct node *dt,
-				     struct node *node, struct property *prop)
+				     struct node *node)
 {
-	struct marker *m = prop->val.markers;
-	struct node *refnode;
-	cell_t phandle;
+	struct property *prop;
 
-	for_each_marker_of_type(m, REF_PHANDLE) {
-		assert(m->offset + sizeof(cell_t) <= prop->val.len);
+	for_each_property(node, prop) {
+		struct marker *m = prop->val.markers;
+		struct node *refnode;
+		cell_t phandle;
 
-		refnode = get_node_by_ref(dt, m->ref);
-		if (! refnode) {
-			FAIL(c, "Reference to non-existent node or label \"%s\"\n",
-			     m->ref);
-			continue;
+		for_each_marker_of_type(m, REF_PHANDLE) {
+			assert(m->offset + sizeof(cell_t) <= prop->val.len);
+
+			refnode = get_node_by_ref(dt, m->ref);
+			if (! refnode) {
+				FAIL(c, "Reference to non-existent node or label \"%s\"\n",
+				     m->ref);
+				continue;
+			}
+
+			phandle = get_node_phandle(dt, refnode);
+			*((cell_t *)(prop->val.val + m->offset)) = cpu_to_fdt32(phandle);
 		}
-
-		phandle = get_node_phandle(dt, refnode);
-		*((cell_t *)(prop->val.val + m->offset)) = cpu_to_fdt32(phandle);
 	}
 }
-ERROR(phandle_references, NULL, fixup_phandle_references, NULL,
+ERROR(phandle_references, fixup_phandle_references, NULL,
       &duplicate_node_names, &explicit_phandles);
 
 static void fixup_path_references(struct check *c, struct node *dt,
-				  struct node *node, struct property *prop)
+				  struct node *node)
 {
-	struct marker *m = prop->val.markers;
-	struct node *refnode;
-	char *path;
+	struct property *prop;
 
-	for_each_marker_of_type(m, REF_PATH) {
-		assert(m->offset <= prop->val.len);
+	for_each_property(node, prop) {
+		struct marker *m = prop->val.markers;
+		struct node *refnode;
+		char *path;
 
-		refnode = get_node_by_ref(dt, m->ref);
-		if (!refnode) {
-			FAIL(c, "Reference to non-existent node or label \"%s\"\n",
-			     m->ref);
-			continue;
+		for_each_marker_of_type(m, REF_PATH) {
+			assert(m->offset <= prop->val.len);
+
+			refnode = get_node_by_ref(dt, m->ref);
+			if (!refnode) {
+				FAIL(c, "Reference to non-existent node or label \"%s\"\n",
+				     m->ref);
+				continue;
+			}
+
+			path = refnode->fullpath;
+			prop->val = data_insert_at_marker(prop->val, m, path,
+							  strlen(path) + 1);
 		}
-
-		path = refnode->fullpath;
-		prop->val = data_insert_at_marker(prop->val, m, path,
-						  strlen(path) + 1);
 	}
 }
-ERROR(path_references, NULL, fixup_path_references, NULL,
-      &duplicate_node_names);
+ERROR(path_references, fixup_path_references, NULL, &duplicate_node_names);
 
 /*
  * Semantic checks
@@ -544,7 +558,7 @@ static void fixup_addr_size_cells(struct check *c, struct node *dt,
 	if (prop)
 		node->size_cells = propval_cell(prop);
 }
-WARNING(addr_size_cells, fixup_addr_size_cells, NULL, NULL,
+WARNING(addr_size_cells, fixup_addr_size_cells, NULL,
 	&address_cells_is_cell, &size_cells_is_cell);
 
 #define node_addr_cells(n) \
