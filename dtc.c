@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 	const char *outform = "dts";
 	const char *outname = "-";
 	const char *depname = NULL;
-	int force = 0, sort = 0;
+	bool force = false, sort = false;
 	const char *arg;
 	int opt;
 	FILE *outf = NULL;
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 			padsize = strtol(optarg, NULL, 0);
 			break;
 		case 'f':
-			force = 1;
+			force = true;
 			break;
 		case 'q':
 			quiet++;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 's':
-			sort = 1;
+			sort = true;
 			break;
 
 		case 'W':

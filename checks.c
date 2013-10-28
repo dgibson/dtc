@@ -53,7 +53,7 @@ struct check {
 	void *data;
 	bool warn, error;
 	enum checkstatus status;
-	int inprogress;
+	bool inprogress;
 	int num_prereqs;
 	struct check **prereq;
 };
@@ -141,9 +141,9 @@ static void check_nodes_props(struct check *c, struct node *dt, struct node *nod
 		check_nodes_props(c, dt, child);
 }
 
-static int run_check(struct check *c, struct node *dt)
+static bool run_check(struct check *c, struct node *dt)
 {
-	int error = 0;
+	bool error = false;
 	int i;
 
 	assert(!c->inprogress);
@@ -151,11 +151,11 @@ static int run_check(struct check *c, struct node *dt)
 	if (c->status != UNCHECKED)
 		goto out;
 
-	c->inprogress = 1;
+	c->inprogress = true;
 
 	for (i = 0; i < c->num_prereqs; i++) {
 		struct check *prq = c->prereq[i];
-		error |= run_check(prq, dt);
+		error = error || run_check(prq, dt);
 		if (prq->status != PASSED) {
 			c->status = PREREQ;
 			check_msg(c, "Failed prerequisite '%s'",
@@ -177,9 +177,9 @@ static int run_check(struct check *c, struct node *dt)
 	TRACE(c, "\tCompleted, status %d", c->status);
 
 out:
-	c->inprogress = 0;
+	c->inprogress = false;
 	if ((c->status != PASSED) && (c->error))
-		error = 1;
+		error = true;
 	return error;
 }
 
@@ -733,7 +733,7 @@ void parse_checks_option(bool warn, bool error, const char *optarg)
 	die("Unrecognized check name \"%s\"\n", name);
 }
 
-void process_checks(int force, struct boot_info *bi)
+void process_checks(bool force, struct boot_info *bi)
 {
 	struct node *dt = bi->dt;
 	int i;

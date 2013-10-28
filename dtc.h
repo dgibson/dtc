@@ -118,7 +118,7 @@ struct data data_append_align(struct data d, int align);
 
 struct data data_add_marker(struct data d, enum markertype type, char *ref);
 
-int data_is_one_string(struct data d);
+bool data_is_one_string(struct data d);
 
 /* DT constraints */
 
@@ -127,13 +127,13 @@ int data_is_one_string(struct data d);
 
 /* Live trees */
 struct label {
-	int deleted;
+	bool deleted;
 	char *label;
 	struct label *next;
 };
 
 struct property {
-	int deleted;
+	bool deleted;
 	char *name;
 	struct data val;
 
@@ -143,7 +143,7 @@ struct property {
 };
 
 struct node {
-	int deleted;
+	bool deleted;
 	char *name;
 	struct property *proplist;
 	struct node *children;
@@ -248,7 +248,7 @@ void sort_tree(struct boot_info *bi);
 /* Checks */
 
 void parse_checks_option(bool warn, bool error, const char *optarg);
-void process_checks(int force, struct boot_info *bi);
+void process_checks(bool force, struct boot_info *bi);
 
 /* Flattened trees */
 

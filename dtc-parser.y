@@ -31,7 +31,7 @@ extern void print_error(char const *fmt, ...);
 extern void yyerror(char const *s);
 
 extern struct boot_info *the_boot_info;
-extern int treesource_error;
+extern bool treesource_error;
 
 static unsigned long long eval_literal(const char *s, int base, int bits);
 static unsigned char eval_char_literal(const char *s);
@@ -478,7 +478,7 @@ void print_error(char const *fmt, ...)
 	srcpos_verror(&yylloc, fmt, va);
 	va_end(va);
 
-	treesource_error = 1;
+	treesource_error = true;
 }
 
 void yyerror(char const *s) {

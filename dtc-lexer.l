@@ -61,7 +61,7 @@ static int dts_version = 1;
 				BEGIN(V1); \
 
 static void push_input_file(const char *filename);
-static int pop_input_file(void);
+static bool pop_input_file(void);
 %}
 
 %%
@@ -238,13 +238,13 @@ static void push_input_file(const char *filename)
 }
 
 
-static int pop_input_file(void)
+static bool pop_input_file(void)
 {
 	if (srcfile_pop() == 0)
-		return 0;
+		return false;
 
 	yypop_buffer_state();
 	yyin = current_srcfile->f;
 
-	return 1;
+	return true;
 }

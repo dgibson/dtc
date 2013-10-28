@@ -159,7 +159,7 @@ void srcfile_push(const char *fname)
 	current_srcfile = srcfile;
 }
 
-int srcfile_pop(void)
+bool srcfile_pop(void)
 {
 	struct srcfile_state *srcfile = current_srcfile;
 
@@ -177,7 +177,7 @@ int srcfile_pop(void)
 	 * fix this we could either allocate all the files from a
 	 * table, or use a pool allocator. */
 
-	return current_srcfile ? 1 : 0;
+	return current_srcfile ? true : false;
 }
 
 void srcfile_add_search_path(const char *dirname)
