@@ -40,11 +40,11 @@ enum checkstatus {
 
 struct check;
 
-typedef void (*node_check_fn)(struct check *c, struct node *dt, struct node *node);
+typedef void (*check_fn)(struct check *c, struct node *dt, struct node *node);
 
 struct check {
 	const char *name;
-	node_check_fn node_fn;
+	check_fn fn;
 	void *data;
 	bool warn, error;
 	enum checkstatus status;
@@ -53,31 +53,24 @@ struct check {
 	struct check **prereq;
 };
 
-#define CHECK_ENTRY(nm, nfn, d, w, e, ...)	       \
-	static struct check *nm##_prereqs[] = { __VA_ARGS__ }; \
-	static struct check nm = { \
-		.name = #nm, \
-		.node_fn = (nfn), \
-		.data = (d), \
-		.warn = (w), \
-		.error = (e), \
+#define CHECK_ENTRY(_nm, _fn, _d, _w, _e, ...)	       \
+	static struct check *_nm##_prereqs[] = { __VA_ARGS__ }; \
+	static struct check _nm = { \
+		.name = #_nm, \
+		.fn = (_fn), \
+		.data = (_d), \
+		.warn = (_w), \
+		.error = (_e), \
 		.status = UNCHECKED, \
-		.num_prereqs = ARRAY_SIZE(nm##_prereqs), \
-		.prereq = nm##_prereqs, \
+		.num_prereqs = ARRAY_SIZE(_nm##_prereqs), \
+		.prereq = _nm##_prereqs, \
 	};
-#define WARNING(nm, nfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, d, true, false, __VA_ARGS__)
-#define ERROR(nm, nfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, d, false, true, __VA_ARGS__)
-#define CHECK(nm, nfn, d, ...) \
-	CHECK_ENTRY(nm, nfn, d, false, false, __VA_ARGS__)
-
-#define NODE_WARNING(nm, d, ...) \
-	WARNING(nm, check_##nm, d, __VA_ARGS__)
-#define NODE_ERROR(nm, d, ...) \
-	ERROR(nm, check_##nm, d, __VA_ARGS__)
-#define NODE_CHECK(nm, d, ...) \
-	CHECK(nm, check_##nm, d, __VA_ARGS__)
+#define WARNING(_nm, _fn, _d, ...) \
+	CHECK_ENTRY(_nm, _fn, _d, true, false, __VA_ARGS__)
+#define ERROR(_nm, _fn, _d, ...) \
+	CHECK_ENTRY(_nm, _fn, _d, false, true, __VA_ARGS__)
+#define CHECK(_nm, _fn, _d, ...) \
+	CHECK_ENTRY(_nm, _fn, _d, false, false, __VA_ARGS__)
 
 #ifdef __GNUC__
 static inline void check_msg(struct check *c, const char *fmt, ...) __attribute__((format (printf, 2, 3)));
@@ -109,8 +102,8 @@ static void check_nodes_props(struct check *c, struct node *dt, struct node *nod
 	struct node *child;
 
 	TRACE(c, "%s", node->fullpath);
-	if (c->node_fn)
-		c->node_fn(c, dt, node);
+	if (c->fn)
+		c->fn(c, dt, node);
 
 	for_each_child(node, child)
 		check_nodes_props(c, dt, child);
@@ -141,8 +134,7 @@ static bool run_check(struct check *c, struct node *dt)
 	if (c->status != UNCHECKED)
 		goto out;
 
-	if (c->node_fn)
-		check_nodes_props(c, dt, dt);
+	check_nodes_props(c, dt, dt);
 
 	if (c->status == UNCHECKED)
 		c->status = PASSED;
@@ -166,7 +158,7 @@ static inline void check_always_fail(struct check *c, struct node *dt,
 {
 	FAIL(c, "always_fail check");
 }
-NODE_CHECK(always_fail, NULL);
+CHECK(always_fail, check_always_fail, NULL);
 
 static void check_is_string(struct check *c, struct node *root,
 			    struct node *node)
@@ -223,7 +215,7 @@ static void check_duplicate_node_names(struct check *c, struct node *dt,
 				FAIL(c, "Duplicate node name %s",
 				     child->fullpath);
 }
-NODE_ERROR(duplicate_node_names, NULL);
+ERROR(duplicate_node_names, check_duplicate_node_names, NULL);
 
 static void check_duplicate_property_names(struct check *c, struct node *dt,
 					   struct node *node)
@@ -240,7 +232,7 @@ static void check_duplicate_property_names(struct check *c, struct node *dt,
 		}
 	}
 }
-NODE_ERROR(duplicate_property_names, NULL);
+ERROR(duplicate_property_names, check_duplicate_property_names, NULL);
 
 #define LOWERCASE	"abcdefghijklmnopqrstuvwxyz"
 #define UPPERCASE	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -256,7 +248,7 @@ static void check_node_name_chars(struct check *c, struct node *dt,
 		FAIL(c, "Bad character '%c' in node %s",
 		     node->name[n], node->fullpath);
 }
-NODE_ERROR(node_name_chars, PROPNODECHARS "@");
+ERROR(node_name_chars, check_node_name_chars, PROPNODECHARS "@");
 
 static void check_node_name_format(struct check *c, struct node *dt,
 				   struct node *node)
@@ -265,7 +257,7 @@ static void check_node_name_format(struct check *c, struct node *dt,
 		FAIL(c, "Node %s has multiple '@' characters in name",
 		     node->fullpath);
 }
-NODE_ERROR(node_name_format, NULL, &node_name_chars);
+ERROR(node_name_format, check_node_name_format, NULL, &node_name_chars);
 
 static void check_unit_address_vs_reg(struct check *c, struct node *dt,
 			     struct node *node)
@@ -289,7 +281,7 @@ static void check_unit_address_vs_reg(struct check *c, struct node *dt,
 			    node->fullpath);
 	}
 }
-NODE_WARNING(unit_address_vs_reg, NULL);
+WARNING(unit_address_vs_reg, check_unit_address_vs_reg, NULL);
 
 static void check_property_name_chars(struct check *c, struct node *dt,
 				      struct node *node)
@@ -304,7 +296,7 @@ static void check_property_name_chars(struct check *c, struct node *dt,
 			     prop->name[n], prop->name, node->fullpath);
 	}
 }
-NODE_ERROR(property_name_chars, PROPNODECHARS);
+ERROR(property_name_chars, check_property_name_chars, PROPNODECHARS);
 
 #define DESCLABEL_FMT	"%s%s%s%s%s"
 #define DESCLABEL_ARGS(node,prop,mark)		\
@@ -439,7 +431,7 @@ static void check_explicit_phandles(struct check *c, struct node *root,
 
 	node->phandle = phandle;
 }
-NODE_ERROR(explicit_phandles, NULL);
+ERROR(explicit_phandles, check_explicit_phandles, NULL);
 
 static void check_name_properties(struct check *c, struct node *root,
 				  struct node *node)
@@ -469,7 +461,7 @@ static void check_name_properties(struct check *c, struct node *root,
 	}
 }
 ERROR_IF_NOT_STRING(name_is_string, "name");
-NODE_ERROR(name_properties, NULL, &name_is_string);
+ERROR(name_properties, check_name_properties, NULL, &name_is_string);
 
 /*
  * Reference fixup functions
@@ -593,7 +585,7 @@ static void check_reg_format(struct check *c, struct node *dt,
 		     "(#address-cells == %d, #size-cells == %d)",
 		     node->fullpath, prop->val.len, addr_cells, size_cells);
 }
-NODE_WARNING(reg_format, NULL, &addr_size_cells);
+WARNING(reg_format, check_reg_format, NULL, &addr_size_cells);
 
 static void check_ranges_format(struct check *c, struct node *dt,
 				struct node *node)
@@ -634,7 +626,7 @@ static void check_ranges_format(struct check *c, struct node *dt,
 		     p_addr_cells, c_addr_cells, c_size_cells);
 	}
 }
-NODE_WARNING(ranges_format, NULL, &addr_size_cells);
+WARNING(ranges_format, check_ranges_format, NULL, &addr_size_cells);
 
 /*
  * Style checks
@@ -661,7 +653,8 @@ static void check_avoid_default_addr_size(struct check *c, struct node *dt,
 		FAIL(c, "Relying on default #size-cells value for %s",
 		     node->fullpath);
 }
-NODE_WARNING(avoid_default_addr_size, NULL, &addr_size_cells);
+WARNING(avoid_default_addr_size, check_avoid_default_addr_size, NULL,
+	&addr_size_cells);
 
 static void check_obsolete_chosen_interrupt_controller(struct check *c,
 						       struct node *dt,
@@ -683,7 +676,8 @@ static void check_obsolete_chosen_interrupt_controller(struct check *c,
 		FAIL(c, "/chosen has obsolete \"interrupt-controller\" "
 		     "property");
 }
-NODE_WARNING(obsolete_chosen_interrupt_controller, NULL);
+WARNING(obsolete_chosen_interrupt_controller,
+	check_obsolete_chosen_interrupt_controller, NULL);
 
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
