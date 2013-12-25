@@ -87,7 +87,7 @@ bool util_is_printable_string(const void *data, int len)
 
 	while (s < se) {
 		ss = s;
-		while (s < se && *s && isprint(*s))
+		while (s < se && *s && isprint((unsigned char)*s))
 			s++;
 
 		/* not zero, or not done yet */

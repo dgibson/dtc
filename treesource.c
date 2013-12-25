@@ -56,7 +56,7 @@ static void write_prefix(FILE *f, int level)
 
 static bool isstring(char c)
 {
-	return (isprint(c)
+	return (isprint((unsigned char)c)
 		|| (c == '\0')
 		|| strchr("\a\b\t\n\v\f\r", c));
 }
@@ -119,7 +119,7 @@ static void write_propval_string(FILE *f, struct data val)
 			fprintf(f, "\"");
 			break;
 		default:
-			if (isprint(c))
+			if (isprint((unsigned char)c))
 				fprintf(f, "%c", c);
 			else
 				fprintf(f, "\\x%02hhx", c);

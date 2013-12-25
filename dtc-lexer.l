@@ -75,11 +75,11 @@ static bool pop_input_file(void);
 			char *line, *tmp, *fn;
 			/* skip text before line # */
 			line = yytext;
-			while (!isdigit(*line))
+			while (!isdigit((unsigned char)*line))
 				line++;
 			/* skip digits in line # */
 			tmp = line;
-			while (!isspace(*tmp))
+			while (!isspace((unsigned char)*tmp))
 				tmp++;
 			/* "NULL"-terminate line # */
 			*tmp = '\0';
