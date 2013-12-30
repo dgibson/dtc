@@ -7,6 +7,7 @@ if [ -z "$CC" ]; then
 fi
 
 export QUIET_TEST=1
+STOP_ON_FAIL=0
 
 export VALGRIND=
 VGCODE=126
@@ -24,6 +25,9 @@ base_run_test() {
 	tot_pass=$((tot_pass + 1))
     else
 	ret="$?"
+	if [ "$STOP_ON_FAIL" -eq 1 ]; then
+	    exit 1
+	fi
 	if [ "$ret" -eq 1 ]; then
 	    tot_config=$((tot_config + 1))
 	elif [ "$ret" -eq 2 ]; then
@@ -595,7 +599,7 @@ utilfdt_tests () {
     run_test utilfdt_test
 }
 
-while getopts "vt:m" ARG ; do
+while getopts "vt:me" ARG ; do
     case $ARG in
 	"v")
 	    unset QUIET_TEST
@@ -605,6 +609,9 @@ while getopts "vt:m" ARG ; do
 	    ;;
 	"m")
 	    VALGRIND="valgrind --tool=memcheck -q --error-exitcode=$VGCODE"
+	    ;;
+	"e")
+	    STOP_ON_FAIL=1
 	    ;;
     esac
 done
