@@ -37,7 +37,7 @@ static enum {
 	REALLOC,
 } alloc_mode;
 
-static void realloc_fdt(void **fdt, size_t *size)
+static void realloc_fdt(void **fdt, size_t *size, bool created)
 {
 	switch (alloc_mode) {
 	case FIXED:
@@ -61,7 +61,8 @@ static void realloc_fdt(void **fdt, size_t *size)
 	case REALLOC:
 		*size += 1;
 		*fdt = xrealloc(*fdt, *size);
-		fdt_resize(*fdt, *fdt, *size);
+		if (created)
+			fdt_resize(*fdt, *fdt, *size);
 		return;
 
 	default:
@@ -73,7 +74,7 @@ static void realloc_fdt(void **fdt, size_t *size)
 	do {			      \
 		err = (code);			     \
 		if (err == -FDT_ERR_NOSPACE)			\
-			realloc_fdt(&fdt, &size);			\
+			realloc_fdt(&fdt, &size, created);		\
 		else if (err)						\
 			FAIL(#code ": %s", fdt_strerror(err));		\
 	} while (err != 0)
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
 	void *fdt = NULL;
 	size_t size;
 	int err;
+	bool created = false;
 
 	test_init(argc, argv);
 
@@ -108,12 +110,13 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	realloc_fdt(&fdt, &size);
-	
 	fdt = xmalloc(size);
 	CHECK(fdt_create(fdt, size));
 
+	created = true;
+
 	CHECK(fdt_add_reservemap_entry(fdt, TEST_ADDR_1, TEST_SIZE_1));
+
 	CHECK(fdt_add_reservemap_entry(fdt, TEST_ADDR_2, TEST_SIZE_2));
 	CHECK(fdt_finish_reservemap(fdt));
 
