@@ -312,23 +312,6 @@ srcpos_error(struct srcpos *pos, char const *fmt, ...)
 	va_end(va);
 }
 
-
-void
-srcpos_warn(struct srcpos *pos, char const *fmt, ...)
-{
-	const char *srcstr;
-	va_list va;
-	va_start(va, fmt);
-
-	srcstr = srcpos_string(pos);
-
-	fprintf(stderr, "Warning: %s ", srcstr);
-	vfprintf(stderr, fmt, va);
-	fprintf(stderr, "\n");
-
-	va_end(va);
-}
-
 void srcpos_set_line(char *f, int l)
 {
 	current_srcfile->name = f;

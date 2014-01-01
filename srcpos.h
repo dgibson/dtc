@@ -111,8 +111,6 @@ extern void srcpos_verror(struct srcpos *pos, char const *, va_list va)
      __attribute__((format(printf, 2, 0)));
 extern void srcpos_error(struct srcpos *pos, char const *, ...)
      __attribute__((format(printf, 2, 3)));
-extern void srcpos_warn(struct srcpos *pos, char const *, ...)
-     __attribute__((format(printf, 2, 3)));
 
 extern void srcpos_set_line(char *f, int l);
 
