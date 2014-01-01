@@ -475,7 +475,7 @@ void print_error(char const *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	srcpos_verror(&yylloc, fmt, va);
+	srcpos_verror(&yylloc, "Error", fmt, va);
 	va_end(va);
 
 	treesource_error = true;

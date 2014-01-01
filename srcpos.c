@@ -290,27 +290,27 @@ srcpos_string(struct srcpos *pos)
 	return pos_str;
 }
 
-void
-srcpos_verror(struct srcpos *pos, const char *fmt, va_list va)
+void srcpos_verror(struct srcpos *pos, const char *prefix,
+		   const char *fmt, va_list va)
 {
 	char *srcstr;
 
 	srcstr = srcpos_string(pos);
 
-	fprintf(stderr, "Error: %s ", srcstr);
+	fprintf(stderr, "%s: %s ", prefix, srcstr);
 	vfprintf(stderr, fmt, va);
 	fprintf(stderr, "\n");
 
 	free(srcstr);
 }
 
-void
-srcpos_error(struct srcpos *pos, const char *fmt, ...)
+void srcpos_error(struct srcpos *pos, const char *prefix,
+		  const char *fmt, ...)
 {
 	va_list va;
 
 	va_start(va, fmt);
-	srcpos_verror(pos, fmt, va);
+	srcpos_verror(pos, prefix, fmt, va);
 	va_end(va);
 }
 
