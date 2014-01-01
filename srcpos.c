@@ -293,13 +293,15 @@ srcpos_string(struct srcpos *pos)
 void
 srcpos_verror(struct srcpos *pos, const char *fmt, va_list va)
 {
-	const char *srcstr;
+	char *srcstr;
 
 	srcstr = srcpos_string(pos);
 
 	fprintf(stderr, "Error: %s ", srcstr);
 	vfprintf(stderr, fmt, va);
 	fprintf(stderr, "\n");
+
+	free(srcstr);
 }
 
 void
