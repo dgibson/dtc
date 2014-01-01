@@ -107,9 +107,9 @@ extern struct srcpos *srcpos_copy(struct srcpos *pos);
 extern char *srcpos_string(struct srcpos *pos);
 extern void srcpos_dump(struct srcpos *pos);
 
-extern void srcpos_verror(struct srcpos *pos, char const *, va_list va)
+extern void srcpos_verror(struct srcpos *pos, const char *, va_list va)
      __attribute__((format(printf, 2, 0)));
-extern void srcpos_error(struct srcpos *pos, char const *, ...)
+extern void srcpos_error(struct srcpos *pos, const char *, ...)
      __attribute__((format(printf, 2, 3)));
 
 extern void srcpos_set_line(char *f, int l);

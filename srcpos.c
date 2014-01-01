@@ -291,7 +291,7 @@ srcpos_string(struct srcpos *pos)
 }
 
 void
-srcpos_verror(struct srcpos *pos, char const *fmt, va_list va)
+srcpos_verror(struct srcpos *pos, const char *fmt, va_list va)
 {
        const char *srcstr;
 
@@ -303,7 +303,7 @@ srcpos_verror(struct srcpos *pos, char const *fmt, va_list va)
 }
 
 void
-srcpos_error(struct srcpos *pos, char const *fmt, ...)
+srcpos_error(struct srcpos *pos, const char *fmt, ...)
 {
 	va_list va;
 
