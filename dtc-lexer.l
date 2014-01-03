@@ -40,6 +40,7 @@ LINECOMMENT	"//".*\n
 #include "dtc-parser.tab.h"
 
 YYLTYPE yylloc;
+extern bool treesource_error;
 
 /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
 #define	YY_USER_ACTION \
@@ -62,6 +63,7 @@ static int dts_version = 1;
 
 static void push_input_file(const char *filename);
 static bool pop_input_file(void);
+static void lexical_error(const char *fmt, ...);
 %}
 
 %%
@@ -146,8 +148,21 @@ static bool pop_input_file(void);
 		}
 
 <V1>([0-9]+|0[xX][0-9a-fA-F]+)(U|L|UL|LL|ULL)? {
-			yylval.literal = xstrdup(yytext);
-			DPRINT("Literal: '%s'\n", yylval.literal);
+			char *e;
+			DPRINT("Integer Literal: '%s'\n", yytext);
+
+			errno = 0;
+			yylval.integer = strtoull(yytext, &e, 0);
+
+			assert(!(*e) || !e[strspn(e, "UL")]);
+
+			if (errno == ERANGE)
+				lexical_error("Integer literal '%s' out of range",
+					      yytext);
+			else
+				/* ERANGE is the only strtoull error triggerable
+				 *  by strings matching the pattern */
+				assert(errno == 0);
 			return DT_LITERAL;
 		}
 
@@ -247,4 +262,15 @@ static bool pop_input_file(void)
 	yyin = current_srcfile->f;
 
 	return true;
+}
+
+static void lexical_error(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	srcpos_verror(&yylloc, "Lexical error", fmt, ap);
+	va_end(ap);
+
+	treesource_error = true;
 }

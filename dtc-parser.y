@@ -33,7 +33,6 @@ extern void yyerror(char const *s);
 extern struct boot_info *the_boot_info;
 extern bool treesource_error;
 
-static unsigned long long eval_literal(const char *s, int base, int bits);
 static unsigned char eval_char_literal(const char *s);
 %}
 
@@ -65,7 +64,7 @@ static unsigned char eval_char_literal(const char *s);
 %token DT_DEL_PROP
 %token DT_DEL_NODE
 %token <propnodename> DT_PROPNODENAME
-%token <literal> DT_LITERAL
+%token <integer> DT_LITERAL
 %token <literal> DT_CHAR_LITERAL
 %token <cbase> DT_BASE
 %token <byte> DT_BYTE
@@ -274,18 +273,20 @@ propdataprefix:
 arrayprefix:
 	DT_BITS DT_LITERAL '<'
 		{
-			$$.data = empty_data;
-			$$.bits = eval_literal($2, 0, 7);
+			unsigned long long bits;
 
-			if (($$.bits !=  8) &&
-			    ($$.bits != 16) &&
-			    ($$.bits != 32) &&
-			    ($$.bits != 64))
+			bits = $2;
+
+			if ((bits !=  8) && (bits != 16) &&
+			    (bits != 32) && (bits != 64))
 			{
 				print_error("Only 8, 16, 32 and 64-bit elements"
 					    " are currently supported");
-				$$.bits = 32;
+				bits = 32;
 			}
+
+			$$.data = empty_data;
+			$$.bits = bits;
 		}
 	| '<'
 		{
@@ -334,9 +335,6 @@ arrayprefix:
 
 integer_prim:
 	  DT_LITERAL
-		{
-			$$ = eval_literal($1, 0, 64);
-		}
 	| DT_CHAR_LITERAL
 		{
 			$$ = eval_char_literal($1);
@@ -483,26 +481,6 @@ void print_error(char const *fmt, ...)
 
 void yyerror(char const *s) {
 	print_error("%s", s);
-}
-
-static unsigned long long eval_literal(const char *s, int base, int bits)
-{
-	unsigned long long val;
-	char *e;
-
-	errno = 0;
-	val = strtoull(s, &e, base);
-	if (*e) {
-		size_t uls = strspn(e, "UL");
-		if (e[uls])
-			print_error("bad characters in literal");
-	}
-	if ((errno == ERANGE)
-		 || ((bits < 64) && (val >= (1ULL << bits))))
-		print_error("literal out of range");
-	else if (errno != 0)
-		print_error("bad literal");
-	return val;
 }
 
 static unsigned char eval_char_literal(const char *s)
