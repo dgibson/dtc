@@ -226,10 +226,9 @@ propdata:
 
 			if ($6 != 0)
 				if (fseek(f, $6, SEEK_SET) != 0)
-					print_error("Couldn't seek to offset %llu in \"%s\": %s",
-						     (unsigned long long)$6,
-						     $4.val,
-						     strerror(errno));
+					die("Couldn't seek to offset %llu in \"%s\": %s",
+					    (unsigned long long)$6, $4.val,
+					    strerror(errno));
 
 			d = data_copy_file(f, $8);
 
