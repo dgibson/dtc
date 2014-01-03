@@ -32,13 +32,10 @@ extern void yyerror(char const *s);
 
 extern struct boot_info *the_boot_info;
 extern bool treesource_error;
-
-static unsigned char eval_char_literal(const char *s);
 %}
 
 %union {
 	char *propnodename;
-	char *literal;
 	char *labelref;
 	unsigned int cbase;
 	uint8_t byte;
@@ -65,7 +62,7 @@ static unsigned char eval_char_literal(const char *s);
 %token DT_DEL_NODE
 %token <propnodename> DT_PROPNODENAME
 %token <integer> DT_LITERAL
-%token <literal> DT_CHAR_LITERAL
+%token <integer> DT_CHAR_LITERAL
 %token <cbase> DT_BASE
 %token <byte> DT_BYTE
 %token <data> DT_STRING
@@ -336,9 +333,6 @@ arrayprefix:
 integer_prim:
 	  DT_LITERAL
 	| DT_CHAR_LITERAL
-		{
-			$$ = eval_char_literal($1);
-		}
 	| '(' integer_expr ')'
 		{
 			$$ = $2;
@@ -481,30 +475,4 @@ void print_error(char const *fmt, ...)
 
 void yyerror(char const *s) {
 	print_error("%s", s);
-}
-
-static unsigned char eval_char_literal(const char *s)
-{
-	int i = 1;
-	char c = s[0];
-
-	if (c == '\0')
-	{
-		print_error("empty character literal");
-		return 0;
-	}
-
-	/*
-	 * If the first character in the character literal is a \ then process
-	 * the remaining characters as an escape encoding. If the first
-	 * character is neither an escape or a terminator it should be the only
-	 * character in the literal and will be returned.
-	 */
-	if (c == '\\')
-		c = get_escape_char(s, &i);
-
-	if (s[i] != '\0')
-		print_error("malformed character literal");
-
-	return c;
 }
