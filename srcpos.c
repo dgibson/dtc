@@ -34,7 +34,7 @@ struct search_path {
 static struct search_path *search_path_head, **search_path_tail;
 
 
-static char *dirname(const char *path)
+static char *get_dirname(const char *path)
 {
 	const char *slash = strrchr(path, '/');
 
@@ -150,7 +150,7 @@ void srcfile_push(const char *fname)
 	srcfile = xmalloc(sizeof(*srcfile));
 
 	srcfile->f = srcfile_relative_open(fname, &srcfile->name);
-	srcfile->dir = dirname(srcfile->name);
+	srcfile->dir = get_dirname(srcfile->name);
 	srcfile->prev = current_srcfile;
 
 	srcfile->lineno = 1;
