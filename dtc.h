@@ -247,7 +247,7 @@ void sort_tree(struct boot_info *bi);
 
 /* Checks */
 
-void parse_checks_option(bool warn, bool error, const char *optarg);
+void parse_checks_option(bool warn, bool error, const char *arg);
 void process_checks(bool force, struct boot_info *bi);
 
 /* Flattened trees */

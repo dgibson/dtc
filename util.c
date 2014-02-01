@@ -39,11 +39,11 @@
 char *xstrdup(const char *s)
 {
 	int len = strlen(s) + 1;
-	char *dup = xmalloc(len);
+	char *d = xmalloc(len);
 
-	memcpy(dup, s, len);
+	memcpy(d, s, len);
 
-	return dup;
+	return d;
 }
 
 char *join_path(const char *path, const char *name)

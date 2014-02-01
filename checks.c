@@ -706,15 +706,15 @@ static void disable_warning_error(struct check *c, bool warn, bool error)
 	c->error = c->error && !error;
 }
 
-void parse_checks_option(bool warn, bool error, const char *optarg)
+void parse_checks_option(bool warn, bool error, const char *arg)
 {
 	int i;
-	const char *name = optarg;
+	const char *name = arg;
 	bool enable = true;
 
-	if ((strncmp(optarg, "no-", 3) == 0)
-	    || (strncmp(optarg, "no_", 3) == 0)) {
-		name = optarg + 3;
+	if ((strncmp(arg, "no-", 3) == 0)
+	    || (strncmp(arg, "no_", 3) == 0)) {
+		name = arg + 3;
 		enable = false;
 	}
 
