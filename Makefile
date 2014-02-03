@@ -196,6 +196,11 @@ fdtget:	$(FDTGET_OBJS) $(LIBFDT_archive)
 
 fdtput:	$(FDTPUT_OBJS) $(LIBFDT_archive)
 
+dist:
+	git archive --format=tar --prefix=dtc-v$(dtc_version)/ HEAD \
+		> ../dtc-v$(dtc_version).tar
+	cat ../dtc-v$(dtc_version).tar | \
+		gzip -9 > ../dtc-v$(dtc_version).tgz
 
 #
 # Testsuite rules
