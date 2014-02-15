@@ -38,7 +38,6 @@ extern bool treesource_error;
 %union {
 	char *propnodename;
 	char *labelref;
-	unsigned int cbase;
 	uint8_t byte;
 	struct data data;
 
@@ -64,7 +63,6 @@ extern bool treesource_error;
 %token <propnodename> DT_PROPNODENAME
 %token <integer> DT_LITERAL
 %token <integer> DT_CHAR_LITERAL
-%token <cbase> DT_BASE
 %token <byte> DT_BYTE
 %token <data> DT_STRING
 %token <labelref> DT_LABEL
