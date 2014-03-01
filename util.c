@@ -219,10 +219,6 @@ int utilfdt_read_err_len(const char *filename, char **buffp, off_t *len)
 		if (offset == bufsize) {
 			bufsize *= 2;
 			buf = xrealloc(buf, bufsize);
-			if (!buf) {
-				ret = ENOMEM;
-				break;
-			}
 		}
 
 		ret = read(fd, &buf[offset], bufsize - offset);
