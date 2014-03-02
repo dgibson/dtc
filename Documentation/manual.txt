@@ -30,25 +30,23 @@ I - "dtc", the device tree compiler
 
 1) Sources
 
-Source code for the Device Tree Compiler can be found at jdl.com.
-The gitweb interface is:
+Source code for the Device Tree Compiler can be found at git.kernel.org.
 
-    http://git.jdl.com/gitweb/
+The upstream repository is here:
 
-The repository is here:
+    git://git.kernel.org/pub/scm/utils/dtc/dtc.git
+    https://git.kernel.org/pub/scm/utils/dtc/dtc.git
 
-    git://www.jdl.com/software/dtc.git
-    http://www.jdl.com/software/dtc.git
+The gitweb interface for the upstream respository is:
 
-Tarballs of the 1.0.0 and latest releases are here:
-
-    http://www.jdl.com/software/dtc-v1.2.0.tgz
-    http://www.jdl.com/software/dtc-latest.tgz
+    https://git.kernel.org/cgit/utils/dtc/dtc.git/
 
 1.1) Submitting Patches
 
-Patches should be sent to jdl@jdl.com, and CC'ed to
-devicetree-discuss@lists.ozlabs.org.
+Patches should be sent to the maintainers:
+	David Gibson <david@gibson.dropbear.id.au>
+	Jon Loeliger <jdl@jdl.com>
+and CCed to <devicetree-compiler@vger.kernel.org>.
 
 2) Description
 
