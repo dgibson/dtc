@@ -3,6 +3,7 @@
 *.test.dts
 tmp.*
 /add_subnode_with_nops
+/addr_size_cells
 /appendprop[12]
 /asm_tree_dump
 /boot-cpuid
