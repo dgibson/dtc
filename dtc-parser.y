@@ -101,11 +101,16 @@ extern bool treesource_error;
 %%
 
 sourcefile:
-	  DT_V1 ';' memreserves devicetree
+	  v1tag memreserves devicetree
 		{
-			the_boot_info = build_boot_info($3, $4,
-							guess_boot_cpuid($4));
+			the_boot_info = build_boot_info($2, $3,
+							guess_boot_cpuid($3));
 		}
+	;
+
+v1tag:
+	  DT_V1 ';'
+	| DT_V1 ';' v1tag
 	;
 
 memreserves:
