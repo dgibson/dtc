@@ -88,7 +88,7 @@ static void dump_blob(void *blob, bool debug)
 		if (addr == 0 && size == 0)
 			break;
 
-		printf("/memreserve/ %llx %llx;\n",
+		printf("/memreserve/ %#llx %#llx;\n",
 		       (unsigned long long)addr, (unsigned long long)size);
 	}
 
