@@ -138,6 +138,13 @@ run_fdtput_test () {
     base_run_test sh fdtput-runtest.sh "$expect" "$@"
 }
 
+run_fdtdump_test() {
+    file="$1"
+    shorten_echo fdtdump-runtest.sh "$file"
+    echo -n ":	"
+    base_run_test sh fdtdump-runtest.sh "$file"
+}
+
 tree1_tests () {
     TREE=$1
 
@@ -602,6 +609,25 @@ utilfdt_tests () {
     run_test utilfdt_test
 }
 
+fdtdump_tests () {
+    run_fdtdump_test fdtdump.dts
+    return
+
+    local dts=fdtdump.dts
+    local dtb=fdtdump.dts.dtb
+    local out=fdtdump.dts.out
+    run_dtc_test -O dtb $dts -o ${dtb}
+    $FDTDUMP ${dtb} | grep -v "//" >${out}
+    if cmp $dts $out >/dev/null; then
+	PASS
+    else
+	if [ -z "$QUIET_TEST" ]; then
+	    diff -w fdtdump.dts $out
+	fi
+	FAIL "Results differ from expected"
+    fi
+}
+
 while getopts "vt:me" ARG ; do
     case $ARG in
 	"v")
@@ -620,7 +646,7 @@ while getopts "vt:me" ARG ; do
 done
 
 if [ -z "$TESTSETS" ]; then
-    TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput"
+    TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump"
 fi
 
 # Make sure we don't have stale blobs lying around
@@ -645,6 +671,9 @@ for set in $TESTSETS; do
 	    ;;
 	"fdtput")
 	    fdtput_tests
+	    ;;
+	"fdtdump")
+	    fdtdump_tests
 	    ;;
     esac
 done

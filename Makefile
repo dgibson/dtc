@@ -211,6 +211,7 @@ TESTS_BIN += dtc
 TESTS_BIN += convert-dtsv0
 TESTS_BIN += fdtput
 TESTS_BIN += fdtget
+TESTS_BIN += fdtdump
 
 include tests/Makefile.tests
 
