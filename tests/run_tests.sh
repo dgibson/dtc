@@ -271,6 +271,10 @@ libfdt_tests () {
 
     # Specific bug tests
     run_test add_subnode_with_nops
+    run_dtc_test -I dts -O dts -o sourceoutput.test.dts sourceoutput.dts
+    run_dtc_test -I dts -O dtb -o sourceoutput.test.dtb sourceoutput.dts
+    run_dtc_test -I dts -O dtb -o sourceoutput.test.dts.test.dtb sourceoutput.test.dts
+    run_test dtbs_equal_ordered sourceoutput.test.dtb sourceoutput.test.dts.test.dtb
 }
 
 dtc_tests () {

@@ -109,7 +109,7 @@ static void write_propval_string(FILE *f, struct data val)
 			break;
 		case '\0':
 			fprintf(f, "\", ");
-			while (m && (m->offset < i)) {
+			while (m && (m->offset <= (i + 1))) {
 				if (m->type == LABEL) {
 					assert(m->offset == (i+1));
 					fprintf(f, "%s: ", m->ref);
