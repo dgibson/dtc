@@ -38,9 +38,9 @@
 #include "util.h"
 
 #ifdef DEBUG
-#define debug(fmt,args...)	printf(fmt, ##args)
+#define debug(...)	printf(__VA_ARGS__)
 #else
-#define debug(fmt,args...)
+#define debug(...)
 #endif
 
 
@@ -88,7 +88,7 @@ struct data {
 };
 
 
-#define empty_data ((struct data){ /* all .members = 0 or NULL */ })
+#define empty_data ((struct data){ 0 /* all .members = 0 or NULL */ })
 
 #define for_each_marker(m) \
 	for (; (m); (m) = (m)->next)
