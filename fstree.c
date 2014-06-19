@@ -52,7 +52,7 @@ static struct node *read_fstree(const char *dirname)
 			struct property *prop;
 			FILE *pfile;
 
-			pfile = fopen(tmpname, "r");
+			pfile = fopen(tmpname, "rb");
 			if (! pfile) {
 				fprintf(stderr,
 					"WARNING: Cannot open %s: %s\n",

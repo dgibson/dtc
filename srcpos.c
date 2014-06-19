@@ -77,7 +77,7 @@ static char *try_open(const char *dirname, const char *fname, FILE **fp)
 	else
 		fullname = join_path(dirname, fname);
 
-	*fp = fopen(fullname, "r");
+	*fp = fopen(fullname, "rb");
 	if (!*fp) {
 		free(fullname);
 		fullname = NULL;
