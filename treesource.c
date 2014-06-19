@@ -178,7 +178,7 @@ static void write_propval_bytes(FILE *f, struct data val)
 			m = m->next;
 		}
 
-		fprintf(f, "%02hhx", *bp++);
+		fprintf(f, "%02hhx", (unsigned char)(*bp++));
 		if ((const void *)bp >= propend)
 			break;
 		fprintf(f, " ");
