@@ -22,7 +22,7 @@
 static const char *tagname(uint32_t tag)
 {
 	static const char * const names[] = {
-#define TN(t) [t] #t
+#define TN(t) [t] = #t
 		TN(FDT_BEGIN_NODE),
 		TN(FDT_END_NODE),
 		TN(FDT_PROP),
