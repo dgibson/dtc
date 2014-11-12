@@ -226,6 +226,7 @@ clean: libfdt_clean tests_clean
 	rm -f $(STD_CLEANFILES)
 	rm -f $(VERSION_FILE)
 	rm -f $(BIN)
+	rm -f dtc-*.tar dtc-*.tar.sign dtc-*.tar.asc
 
 #
 # Generic compile rules
