@@ -34,6 +34,7 @@ static inline void __attribute__((noreturn)) die(const char *str, ...)
 	va_start(ap, str);
 	fprintf(stderr, "FATAL ERROR: ");
 	vfprintf(stderr, str, ap);
+	va_end(ap);
 	exit(1);
 }
 
