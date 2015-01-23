@@ -32,6 +32,8 @@
 enum oper_type {
 	OPER_WRITE_PROP,		/* Write a property in a node */
 	OPER_CREATE_NODE,		/* Create a new node */
+	OPER_REMOVE_NODE,		/* Delete a node */
+	OPER_DELETE_PROP,		/* Delete a property in a node */
 };
 
 struct display_info {
@@ -270,11 +272,65 @@ static int create_node(char **blob, const char *node_name)
 	return 0;
 }
 
+/**
+ * Delete a property of a node in the fdt.
+ *
+ * @param blob		FDT blob to write into
+ * @param node_name	Path to node containing the property to delete
+ * @param prop_name	Name of property to delete
+ * @return 0 on success, or -1 on failure
+ */
+static int delete_prop(char *blob, const char *node_name, const char *prop_name)
+{
+	int node = 0;
+
+	node = fdt_path_offset(blob, node_name);
+	if (node < 0) {
+		report_error(node_name, -1, node);
+		return -1;
+	}
+
+	node = fdt_delprop(blob, node, prop_name);
+	if (node < 0) {
+		report_error(node_name, -1, node);
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * Delete a node in the fdt.
+ *
+ * @param blob		FDT blob to write into
+ * @param node_name	Name of node to delete
+ * @return 0 on success, or -1 on failure
+ */
+static int delete_node(char *blob, const char *node_name)
+{
+	int node = 0;
+
+	node = fdt_path_offset(blob, node_name);
+	if (node < 0) {
+		report_error(node_name, -1, node);
+		return -1;
+	}
+
+	node = fdt_del_node(blob, node);
+	if (node < 0) {
+		report_error(node_name, -1, node);
+		return -1;
+	}
+
+	return 0;
+}
+
 static int do_fdtput(struct display_info *disp, const char *filename,
 		    char **arg, int arg_count)
 {
 	char *value;
 	char *blob;
+	char *node;
 	int len, ret = 0;
 
 	blob = utilfdt_read(filename);
@@ -302,6 +358,15 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 				ret = create_node(&blob, *arg);
 		}
 		break;
+	case OPER_REMOVE_NODE:
+		for (; ret >= 0 && arg_count--; arg++)
+			ret = delete_node(blob, *arg);
+		break;
+	case OPER_DELETE_PROP:
+		node = *arg;
+		for (arg++; ret >= 0 && arg_count-- > 1; arg++)
+			ret = delete_prop(blob, node, *arg);
+		break;
 	}
 	if (ret >= 0) {
 		fdt_pack(blob);
@@ -317,12 +382,16 @@ static const char usage_synopsis[] =
 	"write a property value to a device tree\n"
 	"	fdtput <options> <dt file> <node> <property> [<value>...]\n"
 	"	fdtput -c <options> <dt file> [<node>...]\n"
+	"	fdtput -r <options> <dt file> [<node>...]\n"
+	"	fdtput -d <options> <dt file> <node> [<property>...]\n"
 	"\n"
 	"The command line arguments are joined together into a single value.\n"
 	USAGE_TYPE_MSG;
-static const char usage_short_opts[] = "cpt:v" USAGE_COMMON_SHORT_OPTS;
+static const char usage_short_opts[] = "crdpt:v" USAGE_COMMON_SHORT_OPTS;
 static struct option const usage_long_opts[] = {
 	{"create",           no_argument, NULL, 'c'},
+	{"remove",	     no_argument, NULL, 'r'},
+	{"delete",	     no_argument, NULL, 'd'},
 	{"auto-path",        no_argument, NULL, 'p'},
 	{"type",              a_argument, NULL, 't'},
 	{"verbose",          no_argument, NULL, 'v'},
@@ -330,6 +399,8 @@ static struct option const usage_long_opts[] = {
 };
 static const char * const usage_opts_help[] = {
 	"Create nodes if they don't already exist",
+	"Delete nodes (and any subnodes) if they already exist",
+	"Delete properties if they already exist",
 	"Automatically create nodes as needed for the node path",
 	"Type of data",
 	"Display each value decoded from command line",
@@ -348,8 +419,6 @@ int main(int argc, char *argv[])
 	while ((opt = util_getopt_long()) != EOF) {
 		/*
 		 * TODO: add options to:
-		 * - delete property
-		 * - delete node (optionally recursively)
 		 * - rename node
 		 * - pack fdt before writing
 		 * - set amount of free space when writing
@@ -359,6 +428,12 @@ int main(int argc, char *argv[])
 
 		case 'c':
 			disp.oper = OPER_CREATE_NODE;
+			break;
+		case 'r':
+			disp.oper = OPER_REMOVE_NODE;
+			break;
+		case 'd':
+			disp.oper = OPER_DELETE_PROP;
 			break;
 		case 'p':
 			disp.auto_path = 1;
@@ -389,6 +464,10 @@ int main(int argc, char *argv[])
 		if (argc < 2)
 			usage("missing property");
 	}
+
+	if (disp.oper == OPER_DELETE_PROP)
+		if (argc < 1)
+			usage("missing node");
 
 	if (do_fdtput(&disp, filename, argv, argc))
 		return 1;

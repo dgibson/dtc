@@ -610,6 +610,28 @@ fdtput_tests () {
     run_wrap_test $DTPUT $dtb -cp /chosen
     run_wrap_test $DTPUT $dtb -cp /chosen/son
 
+    # Start again with a fresh dtb
+    run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
+
+    # Node delete
+    run_wrap_test $DTPUT $dtb -c /chosen/node1 /chosen/node2 /chosen/node3
+    run_fdtget_test "node3\nnode2\nnode1" $dtb -l  /chosen
+    run_wrap_test $DTPUT $dtb -r /chosen/node1 /chosen/node2
+    run_fdtget_test "node3" $dtb -l  /chosen
+
+    # Delete the non-existent node
+    run_wrap_error_test $DTPUT $dtb -r /non-existent/node
+
+    # Property delete
+    run_fdtput_test "eva" $dtb /chosen/ name "" -ts "eva"
+    run_fdtput_test "016" $dtb /chosen/ age  "" -ts "016"
+    run_fdtget_test "age\nname\nbootargs\nlinux,platform" $dtb -p  /chosen
+    run_wrap_test $DTPUT $dtb -d /chosen/ name age
+    run_fdtget_test "bootargs\nlinux,platform" $dtb -p  /chosen
+
+    # Delete the non-existent property
+    run_wrap_error_test $DTPUT $dtb -d /chosen   non-existent-prop
+
     # TODO: Add tests for verbose mode?
 }
 
