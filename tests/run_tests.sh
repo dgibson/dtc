@@ -399,6 +399,8 @@ dtc_tests () {
     tree1_tests dtc_tree1_merge.test.dtb test_tree1.dtb
     run_dtc_test -I dts -O dtb -o dtc_tree1_merge_labelled.test.dtb test_tree1_merge_labelled.dts
     tree1_tests dtc_tree1_merge_labelled.test.dtb test_tree1.dtb
+    run_dtc_test -I dts -O dtb -o dtc_tree1_label_noderef.test.dtb test_tree1_label_noderef.dts
+    run_test dtbs_equal_unordered dtc_tree1_label_noderef.test.dtb test_tree1.dtb
     run_dtc_test -I dts -O dtb -o multilabel_merge.test.dtb multilabel_merge.dts
     run_test references multilabel.test.dtb
     run_test dtbs_equal_ordered multilabel.test.dtb multilabel_merge.test.dtb
