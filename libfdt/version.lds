@@ -8,6 +8,7 @@ LIBFDT_1.2 {
 		fdt_get_mem_rsv;
 		fdt_subnode_offset_namelen;
 		fdt_subnode_offset;
+		fdt_path_offset_namelen;
 		fdt_path_offset;
 		fdt_get_name;
 		fdt_get_property_namelen;
