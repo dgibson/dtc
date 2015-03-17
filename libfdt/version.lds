@@ -54,6 +54,8 @@ LIBFDT_1.2 {
 		fdt_get_property_by_offset;
 		fdt_getprop_by_offset;
 		fdt_next_property_offset;
+		fdt_first_subnode;
+		fdt_next_subnode;
 
 	local:
 		*;
