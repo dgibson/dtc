@@ -54,58 +54,43 @@ static int check_subnode(void *fdt, int parent, const char *name)
 	return offset;
 }
 
+static void check_path_offset(void *fdt, char *path, int offset)
+{
+	int rc;
+
+	rc = fdt_path_offset(fdt, path);
+	if (rc < 0)
+		FAIL("fdt_path_offset(\"%s\") failed: %s",
+		     path,  fdt_strerror(rc));
+	if (rc != offset)
+		FAIL("fdt_path_offset(\"%s\") returned incorrect offset"
+		     " %d instead of %d", path, rc, offset);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt;
-	int root_offset;
 	int subnode1_offset, subnode2_offset;
-	int subnode1_offset_p, subnode2_offset_p;
 	int subsubnode1_offset, subsubnode2_offset, subsubnode2_offset2;
-	int subsubnode1_offset_p, subsubnode2_offset_p, subsubnode2_offset2_p;
 
 	test_init(argc, argv);
 	fdt = load_blob_arg(argc, argv);
 
-	root_offset = fdt_path_offset(fdt, "/");
-	if (root_offset < 0)
-		FAIL("fdt_path_offset(\"/\") failed: %s",
-		     fdt_strerror(root_offset));
-	else if (root_offset != 0)
-		FAIL("fdt_path_offset(\"/\") returns incorrect offset %d",
-		     root_offset);
+	check_path_offset(fdt, "/", 0);
+
 	subnode1_offset = check_subnode(fdt, 0, "subnode@1");
 	subnode2_offset = check_subnode(fdt, 0, "subnode@2");
 
-	subnode1_offset_p = fdt_path_offset(fdt, "/subnode@1");
-	subnode2_offset_p = fdt_path_offset(fdt, "/subnode@2");
-
-	if (subnode1_offset != subnode1_offset_p)
-		FAIL("Mismatch between subnode_offset (%d) and path_offset (%d)",
-		     subnode1_offset, subnode1_offset_p);
-
-	if (subnode2_offset != subnode2_offset_p)
-		FAIL("Mismatch between subnode_offset (%d) and path_offset (%d)",
-		     subnode2_offset, subnode2_offset_p);
+	check_path_offset(fdt, "/subnode@1", subnode1_offset);
+	check_path_offset(fdt, "/subnode@2", subnode2_offset);
 
 	subsubnode1_offset = check_subnode(fdt, subnode1_offset, "subsubnode");
 	subsubnode2_offset = check_subnode(fdt, subnode2_offset, "subsubnode@0");
 	subsubnode2_offset2 = check_subnode(fdt, subnode2_offset, "subsubnode");
 
-	subsubnode1_offset_p = fdt_path_offset(fdt, "/subnode@1/subsubnode");
-	subsubnode2_offset_p = fdt_path_offset(fdt, "/subnode@2/subsubnode@0");
-	subsubnode2_offset2_p = fdt_path_offset(fdt, "/subnode@2/subsubnode");
-
-	if (subsubnode1_offset != subsubnode1_offset_p)
-		FAIL("Mismatch between subnode_offset (%d) and path_offset (%d)",
-		     subsubnode1_offset, subsubnode1_offset_p);
-
-	if (subsubnode2_offset != subsubnode2_offset_p)
-		FAIL("Mismatch between subnode_offset (%d) and path_offset (%d)",
-		     subsubnode2_offset, subsubnode2_offset_p);
-
-	if (subsubnode2_offset2 != subsubnode2_offset2_p)
-		FAIL("Mismatch between subnode_offset (%d) and path_offset (%d)",
-		     subsubnode2_offset2, subsubnode2_offset2_p);
+	check_path_offset(fdt, "/subnode@1/subsubnode", subsubnode1_offset);
+	check_path_offset(fdt, "/subnode@2/subsubnode@0", subsubnode2_offset);
+	check_path_offset(fdt, "/subnode@2/subsubnode", subsubnode2_offset2);
 
 	PASS();
 }
