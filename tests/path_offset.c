@@ -69,6 +69,26 @@ static void check_path_offset(void *fdt, char *path, int offset)
 		     " %d instead of %d", path, rc, offset);
 }
 
+static void check_path_offset_namelen(void *fdt, char *path, int namelen,
+				      int offset)
+{
+	int rc;
+
+	verbose_printf("Checking offset of \"%s\" [first %d characters]"
+		       " is %d...\n", path, namelen, offset);
+
+	rc = fdt_path_offset_namelen(fdt, path, namelen);
+	if (rc == offset)
+		return;
+
+	if (rc < 0)
+		FAIL("fdt_path_offset_namelen(\"%s\", %d) failed: %s",
+		     path, namelen, fdt_strerror(rc));
+	else
+		FAIL("fdt_path_offset_namelen(\"%s\", %d) returned incorrect"
+		     " offset %d instead of %d", path, namelen, rc, offset);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt;
@@ -101,6 +121,17 @@ int main(int argc, char *argv[])
 	check_path_offset(fdt, "/subnode@1/", subnode1_offset);
 	check_path_offset(fdt, "//subnode@1///", subnode1_offset);
 	check_path_offset(fdt, "/subnode@2////subsubnode", subsubnode2_offset2);
+
+	/* Test fdt_path_offset_namelen() */
+	check_path_offset_namelen(fdt, "/subnode@1", 1, 0);
+	check_path_offset_namelen(fdt, "/subnode@1/subsubnode", 10, subnode1_offset);
+	check_path_offset_namelen(fdt, "/subnode@1/subsubnode", 11, subnode1_offset);
+	check_path_offset_namelen(fdt, "/subnode@2TRAILINGGARBAGE", 10, subnode2_offset);
+	check_path_offset_namelen(fdt, "/subnode@2TRAILINGGARBAGE", 11, -FDT_ERR_NOTFOUND);
+	check_path_offset_namelen(fdt, "/subnode@2/subsubnode@0/more", 23, subsubnode2_offset2);
+	check_path_offset_namelen(fdt, "/subnode@2/subsubnode@0/more", 22, -FDT_ERR_NOTFOUND);
+	check_path_offset_namelen(fdt, "/subnode@2/subsubnode@0/more", 24, subsubnode2_offset2);
+	check_path_offset_namelen(fdt, "/subnode@2/subsubnode@0/more", 25, -FDT_ERR_NOTFOUND);
 
 	PASS();
 }
