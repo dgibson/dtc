@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 {
 	struct boot_info *bi;
 	const char *inform = NULL;
-	const char *outform = "dts";
+	const char *outform = NULL;
 	const char *outname = "-";
 	const char *depname = NULL;
 	bool force = false, sort = false;
@@ -262,6 +262,15 @@ int main(int argc, char *argv[])
 
 	if (inform == NULL)
 		inform = guess_input_format(arg, "dts");
+	if (outform == NULL) {
+		outform = guess_type_by_name(outname, NULL);
+		if (outform == NULL) {
+			if (streq(inform, "dts"))
+				outform = "dtb";
+			else
+				outform = "dts";
+		}
+	}
 	if (streq(inform, "dts"))
 		bi = dt_from_source(arg);
 	else if (streq(inform, "fs"))
