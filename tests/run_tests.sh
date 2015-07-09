@@ -269,6 +269,11 @@ libfdt_tests () {
     # Tests for behaviour on various sorts of corrupted trees
     run_test truncated_property
 
+    # Check aliases support in fdt_path_offset
+    run_dtc_test -I dts -O dtb -o aliases.dtb aliases.dts
+    run_test get_alias aliases.dtb
+    run_test path_offset_aliases aliases.dtb
+
     # Specific bug tests
     run_test add_subnode_with_nops
     run_dtc_test -I dts -O dts -o sourceoutput.test.dts sourceoutput.dts
@@ -326,11 +331,6 @@ dtc_tests () {
     run_dtc_test -I dts -O dtb -o dtc_comments.test.dtb comments.dts
     run_dtc_test -I dts -O dtb -o dtc_comments-cmp.test.dtb comments-cmp.dts
     run_test dtbs_equal_ordered dtc_comments.test.dtb dtc_comments-cmp.test.dtb
-
-    # Check aliases support in fdt_path_offset
-    run_dtc_test -I dts -O dtb -o aliases.dtb aliases.dts
-    run_test get_alias aliases.dtb
-    run_test path_offset_aliases aliases.dtb
 
     # Check /include/ directive
     run_dtc_test -I dts -O dtb -o includes.test.dtb include0.dts
