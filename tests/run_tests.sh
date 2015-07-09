@@ -645,21 +645,6 @@ utilfdt_tests () {
 
 fdtdump_tests () {
     run_fdtdump_test fdtdump.dts
-    return
-
-    local dts=fdtdump.dts
-    local dtb=fdtdump.dts.dtb
-    local out=fdtdump.dts.out
-    run_dtc_test -O dtb $dts -o ${dtb}
-    $FDTDUMP ${dtb} | grep -v "//" >${out}
-    if cmp $dts $out >/dev/null; then
-	PASS
-    else
-	if [ -z "$QUIET_TEST" ]; then
-	    diff -w fdtdump.dts $out
-	fi
-	FAIL "Results differ from expected"
-    fi
 }
 
 while getopts "vt:me" ARG ; do
