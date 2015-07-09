@@ -23,6 +23,7 @@
 	randomnode {
 		string =  "foo", "stuff";
 		bytes = [61 62 63 64 65];
+		nbytes = [80 ff];
 		child {
 		};
 	};
