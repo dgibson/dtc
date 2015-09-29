@@ -40,6 +40,24 @@ static void check_expected_failure(const void *fdt, const char *path,
 	err = fdt_stringlist_count(fdt, offset, "#address-cells");
 	if (err != -FDT_ERR_BADVALUE)
 		FAIL("unexpectedly succeeded in parsing #address-cells\n");
+
+	err = fdt_stringlist_search(fdt, offset, "#address-cells", "foo");
+	if (err != -FDT_ERR_BADVALUE)
+		FAIL("found string in #address-cells: %d\n", err);
+
+	/*
+	 * Note that the #address-cells property contains a small 32-bit
+	 * unsigned integer, hence some bytes will be zero, and searching for
+	 * the empty string will succeed.
+	 *
+	 * The reason for this oddity is that the function will exit when the
+	 * first occurrence of the string is found, but in order to determine
+	 * that the property does not contain a valid string list it would
+	 * need to process the whole value.
+	 */
+	err = fdt_stringlist_search(fdt, offset, "#address-cells", "");
+	if (err != 0)
+		FAIL("empty string not found in #address-cells: %d\n", err);
 }
 
 static void check_string_count(const void *fdt, const char *path,
@@ -61,6 +79,23 @@ static void check_string_count(const void *fdt, const char *path,
 		     path, property, err, count);
 }
 
+static void check_string_index(const void *fdt, const char *path,
+			       const char *property, const char *string,
+			       int idx)
+{
+	int offset, err;
+
+	offset = fdt_path_offset(fdt, path);
+	if (offset < 0)
+		FAIL("Couldn't find path %s", path);
+
+	err = fdt_stringlist_search(fdt, offset, property, string);
+
+	if (err != idx)
+		FAIL("Index of %s in property %s of node %s is %d, expected %d\n",
+		     string, property, path, err, idx);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt;
@@ -77,6 +112,11 @@ int main(int argc, char *argv[])
 	check_string_count(fdt, "/", "compatible", 1);
 	check_string_count(fdt, "/device", "compatible", 2);
 	check_string_count(fdt, "/device", "big-endian", 0);
+
+	check_string_index(fdt, "/", "compatible", "test-strings", 0);
+	check_string_index(fdt, "/device", "compatible", "foo", 0);
+	check_string_index(fdt, "/device", "compatible", "bar", 1);
+	check_string_index(fdt, "/device", "big-endian", "baz", -1);
 
 	PASS();
 }
