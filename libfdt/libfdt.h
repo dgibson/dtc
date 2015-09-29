@@ -907,6 +907,34 @@ int fdt_stringlist_count(const void *fdt, int nodeoffset, const char *property);
 int fdt_stringlist_search(const void *fdt, int nodeoffset, const char *property,
 			  const char *string);
 
+/**
+ * fdt_stringlist_get() - obtain the string at a given index in a string list
+ * @fdt: pointer to the device tree blob
+ * @nodeoffset: offset of a tree node
+ * @property: name of the property containing the string list
+ * @index: index of the string to return
+ * @lenp: return location for the string length or an error code on failure
+ *
+ * Note that this will successfully extract strings from properties with
+ * non-NUL-terminated values. For example on small-valued cell properties
+ * this function will return the empty string.
+ *
+ * If non-NULL, the length of the string (on success) or a negative error-code
+ * (on failure) will be stored in the integer pointer to by lenp.
+ *
+ * @return:
+ *   A pointer to the string at the given index in the string list or NULL on
+ *   failure. On success the length of the string will be stored in the memory
+ *   location pointed to by the lenp parameter, if non-NULL. On failure one of
+ *   the following negative error codes will be returned in the lenp parameter
+ *   (if non-NULL):
+ *     -FDT_ERR_BADVALUE if the property value is not NUL-terminated
+ *     -FDT_ERR_NOTFOUND if the property does not exist
+ */
+const char *fdt_stringlist_get(const void *fdt, int nodeoffset,
+			       const char *property, int index,
+			       int *lenp);
+
 /**********************************************************************/
 /* Read-only functions (addressing related)                           */
 /**********************************************************************/

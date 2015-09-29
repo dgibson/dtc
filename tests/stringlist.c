@@ -58,6 +58,13 @@ static void check_expected_failure(const void *fdt, const char *path,
 	err = fdt_stringlist_search(fdt, offset, "#address-cells", "");
 	if (err != 0)
 		FAIL("empty string not found in #address-cells: %d\n", err);
+
+	/*
+	 * fdt_get_string() can successfully extract strings from non-string
+	 * properties. This is because it doesn't necessarily parse the whole
+	 * property value, which would be necessary for it to determine if a
+	 * valid string or string list is present.
+	 */
 }
 
 static void check_string_count(const void *fdt, const char *path,
@@ -96,6 +103,27 @@ static void check_string_index(const void *fdt, const char *path,
 		     string, property, path, err, idx);
 }
 
+static void check_string(const void *fdt, const char *path,
+			 const char *property, int idx,
+			 const char *string)
+{
+	const char *result;
+	int offset, len;
+
+	offset = fdt_path_offset(fdt, path);
+	if (offset < 0)
+		FAIL("Couldn't find path %s", path);
+
+	result = fdt_stringlist_get(fdt, offset, property, idx, &len);
+	if (!result)
+		FAIL("Couldn't extract string %d from property %s of node %s: %d\n",
+		     idx, property, path, len);
+
+	if (strcmp(string, result) != 0)
+		FAIL("String %d in property %s of node %s is %s, expected %s\n",
+		     idx, property, path, result, string);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt;
@@ -117,6 +145,10 @@ int main(int argc, char *argv[])
 	check_string_index(fdt, "/device", "compatible", "foo", 0);
 	check_string_index(fdt, "/device", "compatible", "bar", 1);
 	check_string_index(fdt, "/device", "big-endian", "baz", -1);
+
+	check_string(fdt, "/", "compatible", 0, "test-strings");
+	check_string(fdt, "/device", "compatible", 0, "foo");
+	check_string(fdt, "/device", "compatible", 1, "bar");
 
 	PASS();
 }
