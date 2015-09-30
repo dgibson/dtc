@@ -198,6 +198,9 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb -o addresses.test.dtb addresses.dts
     run_test addr_size_cells addresses.test.dtb
 
+    run_dtc_test -I dts -O dtb -o stringlist.test.dtb stringlist.dts
+    run_test stringlist stringlist.test.dtb
+
     # Sequential write tests
     run_test sw_tree1
     tree1_tests sw_tree1.test.dtb
