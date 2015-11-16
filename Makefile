@@ -16,7 +16,7 @@ LOCAL_VERSION =
 CONFIG_LOCALVERSION =
 
 CPPFLAGS = -I libfdt -I .
-WARNINGS = -Werror -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
+WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
 CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
 
