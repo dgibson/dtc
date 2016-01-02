@@ -295,6 +295,8 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb nul-in-escape.dts
     run_wrap_error_test $DTC nul-in-line-info1.dts
     run_wrap_error_test $DTC nul-in-line-info2.dts
+
+    run_wrap_error_test $DTC -I dtb -O dts -o /dev/null ovf_size_strings.dtb
 }
 
 dtc_tests () {
