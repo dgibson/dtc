@@ -152,7 +152,6 @@ char get_escape_char(const char *s, int *i)
 	int	j = *i + 1;
 	char	val;
 
-	assert(c);
 	switch (c) {
 	case 'a':
 		val = '\a';
