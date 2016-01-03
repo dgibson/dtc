@@ -153,7 +153,10 @@ static void lexical_error(const char *fmt, ...);
 			errno = 0;
 			yylval.integer = strtoull(yytext, &e, 0);
 
-			assert(!(*e) || !e[strspn(e, "UL")]);
+			if (*e && e[strspn(e, "UL")]) {
+				lexical_error("Bad integer literal '%s'",
+					      yytext);
+			}
 
 			if (errno == ERANGE)
 				lexical_error("Integer literal '%s' out of range",

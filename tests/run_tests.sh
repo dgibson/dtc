@@ -291,6 +291,7 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb bad-size-cells.dts
 
     run_wrap_error_test $DTC division-by-zero.dts
+    run_wrap_error_test $DTC bad-octal-literal.dts
 }
 
 dtc_tests () {
