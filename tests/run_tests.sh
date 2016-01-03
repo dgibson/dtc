@@ -289,6 +289,8 @@ libfdt_tests () {
     run_test dtbs_equal_ordered embedded_nul.test.dtb embedded_nul_equiv.test.dtb
 
     run_dtc_test -I dts -O dtb bad-size-cells.dts
+
+    run_wrap_error_test $DTC division-by-zero.dts
 }
 
 dtc_tests () {
