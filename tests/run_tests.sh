@@ -293,6 +293,8 @@ libfdt_tests () {
     run_wrap_error_test $DTC division-by-zero.dts
     run_wrap_error_test $DTC bad-octal-literal.dts
     run_dtc_test -I dts -O dtb nul-in-escape.dts
+    run_wrap_error_test $DTC nul-in-line-info1.dts
+    run_wrap_error_test $DTC nul-in-line-info2.dts
 }
 
 dtc_tests () {
