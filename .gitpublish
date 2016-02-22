@@ -1,0 +1,8 @@
+# The first profile is the default
+[gitpublishprofile "rhel"]
+base = rhel7/master-1.4.3
+prefix = RHEL-7.4 dtc PATCH
+to = rhvirt-patches@redhat.com
+suppresscc = all
+message = True
+

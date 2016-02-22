@@ -1,0 +1,81 @@
+Name:           dtc
+Version:        %%VERSION%%
+Release:        %%RELEASE%%%{?dist}%%ZRELEASE%%%%LOCALVERSION%%
+Summary:        Device Tree Compiler
+Group:          Development/Tools
+License:        GPLv2+
+URL:            https://github.com/dgibson/dtc
+Source:         https://github.com/dgibson/dtc/archive/v%{version}.tar.gz
+
+%%PATCHLIST%%
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRequires:  flex, bison
+ExclusiveArch: %{power64} aarch64
+
+%description
+The Device Tree Compiler generates flattened Open Firmware style device trees
+for use with PowerPC machines that lack an Open Firmware implementation
+
+%package -n libfdt
+Summary: Device tree library
+Group: Development/Libraries
+
+%description -n libfdt
+libfdt is a library to process Open Firmware style device trees on various
+architectures.
+
+%package -n libfdt-devel
+Summary: Development headers for device tree library
+Group: Development/Libraries
+Requires: libfdt = %{version}-%{release}
+
+%description -n libfdt-devel
+This package provides development files for libfdt
+
+%prep
+%setup -q -n dtc-%{version}
+
+%%PATCHAPPLY%%
+
+%build
+make %{?_smp_mflags}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT PREFIX=/usr LIBDIR=%{_libdir}
+rm -rf $RPM_BUILD_ROOT/%{_libdir}/*.a
+
+# we don't want or need ftdump, so drop
+rm -f $RPM_BUILD_ROOT/%{_bindir}/ftdump
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%doc GPL
+%{_bindir}/*
+
+%files -n libfdt
+%defattr(-,root,root,-)
+%doc GPL
+%{_libdir}/libfdt-%{version}.so
+%{_libdir}/libfdt.so.*
+
+%files -n libfdt-devel
+%defattr(-,root,root,-)
+%{_libdir}/libfdt.so
+%{_includedir}/*
+
+%post -n libfdt -p /sbin/ldconfig
+
+%postun -n libfdt -p /sbin/ldconfig
+
+%changelog
+* Tue Aug 19 2014 Miroslav Rezanina <mrezanin@redhat.com> - 1.4.0-2
+- Update power macro for ppc64le
+
+* Fri Jul 25 2014 Miroslav Rezanina <mrezanin@redhat.com> - 1.4.0-1
+- Initial version

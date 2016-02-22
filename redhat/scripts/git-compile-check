@@ -1,0 +1,215 @@
+#!/bin/bash
+#
+# See $desc, below, for program description
+#
+# Copyright (c) 2013 Red Hat, Inc.
+#
+# Author(s):
+#   Jeff Cody <jcody@redhat.com>
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; under version 2 of the license
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, see <http://www.gnu.org/licenses/gpl-2.0.html>.
+#
+
+set -C -u -e
+set -o pipefail
+
+desc="
+$0 iterates through a git commit range, and performs the
+following on each commit:
+  - git checkout
+  - make clean
+  - configure
+  - make
+
+It will also optionally perform a git-reset and git-clean between
+checkouts, if requested via the '-f' option.
+
+The script will exit and report on first error on any of the above steps,
+(except no error checking is performed on 'make clean')
+
+NOTE: While executing, the script will checkout out each commit
+      in the range in the current git tree.  On exit, the HEAD
+      at the time the script was called is checked out"
+
+
+# default range is the last commit
+def_range="HEAD^!"
+def_config_opt="--target-list=x86_64-softmmu"
+# you may want to have make perform multiple jobs, e.g. -j4
+# this is ommitted as the default in case the project makefile
+# is not safe for parallel make processes
+def_make_opt=""
+def_log="output-$$.log"
+def_logdir=""
+force_clean='n'
+
+logfile=$def_log
+range=`git config compile-check.range || true`
+config_opt=`git config compile-check.configopt || true`
+make_opt=`git config compile-check.makeopt || true`
+logdir=`git config compile-check.logdir || true`
+
+if [[ -z "$range" ]]
+then
+    range=$def_range
+    git config compile-check.range $range || true
+fi
+if [[ -z "$config_opt" ]]
+then
+    config_opt=$def_config_opt
+    git config compile-check.configopt $config_opt || true
+fi
+if [[ -z "$make_opt" ]]
+then
+    make_opt=$def_make_opt
+    git config compile-check.makeopt $make_opt || true
+fi
+if [[ -z "$logdir" ]]
+then
+    logdir=$def_logdir
+    git config compile-check.logdir $logdir || true
+fi
+
+usage() {
+    echo ""
+    echo "$0 [OPTIONS]"
+    echo "$desc"
+    echo ""
+    echo "OPTIONS:"
+    echo "      -r git range
+            optional; default is '$range'
+"
+    echo "      -c configure options
+            optional; default is '$config_opt'
+"
+    echo "      -m make options
+            optional; default is '$make_opt'
+"
+    echo "      -d log dir
+            optional; default is '$logdir'
+"
+    echo "      -l log filename
+            optional; default is output-PROCID, where PROCID is the bash process id
+            note: you may specify a full path for the log filename here, and exclude the
+            -d option.
+"
+    echo "      -f force a git reset and clean
+            this will cause a 'git reset --hard; git clean -fdx' to be run between checkouts.
+            !! WARNING: This may cause data loss in your git tree.
+                        READ the git-clean and git-reset man pages and make
+                        sure you understand the implications of
+                        'git clean -fdx' and 'git reset --hard' before using !!
+            If you specify this option, make sure the logfile falls outside of the tree.
+"
+    echo "      -h help"
+}
+
+while getopts ":r:c:m:l:d:hf" opt
+do
+    case $opt in
+        r) range=$OPTARG
+            ;;
+        c) config_opt=$OPTARG
+            ;;
+        m) make_opt=$OPTARG
+            ;;
+        d) logdir=$OPTARG
+            ;;
+        l) logfile=$OPTARG
+            ;;
+        f) force_clean='y'
+            ;;
+        h) usage
+           exit
+            ;;
+        \?) echo "Unknown option: -$OPTARG" >&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+# append a '/' to logdir if $logdir was specified without one
+[[ -n "$logdir" ]] && [[ ${logdir:${#logdir}-1} != "/" ]] && logdir="${logdir}/"
+
+logfile="${logdir}${logfile}"
+
+head=`git rev-parse --abbrev-ref=strict HEAD`
+if [ HEAD = "$head" ]
+then
+    # we're at a detached head, get hash
+    head=`git rev-parse HEAD`
+fi
+
+
+total=`git rev-list "$range" |wc -l`
+
+echo "log output: $logfile"
+
+rm -f "$logfile"
+date > "$logfile"
+echo "git compile check for $range." >> "$logfile"
+echo "* configure options='$config_opt'" >> "$logfile"
+echo "* make options='$make_opt'" >> "$logfile"
+echo "Performing a test compile on $total patches" | tee -a "$logfile"
+echo "-------------------------------------------------------------" >> "$logfile"
+echo "" | tee -a "$logfile"
+
+clean_repo() {
+    if [[ $force_clean == 'y' ]]
+    then
+        git reset --hard >> "$logfile" 2>&1 || true
+        git clean -fdx   >> "$logfile" 2>&1 || true
+    fi
+}
+
+# we want to cleanup and return the git tree back to the previous head
+trap cleanup EXIT
+
+cleanup() {
+    echo ""
+    echo -n "Cleaning up..."
+    clean_repo
+    git checkout $head > /dev/null 2>&1
+    echo "done."
+}
+
+cnt=1
+# don't pipe the git job into read, to avoid subshells
+while read hash
+do
+    txt=`git log --pretty=tformat:"%h: %s" $hash^!`
+    echo "${cnt}/${total}: compiling: $txt" | tee -a "$logfile"
+    let cnt=$cnt+1;
+    echo "####################" >> "$logfile"
+    clean_repo
+    make clean > /dev/null 2>&1 || true
+    git checkout $hash          >> "$logfile" 2>&1 && \
+        ./configure $config_opt >> "$logfile" 2>&1 && \
+        make $make_opt          >> "$logfile" 2>&1 ||
+    (
+        S=$?
+        # don't complain for SIGINT, SIGTERM, SIGQUIT
+        if [ $S -ne 130 ] && [ $S -ne 131 ] && [ $S -ne 143 ]
+        then
+            echo "" | tee -a "$logfile"
+            echo "ERROR: commit $hash failed to build!" | tee -a "$logfile"
+            git show --stat $hash | tee -a "$logfile"
+        fi
+        exit 1
+    )
+done < <(git log $range --pretty=tformat:"%H" --reverse)
+
+echo "
+All patches in $range compiled successfully!" | tee -a "$logfile"
+exit 0

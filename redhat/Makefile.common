@@ -1,0 +1,35 @@
+UNAME:=dtc
+NAME:=dtc
+RHEV:=0
+VERSION:=1.4.3
+DATE:=
+COMMIT:=
+RELEASE:=1
+ZRELEASE:=
+RELEASE_SEPARATOR:=-
+
+TARFILE:=v$(VERSION).tar.gz
+TARURL:=https://github.com/dgibson/dtc/archive/v1.4.3.tar.gz
+TARSHA1:=cef129e4444a52dcd704c08c6375fa3894954048
+MARKER:=fa8bc7f928ac25f23532afc8beb2073efc8fb063
+SOURCES_FILELIST:=
+
+SPECFILE:=$(NAME).spec
+DIST:=.el7
+BUILD_TARGET:=rhel-7.3-candidate
+
+ifeq ($(RHEV),1)
+  NAME_SUFFIX:=-rhev
+endif
+
+ifneq ($(VERSION),)
+  BUILD_DIR:=$(UNAME)-$(VERSION)
+  SRPM_NAME:=$(NAME)$(NAME_SUFFIX)-$(VERSION)$(RELEASE_SEPARATOR)$(RELEASE)$(DIST)
+else
+  BUILD_DIR:=$(UNAME)-$(GITCOMMIT
+  SRPM_NAME:=$(NAME)$(NAME_SUFFIX)-$(DATE)-$(RELEASE).git$(COMMIT)$(DIST)
+endif
+
+ifneq ($(ZRELEASE),)
+  SRPM_NAME:=$(SRPM_NAME).$(ZRELEASE)
+endif
