@@ -366,7 +366,7 @@ static void make_fdt_header(struct fdt_header *fdt,
 		fdt->size_dt_struct = cpu_to_fdt32(dtsize);
 }
 
-void dt_to_blob(FILE *f, struct boot_info *bi, int version)
+void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 {
 	struct version_info *vi = NULL;
 	int i;
@@ -384,14 +384,14 @@ void dt_to_blob(FILE *f, struct boot_info *bi, int version)
 	if (!vi)
 		die("Unknown device tree blob version %d\n", version);
 
-	flatten_tree(bi->dt, &bin_emitter, &dtbuf, &strbuf, vi);
+	flatten_tree(dti->dt, &bin_emitter, &dtbuf, &strbuf, vi);
 	bin_emit_cell(&dtbuf, FDT_END);
 
-	reservebuf = flatten_reserve_list(bi->reservelist, vi);
+	reservebuf = flatten_reserve_list(dti->reservelist, vi);
 
 	/* Make header */
 	make_fdt_header(&fdt, vi, reservebuf.len, dtbuf.len, strbuf.len,
-			bi->boot_cpuid_phys);
+			dti->boot_cpuid_phys);
 
 	/*
 	 * If the user asked for more space than is used, adjust the totalsize.
@@ -467,7 +467,7 @@ static void dump_stringtable_asm(FILE *f, struct data strbuf)
 	}
 }
 
-void dt_to_asm(FILE *f, struct boot_info *bi, int version)
+void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 {
 	struct version_info *vi = NULL;
 	int i;
@@ -507,7 +507,7 @@ void dt_to_asm(FILE *f, struct boot_info *bi, int version)
 
 	if (vi->flags & FTF_BOOTCPUID) {
 		fprintf(f, "\t/* boot_cpuid_phys */\n");
-		asm_emit_cell(f, bi->boot_cpuid_phys);
+		asm_emit_cell(f, dti->boot_cpuid_phys);
 	}
 
 	if (vi->flags & FTF_STRTABSIZE) {
@@ -537,7 +537,7 @@ void dt_to_asm(FILE *f, struct boot_info *bi, int version)
 	 * Use .long on high and low halfs of u64s to avoid .quad
 	 * as it appears .quad isn't available in some assemblers.
 	 */
-	for (re = bi->reservelist; re; re = re->next) {
+	for (re = dti->reservelist; re; re = re->next) {
 		struct label *l;
 
 		for_each_label(re->labels, l) {
@@ -557,7 +557,7 @@ void dt_to_asm(FILE *f, struct boot_info *bi, int version)
 	fprintf(f, "\t.long\t0, 0\n\t.long\t0, 0\n");
 
 	emit_label(f, symprefix, "struct_start");
-	flatten_tree(bi->dt, &asm_emitter, f, &strbuf, vi);
+	flatten_tree(dti->dt, &asm_emitter, f, &strbuf, vi);
 
 	fprintf(f, "\t/* FDT_END */\n");
 	asm_emit_cell(f, FDT_END);
@@ -814,7 +814,7 @@ static struct node *unflatten_tree(struct inbuf *dtbuf,
 }
 
 
-struct boot_info *dt_from_blob(const char *fname)
+struct dt_info *dt_from_blob(const char *fname)
 {
 	FILE *f;
 	uint32_t magic, totalsize, version, size_dt, boot_cpuid_phys;
@@ -942,5 +942,5 @@ struct boot_info *dt_from_blob(const char *fname)
 
 	fclose(f);
 
-	return build_boot_info(DTSF_V1, reservelist, tree, boot_cpuid_phys);
+	return build_dt_info(DTSF_V1, reservelist, tree, boot_cpuid_phys);
 }

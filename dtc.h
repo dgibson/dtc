@@ -241,44 +241,44 @@ struct reserve_info *add_reserve_entry(struct reserve_info *list,
 				       struct reserve_info *new);
 
 
-struct boot_info {
+struct dt_info {
 	unsigned int dtsflags;
 	struct reserve_info *reservelist;
-	struct node *dt;		/* the device tree */
 	uint32_t boot_cpuid_phys;
+	struct node *dt;		/* the device tree */
 };
 
 /* DTS version flags definitions */
 #define DTSF_V1		0x0001	/* /dts-v1/ */
 #define DTSF_PLUGIN	0x0002	/* /plugin/ */
 
-struct boot_info *build_boot_info(unsigned int dtsflags,
-				  struct reserve_info *reservelist,
-				  struct node *tree, uint32_t boot_cpuid_phys);
-void sort_tree(struct boot_info *bi);
-void generate_label_tree(struct boot_info *bi, char *name, bool allocph);
-void generate_fixups_tree(struct boot_info *bi, char *name);
-void generate_local_fixups_tree(struct boot_info *bi, char *name);
+struct dt_info *build_dt_info(unsigned int dtsflags,
+			      struct reserve_info *reservelist,
+			      struct node *tree, uint32_t boot_cpuid_phys);
+void sort_tree(struct dt_info *dti);
+void generate_label_tree(struct dt_info *dti, char *name, bool allocph);
+void generate_fixups_tree(struct dt_info *dti, char *name);
+void generate_local_fixups_tree(struct dt_info *dti, char *name);
 
 /* Checks */
 
 void parse_checks_option(bool warn, bool error, const char *arg);
-void process_checks(bool force, struct boot_info *bi);
+void process_checks(bool force, struct dt_info *dti);
 
 /* Flattened trees */
 
-void dt_to_blob(FILE *f, struct boot_info *bi, int version);
-void dt_to_asm(FILE *f, struct boot_info *bi, int version);
+void dt_to_blob(FILE *f, struct dt_info *dti, int version);
+void dt_to_asm(FILE *f, struct dt_info *dti, int version);
 
-struct boot_info *dt_from_blob(const char *fname);
+struct dt_info *dt_from_blob(const char *fname);
 
 /* Tree source */
 
-void dt_to_source(FILE *f, struct boot_info *bi);
-struct boot_info *dt_from_source(const char *f);
+void dt_to_source(FILE *f, struct dt_info *dti);
+struct dt_info *dt_from_source(const char *f);
 
 /* FS trees */
 
-struct boot_info *dt_from_fs(const char *dirname);
+struct dt_info *dt_from_fs(const char *dirname);
 
 #endif /* _DTC_H */
