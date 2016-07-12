@@ -246,21 +246,6 @@ srcpos_copy(struct srcpos *pos)
 	return pos_new;
 }
 
-
-
-void
-srcpos_dump(struct srcpos *pos)
-{
-	printf("file        : \"%s\"\n",
-	       pos->file ? (char *) pos->file : "<no file>");
-	printf("first_line  : %d\n", pos->first_line);
-	printf("first_column: %d\n", pos->first_column);
-	printf("last_line   : %d\n", pos->last_line);
-	printf("last_column : %d\n", pos->last_column);
-	printf("file        : %s\n", pos->file->name);
-}
-
-
 char *
 srcpos_string(struct srcpos *pos)
 {
