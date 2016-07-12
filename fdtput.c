@@ -328,7 +328,7 @@ static int delete_node(char *blob, const char *node_name)
 static int do_fdtput(struct display_info *disp, const char *filename,
 		    char **arg, int arg_count)
 {
-	char *value;
+	char *value = NULL;
 	char *blob;
 	char *node;
 	int len, ret = 0;
@@ -374,6 +374,11 @@ static int do_fdtput(struct display_info *disp, const char *filename,
 	}
 
 	free(blob);
+
+	if (value) {
+		free(value);
+	}
+
 	return ret;
 }
 
