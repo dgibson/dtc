@@ -15,6 +15,8 @@
 
 #include "util.h"
 
+#define FDT_MAGIC_SIZE	4
+
 #define ALIGN(x, a)	(((x) + ((a) - 1)) & ~((a) - 1))
 #define PALIGN(p, a)	((void *)(ALIGN((unsigned long)(p), (a))))
 #define GET_CELL(p)	(p += 4, *((const uint32_t *)(p-4)))
@@ -188,15 +190,15 @@ int main(int argc, char *argv[])
 
 	/* try and locate an embedded fdt in a bigger blob */
 	if (scan) {
-		unsigned char smagic[4];
+		unsigned char smagic[FDT_MAGIC_SIZE];
 		char *p = buf;
 		char *endp = buf + len;
 
 		fdt_set_magic(smagic, FDT_MAGIC);
 
 		/* poor man's memmem */
-		while (true) {
-			p = memchr(p, smagic[0], endp - p - 4);
+		while ((endp - p) >= FDT_MAGIC_SIZE) {
+			p = memchr(p, smagic[0], endp - p - FDT_MAGIC_SIZE);
 			if (!p)
 				break;
 			if (fdt_magic(p) == FDT_MAGIC) {
@@ -215,7 +217,7 @@ int main(int argc, char *argv[])
 			}
 			++p;
 		}
-		if (!p)
+		if (!p || ((endp - p) < FDT_MAGIC_SIZE))
 			die("%s: could not locate fdt magic\n", file);
 		printf("%s: found fdt at offset %#zx\n", file, p - buf);
 		buf = p;
