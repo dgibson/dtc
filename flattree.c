@@ -398,14 +398,21 @@ void dt_to_blob(FILE *f, struct boot_info *bi, int version)
 	 */
 	if (minsize > 0) {
 		padlen = minsize - fdt32_to_cpu(fdt.totalsize);
-		if ((padlen < 0) && (quiet < 1))
-			fprintf(stderr,
-				"Warning: blob size %d >= minimum size %d\n",
-				fdt32_to_cpu(fdt.totalsize), minsize);
+		if (padlen < 0) {
+			padlen = 0;
+			if (quiet < 1)
+				fprintf(stderr,
+					"Warning: blob size %d >= minimum size %d\n",
+					fdt32_to_cpu(fdt.totalsize), minsize);
+		}
 	}
 
 	if (padsize > 0)
 		padlen = padsize;
+
+	if (alignsize > 0)
+		padlen = ALIGN(fdt32_to_cpu(fdt.totalsize) + padlen, alignsize)
+			- fdt32_to_cpu(fdt.totalsize);
 
 	if (padlen > 0) {
 		int tsize = fdt32_to_cpu(fdt.totalsize);
@@ -572,6 +579,8 @@ void dt_to_asm(FILE *f, struct boot_info *bi, int version)
 	if (padsize > 0) {
 		fprintf(f, "\t.space\t%d, 0\n", padsize);
 	}
+	if (alignsize > 0)
+		asm_emit_align(f, alignsize);
 	emit_label(f, symprefix, "blob_abs_end");
 
 	data_free(strbuf);
