@@ -223,6 +223,8 @@ static void convert_file(const char *fname)
 
 	while(yylex())
 		;
+
+	free(newname);
 }
 
 int main(int argc, char *argv[])
