@@ -23,6 +23,7 @@ LIB_TESTS_L = get_mem_rsv \
 	add_subnode_with_nops path_offset_aliases \
 	utilfdt_test \
 	integer-expressions \
+	property_iterate \
 	subnode_iterate
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 

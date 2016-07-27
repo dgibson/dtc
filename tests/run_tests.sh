@@ -269,6 +269,9 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb -o subnode_iterate.dtb subnode_iterate.dts
     run_test subnode_iterate subnode_iterate.dtb
 
+    run_dtc_test -I dts -O dtb -o property_iterate.dtb property_iterate.dts
+    run_test property_iterate property_iterate.dtb
+
     # Tests for behaviour on various sorts of corrupted trees
     run_test truncated_property
 
