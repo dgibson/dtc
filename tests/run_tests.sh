@@ -62,11 +62,6 @@ run_test () {
     base_run_test $VALGRIND $VGSUPP "./$@"
 }
 
-run_local_test () {
-    printf "$*:	"
-    base_run_test "$@"
-}
-
 run_sh_test () {
     printf "$*:	"
     base_run_test sh "$@"
@@ -117,14 +112,15 @@ run_wrap_error_test () {
 
 # $1: dtb file
 # $2: align base
-align_test () {
-    local size=`stat -c %s $1`
-    local mod=$(($size%$2))
+check_align () {
+    shorten_echo "check_align $@:	"
+    local size=$(stat -c %s "$1")
+    local align="$2"
     (
-	if [ $mod -eq 0 ] ;then
+	if [ $(($size % $align)) -eq 0 ] ;then
 	    PASS
 	else
-	    FAIL
+	    FAIL "Output size $size is not $align-byte aligned"
 	fi
     )
 }
@@ -524,13 +520,14 @@ dtc_tests () {
 	search_dir_b/search_paths_subdir.dts
 
     # Check -a option
-    local alignbase=64
-    # -p -a
-    run_dtc_test -O dtb -p 1000 -a $alignbase -o align0.dtb subnode_iterate.dts
-    run_local_test align_test align0.dtb alignbase
-    # -S -a
-    run_dtc_test -O dtb -S 1999 -a $alignbase -o align1.dtb subnode_iterate.dts
-    run_local_test align_test align1.dtb alignbase
+    for align in 2 4 8 16 32 64; do
+	# -p -a
+	run_dtc_test -O dtb -p 1000 -a $align -o align0.dtb subnode_iterate.dts
+	check_align align0.dtb $align
+	# -S -a
+	run_dtc_test -O dtb -S 1999 -a $align -o align1.dtb subnode_iterate.dts
+	check_align align1.dtb $align
+    done
 }
 
 cmp_tests () {
