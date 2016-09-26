@@ -204,7 +204,7 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 			}
 		}
 
-		/* if no collision occured, add child to the old node. */
+		/* if no collision occurred, add child to the old node. */
 		if (new_child)
 			add_child(old_node, new_child);
 	}
