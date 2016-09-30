@@ -160,6 +160,37 @@ run_fdtdump_test() {
     base_run_test sh fdtdump-runtest.sh "$file"
 }
 
+BAD_FIXUP_TREES="bad_index \
+		empty \
+		empty_index \
+		index_trailing \
+		path_empty_prop \
+		path_only \
+		path_only_sep \
+		path_prop"
+
+overlay_tests () {
+    # Overlay tests that don't require overlay support in dtc
+    run_dtc_test -I dts -O dtb -o overlay_base.dtb overlay_base.dts
+    run_dtc_test -I dts -O dtb -o overlay_overlay.dtb overlay_overlay_nodtc.dts
+    run_test overlay overlay_base.dtb overlay_overlay.dtb
+
+    # Overlay tests that requires overlay support in dtc
+    echo "/dts-v1/; / {};" | $DTC -@ > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        run_dtc_test -@ -I dts -O dtb -o overlay_base.dtb overlay_base.dts
+        run_dtc_test -@ -I dts -O dtb -o overlay_overlay.dtb overlay_overlay_dtc.dts
+        run_test overlay overlay_base.dtb overlay_overlay.dtb
+
+	# Bad fixup tests
+	for test in $BAD_FIXUP_TREES; do
+	    tree="overlay_bad_fixup_$test"
+	    run_dtc_test -I dts -O dtb -o $tree.dtb $tree.dts
+	    run_test overlay_bad_fixup overlay_base.dtb $tree.dtb
+	done
+    fi
+}
+
 tree1_tests () {
     TREE=$1
 
@@ -273,6 +304,7 @@ libfdt_tests () {
     run_test appendprop2 appendprop1.test.dtb
     run_dtc_test -I dts -O dtb -o appendprop.test.dtb appendprop.dts
     run_test dtbs_equal_ordered appendprop2.test.dtb appendprop.test.dtb
+    overlay_tests
 
     for basetree in test_tree1.dtb sw_tree1.test.dtb rw_tree1.test.dtb; do
 	run_test nopulate $basetree

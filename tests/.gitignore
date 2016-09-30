@@ -35,6 +35,8 @@ tmp.*
 /nopulate
 /notfound
 /open_pack
+/overlay
+/overlay_bad_fixup
 /parent_offset
 /path-references
 /path_offset
