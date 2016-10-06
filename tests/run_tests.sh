@@ -181,14 +181,14 @@ overlay_tests () {
         run_dtc_test -@ -I dts -O dtb -o overlay_base.dtb overlay_base.dts
         run_dtc_test -@ -I dts -O dtb -o overlay_overlay.dtb overlay_overlay_dtc.dts
         run_test overlay overlay_base.dtb overlay_overlay.dtb
-
-	# Bad fixup tests
-	for test in $BAD_FIXUP_TREES; do
-	    tree="overlay_bad_fixup_$test"
-	    run_dtc_test -I dts -O dtb -o $tree.dtb $tree.dts
-	    run_test overlay_bad_fixup overlay_base.dtb $tree.dtb
-	done
     fi
+
+    # Bad fixup tests
+    for test in $BAD_FIXUP_TREES; do
+	tree="overlay_bad_fixup_$test"
+	run_dtc_test -I dts -O dtb -o $tree.dtb $tree.dts
+	run_test overlay_bad_fixup overlay_base.dtb $tree.dtb
+    done
 }
 
 tree1_tests () {
