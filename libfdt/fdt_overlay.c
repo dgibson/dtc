@@ -272,6 +272,8 @@ static int overlay_update_local_node_references(void *fdto,
 
 		tree_child = fdt_subnode_offset(fdto, tree_node,
 						fixup_child_name);
+		if (ret == -FDT_ERR_NOTFOUND)
+			return -FDT_ERR_BADOVERLAY;
 		if (tree_child < 0)
 			return tree_child;
 
