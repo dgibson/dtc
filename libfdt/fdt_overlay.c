@@ -492,13 +492,12 @@ static int overlay_fixup_phandles(void *fdt, void *fdto)
 
 	/* We can have overlays without any fixups */
 	fixups_off = fdt_path_offset(fdto, "/__fixups__");
-	if (fixups_off == -FDT_ERR_NOTFOUND)
-		return 0;
-	if (fixups_off < 0)
+	if ((fixups_off < 0 && (fixups_off != -FDT_ERR_NOTFOUND)))
 		return fixups_off;
 
+	/* And base DTs without symbols */
 	symbols_off = fdt_path_offset(fdt, "/__symbols__");
-	if (symbols_off < 0)
+	if ((symbols_off < 0 && (symbols_off != -FDT_ERR_NOTFOUND)))
 		return symbols_off;
 
 	fdt_for_each_property_offset(property, fdto, fixups_off) {
