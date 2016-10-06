@@ -34,9 +34,9 @@
 /* 4k ought to be enough for anybody */
 #define FDT_COPY_SIZE	(4 * 1024)
 
-static int fdt_getprop_u32_by_index(void *fdt, const char *path,
-				    const char *name, int index,
-				    unsigned long *out)
+static int fdt_getprop_u32_by_poffset(void *fdt, const char *path,
+				      const char *name, int poffset,
+				      unsigned long *out)
 {
 	const fdt32_t *val;
 	int node_off;
@@ -47,10 +47,10 @@ static int fdt_getprop_u32_by_index(void *fdt, const char *path,
 		return node_off;
 
 	val = fdt_getprop(fdt, node_off, name, &len);
-	if (!val || (len < (sizeof(uint32_t) * (index + 1))))
+	if (!val || (len < (sizeof(uint32_t) * (poffset + 1))))
 		return -FDT_ERR_NOTFOUND;
 
-	*out = fdt32_to_cpu(*(val + index));
+	*out = fdt32_to_cpu(*(val + poffset));
 
 	return 0;
 }
@@ -141,14 +141,14 @@ static int fdt_overlay_local_phandle(void *fdt)
 	local_phandle = fdt_get_phandle(fdt, off);
 	CHECK(!local_phandle);
 
-	CHECK(fdt_getprop_u32_by_index(fdt, "/test-node",
-				       "test-several-phandle",
-				       0, &val));
+	CHECK(fdt_getprop_u32_by_poffset(fdt, "/test-node",
+					 "test-several-phandle",
+					 0, &val));
 	CHECK(val != local_phandle);
 
-	CHECK(fdt_getprop_u32_by_index(fdt, "/test-node",
-				       "test-several-phandle",
-				       1, &val));
+	CHECK(fdt_getprop_u32_by_poffset(fdt, "/test-node",
+					 "test-several-phandle",
+					 1, &val));
 	CHECK(val != local_phandle);
 
 	return 0;
@@ -172,12 +172,12 @@ static int fdt_overlay_local_phandles(void *fdt)
 	test_phandle = fdt_get_phandle(fdt, off);
 	CHECK(!test_phandle);
 
-	CHECK(fdt_getprop_u32_by_index(fdt, "/test-node",
-				       "test-phandle", 0, &val));
+	CHECK(fdt_getprop_u32_by_poffset(fdt, "/test-node",
+					 "test-phandle", 0, &val));
 	CHECK(test_phandle != val);
 
-	CHECK(fdt_getprop_u32_by_index(fdt, "/test-node",
-				       "test-phandle", 1, &val));
+	CHECK(fdt_getprop_u32_by_poffset(fdt, "/test-node",
+					 "test-phandle", 1, &val));
 	CHECK(local_phandle != val);
 
 	return 0;

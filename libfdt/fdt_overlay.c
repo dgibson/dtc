@@ -234,9 +234,9 @@ static int overlay_update_local_node_references(void *fdto,
 		}
 
 		for (i = 0; i < (fixup_len / sizeof(uint32_t)); i++) {
-			uint32_t adj_val, index;
+			uint32_t adj_val, poffset;
 
-			index = fdt32_to_cpu(fixup_val[i]);
+			poffset = fdt32_to_cpu(fixup_val[i]);
 
 			/*
 			 * phandles to fixup can be unaligned.
@@ -244,7 +244,7 @@ static int overlay_update_local_node_references(void *fdto,
 			 * Use a memcpy for the architectures that do
 			 * not support unaligned accesses.
 			 */
-			memcpy(&adj_val, tree_val + index, sizeof(adj_val));
+			memcpy(&adj_val, tree_val + poffset, sizeof(adj_val));
 
 			adj_val = fdt32_to_cpu(adj_val);
 			adj_val += delta;
@@ -254,7 +254,7 @@ static int overlay_update_local_node_references(void *fdto,
 								  tree_node,
 								  name,
 								  strlen(name),
-								  index,
+								  poffset,
 								  &adj_val,
 								  sizeof(adj_val));
 			if (ret == -FDT_ERR_NOSPACE)
@@ -332,7 +332,7 @@ static int overlay_update_local_references(void *fdto, uint32_t delta)
  * @path_len: number of path characters to consider
  * @name: Name of the property holding the phandle reference in the overlay
  * @name_len: number of name characters to consider
- * @index: Index in the overlay property where the phandle is stored
+ * @poffset: Offset within the overlay property where the phandle is stored
  * @label: Label of the node referenced by the phandle
  *
  * overlay_fixup_one_phandle() resolves an overlay phandle pointing to
@@ -350,7 +350,7 @@ static int overlay_fixup_one_phandle(void *fdt, void *fdto,
 				     int symbols_off,
 				     const char *path, uint32_t path_len,
 				     const char *name, uint32_t name_len,
-				     int index, const char *label)
+				     int poffset, const char *label)
 {
 	const char *symbol_path;
 	uint32_t phandle;
@@ -378,7 +378,7 @@ static int overlay_fixup_one_phandle(void *fdt, void *fdto,
 
 	phandle = cpu_to_fdt32(phandle);
 	return fdt_setprop_inplace_namelen_partial(fdto, fixup_off,
-						   name, name_len, index,
+						   name, name_len, poffset,
 						   &phandle, sizeof(phandle));
 };
 
@@ -423,7 +423,7 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		uint32_t path_len, name_len;
 		uint32_t fixup_len;
 		char *sep, *endptr;
-		int index, ret;
+		int poffset, ret;
 
 		fixup_end = memchr(value, '\0', len);
 		if (!fixup_end)
@@ -452,13 +452,13 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		if (!name_len)
 			return -FDT_ERR_BADOVERLAY;
 
-		index = strtoul(sep + 1, &endptr, 10);
+		poffset = strtoul(sep + 1, &endptr, 10);
 		if ((*endptr != '\0') || (endptr <= (sep + 1)))
 			return -FDT_ERR_BADOVERLAY;
 
 		ret = overlay_fixup_one_phandle(fdt, fdto, symbols_off,
 						path, path_len, name, name_len,
-						index, label);
+						poffset, label);
 		if (ret)
 			return ret;
 	} while (len > 0);
