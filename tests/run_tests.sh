@@ -171,23 +171,23 @@ BAD_FIXUP_TREES="bad_index \
 
 overlay_tests () {
     # Overlay tests that don't require overlay support in dtc
-    run_dtc_test -I dts -O dtb -o overlay_base.test.dtb overlay_base.dts
-    run_dtc_test -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay_nodtc.dts
-    run_test overlay overlay_base.test.dtb overlay_overlay.test.dtb
+    run_dtc_test -I dts -O dtb -o overlay_base_no_symbols.test.dtb overlay_base.dts
+    run_dtc_test -I dts -O dtb -o overlay_overlay_no_symbols.test.dtb overlay_overlay_nodtc.dts
+    run_test overlay overlay_base_no_symbols.test.dtb overlay_overlay_no_symbols.test.dtb
 
     # Overlay tests that requires overlay support in dtc
     echo "/dts-v1/; / {};" | $DTC -@ > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        run_dtc_test -@ -I dts -O dtb -o overlay_base.test.dtb overlay_base.dts
-        run_dtc_test -@ -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay_dtc.dts
-        run_test overlay overlay_base.test.dtb overlay_overlay.test.dtb
+        run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols.test.dtb overlay_base.dts
+        run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.dtb overlay_overlay_dtc.dts
+        run_test overlay overlay_base_with_symbols.test.dtb overlay_overlay_with_symbols.test.dtb
     fi
 
     # Bad fixup tests
     for test in $BAD_FIXUP_TREES; do
 	tree="overlay_bad_fixup_$test"
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb $tree.dts
-	run_test overlay_bad_fixup overlay_base.test.dtb $tree.test.dtb
+	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
     done
 }
 
