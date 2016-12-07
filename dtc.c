@@ -32,6 +32,9 @@ int minsize;		/* Minimum blob size */
 int padsize;		/* Additional padding to blob */
 int alignsize;		/* Additional padding to blob accroding to the alignsize */
 int phandle_format = PHANDLE_BOTH;	/* Use linux,phandle or phandle properties */
+int generate_symbols;	/* enable symbols & fixup support */
+int generate_fixups;		/* suppress generation of fixups on symbol support */
+int auto_label_aliases;		/* auto generate labels -> aliases */
 
 static int is_power_of_2(int x)
 {
@@ -59,7 +62,7 @@ static void fill_fullpaths(struct node *tree, const char *prefix)
 #define FDT_VERSION(version)	_FDT_VERSION(version)
 #define _FDT_VERSION(version)	#version
 static const char usage_synopsis[] = "dtc [options] <input file>";
-static const char usage_short_opts[] = "qI:O:o:V:d:R:S:p:a:fb:i:H:sW:E:hv";
+static const char usage_short_opts[] = "qI:O:o:V:d:R:S:p:a:fb:i:H:sW:E:@Ahv";
 static struct option const usage_long_opts[] = {
 	{"quiet",            no_argument, NULL, 'q'},
 	{"in-format",         a_argument, NULL, 'I'},
@@ -78,6 +81,8 @@ static struct option const usage_long_opts[] = {
 	{"phandle",           a_argument, NULL, 'H'},
 	{"warning",           a_argument, NULL, 'W'},
 	{"error",             a_argument, NULL, 'E'},
+	{"symbols",	     no_argument, NULL, '@'},
+	{"auto-alias",       no_argument, NULL, 'A'},
 	{"help",             no_argument, NULL, 'h'},
 	{"version",          no_argument, NULL, 'v'},
 	{NULL,               no_argument, NULL, 0x0},
@@ -109,6 +114,8 @@ static const char * const usage_opts_help[] = {
 	 "\t\tboth   - Both \"linux,phandle\" and \"phandle\" properties",
 	"\n\tEnable/disable warnings (prefix with \"no-\")",
 	"\n\tEnable/disable errors (prefix with \"no-\")",
+	"\n\tEnable generation of symbols",
+	"\n\tEnable auto-alias of labels",
 	"\n\tPrint this help and exit",
 	"\n\tPrint version and exit",
 	NULL,
@@ -249,6 +256,13 @@ int main(int argc, char *argv[])
 			parse_checks_option(false, true, optarg);
 			break;
 
+		case '@':
+			generate_symbols = 1;
+			break;
+		case 'A':
+			auto_label_aliases = 1;
+			break;
+
 		case 'h':
 			usage(NULL);
 		default:
@@ -305,6 +319,23 @@ int main(int argc, char *argv[])
 
 	fill_fullpaths(bi->dt, "");
 	process_checks(force, bi);
+
+	/* on a plugin, generate by default */
+	if (bi->dtsflags & DTSF_PLUGIN) {
+		generate_symbols = 1;
+		generate_fixups = 1;
+	}
+
+	if (auto_label_aliases)
+		generate_label_tree(bi, "aliases", false);
+
+	if (generate_symbols)
+		generate_label_tree(bi, "__symbols__", true);
+
+	if (generate_fixups) {
+		generate_fixups_tree(bi, "__fixups__");
+		generate_local_fixups_tree(bi, "__local_fixups__");
+	}
 
 	if (sort)
 		sort_tree(bi);

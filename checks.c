@@ -487,8 +487,12 @@ static void fixup_phandle_references(struct check *c, struct boot_info *bi,
 
 			refnode = get_node_by_ref(dt, m->ref);
 			if (! refnode) {
-				FAIL(c, "Reference to non-existent node or label \"%s\"\n",
-				     m->ref);
+				if (!(bi->dtsflags & DTSF_PLUGIN))
+					FAIL(c, "Reference to non-existent node or "
+							"label \"%s\"\n", m->ref);
+				else /* mark the entry as unresolved */
+					*((cell_t *)(prop->val.val + m->offset)) =
+						cpu_to_fdt32(0xffffffff);
 				continue;
 			}
 

@@ -19,6 +19,7 @@
  */
 %{
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "dtc.h"
 #include "srcpos.h"
@@ -52,9 +53,11 @@ extern bool treesource_error;
 	struct node *nodelist;
 	struct reserve_info *re;
 	uint64_t integer;
+	unsigned int flags;
 }
 
 %token DT_V1
+%token DT_PLUGIN
 %token DT_MEMRESERVE
 %token DT_LSHIFT DT_RSHIFT DT_LE DT_GE DT_EQ DT_NE DT_AND DT_OR
 %token DT_BITS
@@ -71,6 +74,8 @@ extern bool treesource_error;
 
 %type <data> propdata
 %type <data> propdataprefix
+%type <flags> versioninfo
+%type <flags> plugindecl
 %type <re> memreserve
 %type <re> memreserves
 %type <array> arrayprefix
@@ -101,16 +106,33 @@ extern bool treesource_error;
 %%
 
 sourcefile:
-	  v1tag memreserves devicetree
+	  versioninfo plugindecl memreserves devicetree
 		{
-			the_boot_info = build_boot_info($2, $3,
-							guess_boot_cpuid($3));
+			the_boot_info = build_boot_info($1 | $2, $3, $4,
+							guess_boot_cpuid($4));
+		}
+	;
+
+versioninfo:
+	v1tag
+		{
+			$$ = DTSF_V1;
 		}
 	;
 
 v1tag:
 	  DT_V1 ';'
 	| DT_V1 ';' v1tag
+
+plugindecl:
+	DT_PLUGIN ';'
+		{
+			$$ = DTSF_PLUGIN;
+		}
+	| /* empty */
+		{
+			$$ = 0;
+		}
 	;
 
 memreserves:
