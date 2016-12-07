@@ -181,6 +181,35 @@ overlay_tests () {
         run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols.test.dtb overlay_base.dts
         run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.dtb overlay_overlay_dtc.dts
         run_test overlay overlay_base_with_symbols.test.dtb overlay_overlay_with_symbols.test.dtb
+
+        # Test symbols/fixups existence
+        run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__symbols__"
+        run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__fixups__"
+        run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__local_fixups__"
+
+        # test plugin source to dtb and back
+        run_dtc_test -@ -I dtb -O dts -o overlay_overlay_dtc.test.dts overlay_overlay_with_symbols.test.dtb
+        run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.test.dtb overlay_overlay_dtc.test.dts
+        run_test dtbs_equal_ordered overlay_overlay_with_symbols.test.dtb overlay_overlay_with_symbols.test.test.dtb
+
+        # test plugin auto-generation without using -@
+        run_dtc_test -I dts -O dtb -o overlay_overlay_with_symbols_auto.test.dtb overlay_overlay_dtc.dts
+        run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__symbols__"
+        run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__fixups__"
+        run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__local_fixups__"
+
+        # Test suppression of fixups
+        run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols_no_fixups.test.dtb overlay_base_fixups.dts
+        run_test check_path overlay_base_with_symbols_no_fixups.test.dtb exists "/__symbols__"
+        run_test check_path overlay_base_with_symbols_no_fixups.test.dtb not-exists "/__fixups__"
+        run_test check_path overlay_base_with_symbols_no_fixups.test.dtb not-exists "/__local_fixups__"
+
+        # Test generation of aliases insted of symbols
+        run_dtc_test -A -I dts -O dtb -o overlay_overlay_with_aliases.dtb overlay_overlay_dtc.dts
+        run_test check_path overlay_overlay_with_aliases.dtb exists "/aliases"
+        run_test check_path overlay_overlay_with_aliases.dtb exists "/__symbols__"
+        run_test check_path overlay_overlay_with_aliases.dtb exists "/__fixups__"
+        run_test check_path overlay_overlay_with_aliases.dtb exists "/__local_fixups__"
     fi
 
     # Bad fixup tests
