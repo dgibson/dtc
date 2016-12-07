@@ -25,7 +25,8 @@ LIB_TESTS_L = get_mem_rsv \
 	integer-expressions \
 	property_iterate \
 	subnode_iterate \
-	overlay overlay_bad_fixup
+	overlay overlay_bad_fixup \
+	check_path
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
 LIBTREE_TESTS_L = truncated_property

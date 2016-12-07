@@ -508,6 +508,9 @@ dtc_tests () {
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label5.dts
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label6.dts
 
+    run_test check_path test_tree1.dtb exists "/subnode@1"
+    run_test check_path test_tree1.dtb not-exists "/subnode@10"
+
     # Check warning options
     run_sh_test dtc-checkfails.sh address_cells_is_cell interrupt_cells_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb bad-ncells.dts
     run_sh_test dtc-fails.sh -n test-warn-output.test.dtb -I dts -O dtb bad-ncells.dts
