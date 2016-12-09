@@ -26,8 +26,9 @@
 
 #define CHECK(code) \
 	{ \
-		if (code) \
-			FAIL(#code ": %s", fdt_strerror(code)); \
+		int err = (code); \
+		if (err) \
+			FAIL(#code ": %s", fdt_strerror(err)); \
 	}
 
 /* 4k ought to be enough for anybody */
