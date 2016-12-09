@@ -169,12 +169,22 @@ BAD_FIXUP_TREES="bad_index \
 		path_only_sep \
 		path_prop"
 
-overlay_tests () {
-    # Overlay tests for libfdt alone
+# Test to exercise libfdt overlay application without dtc's overlay support
+libfdt_overlay_tests () {
     run_dtc_test -I dts -O dtb -o overlay_base_no_symbols.test.dtb overlay_base.dts
     run_dtc_test -I dts -O dtb -o overlay_overlay_no_symbols.test.dtb overlay_overlay_nodtc.dts
     run_test overlay overlay_base_no_symbols.test.dtb overlay_overlay_no_symbols.test.dtb
 
+    # Bad fixup tests
+    for test in $BAD_FIXUP_TREES; do
+	tree="overlay_bad_fixup_$test"
+	run_dtc_test -I dts -O dtb -o $tree.test.dtb $tree.dts
+	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
+    done
+}
+
+# Tests to exercise dtc's overlay generation support
+dtc_overlay_tests () {
     # Overlay tests for dtc
     run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols.test.dtb overlay_base.dts
     run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.dtb overlay_overlay_dtc.dts
@@ -208,13 +218,6 @@ overlay_tests () {
     run_test check_path overlay_base_with_aliases.dtb not-exists "/__symbols__"
     run_test check_path overlay_base_with_aliases.dtb not-exists "/__fixups__"
     run_test check_path overlay_base_with_aliases.dtb not-exists "/__local_fixups__"
-
-    # Bad fixup tests
-    for test in $BAD_FIXUP_TREES; do
-	tree="overlay_bad_fixup_$test"
-	run_dtc_test -I dts -O dtb -o $tree.test.dtb $tree.dts
-	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
-    done
 }
 
 tree1_tests () {
@@ -330,7 +333,7 @@ libfdt_tests () {
     run_test appendprop2 appendprop1.test.dtb
     run_dtc_test -I dts -O dtb -o appendprop.test.dtb appendprop.dts
     run_test dtbs_equal_ordered appendprop2.test.dtb appendprop.test.dtb
-    overlay_tests
+    libfdt_overlay_tests
 
     for basetree in test_tree1.dtb sw_tree1.test.dtb rw_tree1.test.dtb; do
 	run_test nopulate $basetree
@@ -589,6 +592,9 @@ dtc_tests () {
 	run_dtc_test -O dtb -S 1999 -a $align -o align1.dtb subnode_iterate.dts
 	check_align align1.dtb $align
     done
+
+    # Tests for overlay/plugin generation
+    dtc_overlay_tests
 }
 
 cmp_tests () {
