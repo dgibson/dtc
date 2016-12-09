@@ -221,8 +221,8 @@ dtc_overlay_tests () {
     run_test overlay overlay_base.test.dtb overlay_overlay.test.dtb
 
     # test plugin source to dtb and back
-    run_dtc_test -@ -I dtb -O dts -o overlay_overlay_decompile.test.dts overlay_overlay.test.dtb
-    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_decompile.test.dtb overlay_overlay_decompile.test.dts
+    run_dtc_test -I dtb -O dts -o overlay_overlay_decompile.test.dts overlay_overlay.test.dtb
+    run_dtc_test -I dts -O dtb -o overlay_overlay_decompile.test.dtb overlay_overlay_decompile.test.dts
     run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_decompile.test.dtb
 
     # test plugin auto-generation without using -@
