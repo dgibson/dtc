@@ -171,9 +171,31 @@ BAD_FIXUP_TREES="bad_index \
 
 # Test to exercise libfdt overlay application without dtc's overlay support
 libfdt_overlay_tests () {
+    # First test a doctored overlay which requires only local fixups
     run_dtc_test -I dts -O dtb -o overlay_base_no_symbols.test.dtb overlay_base.dts
-    run_dtc_test -I dts -O dtb -o overlay_overlay_no_symbols.test.dtb overlay_overlay_nodtc.dts
-    run_test overlay overlay_base_no_symbols.test.dtb overlay_overlay_no_symbols.test.dtb
+    run_test check_path overlay_base_no_symbols.test.dtb not-exists "/__symbols__"
+    run_test check_path overlay_base_no_symbols.test.dtb not-exists "/__fixups__"
+    run_test check_path overlay_base_no_symbols.test.dtb not-exists "/__local_fixups__"
+
+    run_dtc_test -I dts -O dtb -o overlay_overlay_no_fixups.test.dtb overlay_overlay_no_fixups.dts
+    run_test check_path overlay_overlay_no_fixups.test.dtb not-exists "/__symbols__"
+    run_test check_path overlay_overlay_no_fixups.test.dtb not-exists "/__fixups__"
+    run_test check_path overlay_overlay_no_fixups.test.dtb exists "/__local_fixups__"
+
+    run_test overlay overlay_base_no_symbols.test.dtb overlay_overlay_no_fixups.test.dtb
+
+    # Then test with manually constructed fixups
+    run_dtc_test -I dts -O dtb -o overlay_base_manual_symbols.test.dtb overlay_base_manual_symbols.dts
+    run_test check_path overlay_base_manual_symbols.test.dtb exists "/__symbols__"
+    run_test check_path overlay_base_manual_symbols.test.dtb not-exists "/__fixups__"
+    run_test check_path overlay_base_manual_symbols.test.dtb not-exists "/__local_fixups__"
+
+    run_dtc_test -I dts -O dtb -o overlay_overlay_manual_fixups.test.dtb overlay_overlay_manual_fixups.dts
+    run_test check_path overlay_overlay_manual_fixups.test.dtb not-exists "/__symbols__"
+    run_test check_path overlay_overlay_manual_fixups.test.dtb exists "/__fixups__"
+    run_test check_path overlay_overlay_manual_fixups.test.dtb exists "/__local_fixups__"
+
+    run_test overlay overlay_base_manual_symbols.test.dtb overlay_overlay_manual_fixups.test.dtb
 
     # Bad fixup tests
     for test in $BAD_FIXUP_TREES; do
