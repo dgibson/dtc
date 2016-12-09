@@ -203,11 +203,11 @@ overlay_tests () {
     run_test check_path overlay_base_with_symbols_no_fixups.test.dtb not-exists "/__local_fixups__"
 
     # Test generation of aliases insted of symbols
-    run_dtc_test -A -I dts -O dtb -o overlay_overlay_with_aliases.dtb overlay_overlay_dtc.dts
-    run_test check_path overlay_overlay_with_aliases.dtb exists "/aliases"
-    run_test check_path overlay_overlay_with_aliases.dtb exists "/__symbols__"
-    run_test check_path overlay_overlay_with_aliases.dtb exists "/__fixups__"
-    run_test check_path overlay_overlay_with_aliases.dtb exists "/__local_fixups__"
+    run_dtc_test -A -I dts -O dtb -o overlay_base_with_aliases.dtb overlay_base.dts
+    run_test check_path overlay_base_with_aliases.dtb exists "/aliases"
+    run_test check_path overlay_base_with_aliases.dtb not-exists "/__symbols__"
+    run_test check_path overlay_base_with_aliases.dtb not-exists "/__fixups__"
+    run_test check_path overlay_base_with_aliases.dtb not-exists "/__local_fixups__"
 
     # Bad fixup tests
     for test in $BAD_FIXUP_TREES; do
