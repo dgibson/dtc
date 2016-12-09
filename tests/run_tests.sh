@@ -231,12 +231,6 @@ dtc_overlay_tests () {
     run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__fixups__"
     run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__local_fixups__"
 
-    # Test suppression of fixups
-    run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols_no_fixups.test.dtb overlay_base_fixups.dts
-    run_test check_path overlay_base_with_symbols_no_fixups.test.dtb exists "/__symbols__"
-    run_test check_path overlay_base_with_symbols_no_fixups.test.dtb not-exists "/__fixups__"
-    run_test check_path overlay_base_with_symbols_no_fixups.test.dtb not-exists "/__local_fixups__"
-
     # Test generation of aliases insted of symbols
     run_dtc_test -A -I dts -O dtb -o overlay_base_with_aliases.dtb overlay_base.dts
     run_test check_path overlay_base_with_aliases.dtb exists "/aliases"
