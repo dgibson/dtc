@@ -74,8 +74,8 @@ extern bool treesource_error;
 
 %type <data> propdata
 %type <data> propdataprefix
-%type <flags> versioninfo
-%type <flags> plugindecl
+%type <flags> header
+%type <flags> headers
 %type <re> memreserve
 %type <re> memreserves
 %type <array> arrayprefix
@@ -106,32 +106,31 @@ extern bool treesource_error;
 %%
 
 sourcefile:
-	  versioninfo plugindecl memreserves devicetree
+	  headers memreserves devicetree
 		{
-			the_boot_info = build_boot_info($1 | $2, $3, $4,
-							guess_boot_cpuid($4));
+			the_boot_info = build_boot_info($1, $2, $3,
+			                                guess_boot_cpuid($3));
 		}
 	;
 
-versioninfo:
-	v1tag
+header:
+	  DT_V1 ';'
 		{
 			$$ = DTSF_V1;
 		}
+	| DT_V1 ';' DT_PLUGIN ';'
+		{
+			$$ = DTSF_V1 | DTSF_PLUGIN;
+		}
 	;
 
-v1tag:
-	  DT_V1 ';'
-	| DT_V1 ';' v1tag
-
-plugindecl:
-	DT_PLUGIN ';'
+headers:
+	  header
+	| header headers
 		{
-			$$ = DTSF_PLUGIN;
-		}
-	| /* empty */
-		{
-			$$ = 0;
+			if ($2 != $1)
+				ERROR(&@2, "Header flags don't match earlier ones");
+			$$ = $1;
 		}
 	;
 
