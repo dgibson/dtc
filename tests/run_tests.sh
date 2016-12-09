@@ -208,22 +208,25 @@ libfdt_overlay_tests () {
 # Tests to exercise dtc's overlay generation support
 dtc_overlay_tests () {
     # Overlay tests for dtc
-    run_dtc_test -@ -I dts -O dtb -o overlay_base_with_symbols.test.dtb overlay_base.dts
-    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.dtb overlay_overlay_dtc.dts
-    run_test overlay overlay_base_with_symbols.test.dtb overlay_overlay_with_symbols.test.dtb
+    run_dtc_test -@ -I dts -O dtb -o overlay_base.test.dtb overlay_base.dts
+    run_test check_path overlay_base.test.dtb exists "/__symbols__"
+    run_test check_path overlay_base.test.dtb not-exists "/__fixups__"
+    run_test check_path overlay_base.test.dtb not-exists "/__local_fixups__"
 
-    # Test symbols/fixups existence
-    run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__symbols__"
-    run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__fixups__"
-    run_test check_path overlay_overlay_with_symbols.test.dtb exists "/__local_fixups__"
+    run_dtc_test -@ -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay.dts
+    run_test check_path overlay_overlay.test.dtb exists "/__symbols__"
+    run_test check_path overlay_overlay.test.dtb exists "/__fixups__"
+    run_test check_path overlay_overlay.test.dtb exists "/__local_fixups__"
+
+    run_test overlay overlay_base.test.dtb overlay_overlay.test.dtb
 
     # test plugin source to dtb and back
-    run_dtc_test -@ -I dtb -O dts -o overlay_overlay_dtc.test.dts overlay_overlay_with_symbols.test.dtb
-    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_with_symbols.test.test.dtb overlay_overlay_dtc.test.dts
-    run_test dtbs_equal_ordered overlay_overlay_with_symbols.test.dtb overlay_overlay_with_symbols.test.test.dtb
+    run_dtc_test -@ -I dtb -O dts -o overlay_overlay_decompile.test.dts overlay_overlay.test.dtb
+    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_decompile.test.dtb overlay_overlay_decompile.test.dts
+    run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_decompile.test.dtb
 
     # test plugin auto-generation without using -@
-    run_dtc_test -I dts -O dtb -o overlay_overlay_with_symbols_auto.test.dtb overlay_overlay_dtc.dts
+    run_dtc_test -I dts -O dtb -o overlay_overlay_with_symbols_auto.test.dtb overlay_overlay.dts
     run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__symbols__"
     run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__fixups__"
     run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__local_fixups__"
