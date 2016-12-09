@@ -322,7 +322,6 @@ int main(int argc, char *argv[])
 
 	/* on a plugin, generate by default */
 	if (bi->dtsflags & DTSF_PLUGIN) {
-		generate_symbols = 1;
 		generate_fixups = 1;
 	}
 

@@ -213,8 +213,8 @@ dtc_overlay_tests () {
     run_test check_path overlay_base.test.dtb not-exists "/__fixups__"
     run_test check_path overlay_base.test.dtb not-exists "/__local_fixups__"
 
-    run_dtc_test -@ -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay.dts
-    run_test check_path overlay_overlay.test.dtb exists "/__symbols__"
+    run_dtc_test -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay.dts
+    run_test check_path overlay_overlay.test.dtb not-exists "/__symbols__"
     run_test check_path overlay_overlay.test.dtb exists "/__fixups__"
     run_test check_path overlay_overlay.test.dtb exists "/__local_fixups__"
 
@@ -224,12 +224,6 @@ dtc_overlay_tests () {
     run_dtc_test -I dtb -O dts -o overlay_overlay_decompile.test.dts overlay_overlay.test.dtb
     run_dtc_test -I dts -O dtb -o overlay_overlay_decompile.test.dtb overlay_overlay_decompile.test.dts
     run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_decompile.test.dtb
-
-    # test plugin auto-generation without using -@
-    run_dtc_test -I dts -O dtb -o overlay_overlay_with_symbols_auto.test.dtb overlay_overlay.dts
-    run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__symbols__"
-    run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__fixups__"
-    run_test check_path overlay_overlay_with_symbols_auto.test.dtb exists "/__local_fixups__"
 
     # Test generation of aliases insted of symbols
     run_dtc_test -A -I dts -O dtb -o overlay_base_with_aliases.dtb overlay_base.dts
