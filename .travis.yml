@@ -1,3 +1,7 @@
+before_install:
+	sudo apt-get updated
+	sudo apt-get install libncurses5-dev
+
 language: c
 
 script:
