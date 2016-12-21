@@ -16,6 +16,7 @@
 #include "util.h"
 
 #define FDT_MAGIC_SIZE	4
+#define MAX_VERSION 17
 
 #define ALIGN(x, a)	(((x) + ((a) - 1)) & ~((a) - 1))
 #define PALIGN(p, a)	((void *)(ALIGN((unsigned long)(p), (a))))
@@ -159,6 +160,20 @@ static const char * const usage_opts_help[] = {
 	USAGE_COMMON_OPTS_HELP
 };
 
+static bool valid_header(char *p, off_t len)
+{
+	if (len < sizeof(struct fdt_header) ||
+	    fdt_magic(p) != FDT_MAGIC ||
+	    fdt_version(p) > MAX_VERSION ||
+	    fdt_last_comp_version(p) >= MAX_VERSION ||
+	    fdt_totalsize(p) >= len ||
+	    fdt_off_dt_struct(p) >= len ||
+	    fdt_off_dt_strings(p) >= len)
+		return 0;
+	else
+		return 1;
+}
+
 int main(int argc, char *argv[])
 {
 	int opt;
@@ -204,12 +219,7 @@ int main(int argc, char *argv[])
 			if (fdt_magic(p) == FDT_MAGIC) {
 				/* try and validate the main struct */
 				off_t this_len = endp - p;
-				fdt32_t max_version = 17;
-				if (fdt_version(p) <= max_version &&
-				    fdt_last_comp_version(p) < max_version &&
-				    fdt_totalsize(p) < this_len &&
-				    fdt_off_dt_struct(p) < this_len &&
-					fdt_off_dt_strings(p) < this_len)
+				if (valid_header(p, this_len))
 					break;
 				if (debug)
 					printf("%s: skipping fdt magic at offset %#zx\n",
@@ -217,11 +227,12 @@ int main(int argc, char *argv[])
 			}
 			++p;
 		}
-		if (!p || ((endp - p) < FDT_MAGIC_SIZE))
+		if (!p || endp - p < sizeof(struct fdt_header))
 			die("%s: could not locate fdt magic\n", file);
 		printf("%s: found fdt at offset %#zx\n", file, p - buf);
 		buf = p;
-	}
+	} else if (!valid_header(buf, len))
+		die("%s: header is not valid\n", file);
 
 	dump_blob(buf, debug);
 
