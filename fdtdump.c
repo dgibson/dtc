@@ -2,6 +2,9 @@
  * fdtdump.c - Contributed by Pantelis Antoniou <pantelis.antoniou AT gmail.com>
  */
 
+#include <unistd.h>
+#include <curses.h>
+#include <term.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -63,7 +66,7 @@ static void dump_blob(void *blob, bool debug)
 	depth = 0;
 	shift = 4;
 
-	printf("/dts-v1/;\n");
+	printf("%s/dts-v1/;\n", COLNONE);
 	printf("// magic:\t\t0x%x\n", fdt32_to_cpu(bph->magic));
 	printf("// totalsize:\t\t0x%x (%d)\n", totalsize, totalsize);
 	printf("// off_dt_struct:\t0x%x\n", off_dt);
@@ -104,10 +107,11 @@ static void dump_blob(void *blob, bool debug)
 			s = p;
 			p = PALIGN(p + strlen(s) + 1, 4);
 
+			printf("%s", COLNODE);
 			if (*s == '\0')
 				s = "/";
 
-			printf("%*s%s {\n", depth * shift, "", s);
+			printf("%*s%s%s {\n", depth * shift, "", s, COLNONE);
 
 			depth++;
 			continue;
@@ -139,7 +143,7 @@ static void dump_blob(void *blob, bool debug)
 
 		dumpf("%04zx: string: %s\n", (uintptr_t)s - blob_off, s);
 		dumpf("%04zx: value\n", (uintptr_t)t - blob_off);
-		printf("%*s%s", depth * shift, "", s);
+		printf("%*s%s%s%s", depth * shift, "", COLPROP, s, COLNONE);
 		utilfdt_print_data(t, sz);
 		printf(";\n");
 	}
@@ -147,17 +151,32 @@ static void dump_blob(void *blob, bool debug)
 
 /* Usage related data. */
 static const char usage_synopsis[] = "fdtdump [options] <file>";
-static const char usage_short_opts[] = "ds" USAGE_COMMON_SHORT_OPTS;
+static const char usage_short_opts[] = "c:ds" USAGE_COMMON_SHORT_OPTS;
 static struct option const usage_long_opts[] = {
+	{"color",            a_argument, NULL, 'c'},
 	{"debug",            no_argument, NULL, 'd'},
 	{"scan",             no_argument, NULL, 's'},
 	USAGE_COMMON_LONG_OPTS
 };
 static const char * const usage_opts_help[] = {
+	"Colorize, argument can be auto, never or always",
 	"Dump debug information while decoding the file",
 	"Scan for an embedded fdt in file",
 	USAGE_COMMON_OPTS_HELP
 };
+
+static void check_colored(void) {
+	int ret;
+
+	colored = 0;
+	if (isatty(STDOUT_FILENO) != 1)
+		return;
+	if (setupterm(NULL, STDOUT_FILENO, &ret) != OK || ret != 1)
+		return;
+	if (2 > tigetnum("colors"))
+		return;
+	colored = 1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -168,10 +187,20 @@ int main(int argc, char *argv[])
 	bool scan = false;
 	off_t len;
 
+	check_colored();
+
 	while ((opt = util_getopt_long()) != EOF) {
 		switch (opt) {
 		case_USAGE_COMMON_FLAGS
 
+		case 'c':
+			if (!strcmp("none", optarg))
+				colored = 0;
+			else if (!strcmp("always", optarg))
+				colored = 1;
+			else if (strcmp("auto", optarg))
+				usage("invalid argument for colored");
+			break;
 		case 'd':
 			debug = true;
 			break;

@@ -25,6 +25,14 @@
  *                                                                   USA
  */
 
+extern int colored;
+#define COLNODE (colored ? "\x1b[35m" : "") /* magenta */
+#define COLPROP (colored ? "\x1b[32m" : "") /* green */
+#define COLSTRG (colored ? "\x1b[33m" : "") /* yellow */
+#define COLNUMB (colored ? "\x1b[34m" : "") /* blue */
+#define COLBYTE (colored ? "\x1b[36m" : "") /* cyan */
+#define COLNONE (colored ? "\x1b[0m" : "")  /* default */
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 static inline void __attribute__((noreturn)) die(const char *str, ...)

@@ -19,6 +19,7 @@ CPPFLAGS = -I libfdt -I .
 WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
 CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
+LDFLAGS = -lncurses
 
 BISON = bison
 LEX = flex
@@ -253,7 +254,7 @@ clean: libfdt_clean tests_clean
 
 %.o: %.c
 	@$(VECHO) CC $@
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $< $(LDFLAGS)
 
 %.o: %.S
 	@$(VECHO) AS $@
