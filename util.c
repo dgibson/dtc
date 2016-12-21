@@ -36,6 +36,8 @@
 #include "util.h"
 #include "version_gen.h"
 
+int colored = 0;
+
 char *xstrdup(const char *s)
 {
 	int len = strlen(s) + 1;
@@ -389,7 +391,7 @@ void utilfdt_print_data(const char *data, int len)
 
 		s = data;
 		do {
-			printf("\"%s\"", s);
+			printf("\"%s%s%s\"", COLSTRG, s, COLNONE);
 			s += strlen(s) + 1;
 			if (s < data + len)
 				printf(", ");
@@ -398,17 +400,17 @@ void utilfdt_print_data(const char *data, int len)
 	} else if ((len % 4) == 0) {
 		const uint32_t *cell = (const uint32_t *)data;
 
-		printf(" = <");
+		printf(" = <%s", COLNUMB);
 		for (i = 0, len /= 4; i < len; i++)
 			printf("0x%08x%s", fdt32_to_cpu(cell[i]),
 			       i < (len - 1) ? " " : "");
-		printf(">");
+		printf("%s>", COLNONE);
 	} else {
 		const unsigned char *p = (const unsigned char *)data;
-		printf(" = [");
+		printf(" = [%s", COLBYTE);
 		for (i = 0; i < len; i++)
 			printf("%02x%s", *p++, i < len - 1 ? " " : "");
-		printf("]");
+		printf("%s]", COLNONE);
 	}
 }
 
