@@ -228,7 +228,7 @@ Node may contain sub-nodes to obtain a hierarchical structure.
 For example:
 
     - A child node named "childnode" whose unit name is
-      "childnode at address".  It it turn has a string property
+      "childnode at address".  It in turn has a string property
       called "childprop".
 
 	childnode@addresss {
