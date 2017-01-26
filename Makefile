@@ -218,6 +218,12 @@ kup: dist
 		$(KUPDIR)/dtc-$(dtc_version).tar.gz
 endif
 
+tags: FORCE
+	rm -f tags
+	find . \( -name tests -type d -prune \) -o \
+	       \( ! -name '*.tab.[ch]' ! -name '*.lex.c' \
+	       -name '*.[chly]' -type f -print \) | xargs ctags -a
+
 #
 # Testsuite rules
 #
