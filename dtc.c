@@ -309,6 +309,8 @@ int main(int argc, char *argv[])
 	else
 		die("Unknown input format \"%s\"\n", inform);
 
+	dti->outname = outname;
+
 	if (depfile) {
 		fputc('\n', depfile);
 		fclose(depfile);

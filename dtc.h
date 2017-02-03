@@ -246,6 +246,7 @@ struct dt_info {
 	struct reserve_info *reservelist;
 	uint32_t boot_cpuid_phys;
 	struct node *dt;		/* the device tree */
+	const char *outname;		/* filename being written to, "-" for stdout */
 };
 
 /* DTS version flags definitions */
