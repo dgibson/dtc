@@ -252,6 +252,17 @@ static void check_node_name_chars(struct check *c, struct dt_info *dti,
 }
 ERROR(node_name_chars, check_node_name_chars, PROPNODECHARS "@");
 
+static void check_node_name_chars_strict(struct check *c, struct dt_info *dti,
+					 struct node *node)
+{
+	int n = strspn(node->name, c->data);
+
+	if (n < node->basenamelen)
+		FAIL(c, "Character '%c' not recommended in node %s",
+		     node->name[n], node->fullpath);
+}
+CHECK(node_name_chars_strict, check_node_name_chars_strict, PROPNODECHARSSTRICT);
+
 static void check_node_name_format(struct check *c, struct dt_info *dti,
 				   struct node *node)
 {
@@ -737,6 +748,7 @@ static struct check *check_table[] = {
 	&device_type_is_string, &model_is_string, &status_is_string,
 
 	&property_name_chars_strict,
+	&node_name_chars_strict,
 
 	&addr_size_cells, &reg_format, &ranges_format,
 
