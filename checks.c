@@ -239,6 +239,7 @@ ERROR(duplicate_property_names, check_duplicate_property_names, NULL);
 #define UPPERCASE	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #define DIGITS		"0123456789"
 #define PROPNODECHARS	LOWERCASE UPPERCASE DIGITS ",._+*#?-"
+#define PROPNODECHARSSTRICT	LOWERCASE UPPERCASE DIGITS ",-"
 
 static void check_node_name_chars(struct check *c, struct dt_info *dti,
 				  struct node *node)
@@ -298,6 +299,38 @@ static void check_property_name_chars(struct check *c, struct dt_info *dti,
 	}
 }
 ERROR(property_name_chars, check_property_name_chars, PROPNODECHARS);
+
+static void check_property_name_chars_strict(struct check *c,
+					     struct dt_info *dti,
+					     struct node *node)
+{
+	struct property *prop;
+
+	for_each_property(node, prop) {
+		const char *name = prop->name;
+		int n = strspn(name, c->data);
+
+		if (n == strlen(prop->name))
+			continue;
+
+		/* Certain names are whitelisted */
+		if (strcmp(name, "device_type") == 0)
+			continue;
+
+		/*
+		 * # is only allowed at the beginning of property names not counting
+		 * the vendor prefix.
+		 */
+		if (name[n] == '#' && ((n == 0) || (name[n-1] == ','))) {
+			name += n + 1;
+			n = strspn(name, c->data);
+		}
+		if (n < strlen(name))
+			FAIL(c, "Character '%c' not recommended in property name \"%s\", node %s",
+			     name[n], prop->name, node->fullpath);
+	}
+}
+CHECK(property_name_chars_strict, check_property_name_chars_strict, PROPNODECHARSSTRICT);
 
 #define DESCLABEL_FMT	"%s%s%s%s%s"
 #define DESCLABEL_ARGS(node,prop,mark)		\
@@ -702,6 +735,8 @@ static struct check *check_table[] = {
 
 	&address_cells_is_cell, &size_cells_is_cell, &interrupt_cells_is_cell,
 	&device_type_is_string, &model_is_string, &status_is_string,
+
+	&property_name_chars_strict,
 
 	&addr_size_cells, &reg_format, &ranges_format,
 
