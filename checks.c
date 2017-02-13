@@ -325,7 +325,7 @@ static void check_property_name_chars_strict(struct check *c,
 			continue;
 
 		/* Certain names are whitelisted */
-		if (strcmp(name, "device_type") == 0)
+		if (streq(name, "device_type"))
 			continue;
 
 		/*
