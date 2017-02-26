@@ -53,7 +53,7 @@ static inline void *xrealloc(void *p, size_t len)
 	void *new = realloc(p, len);
 
 	if (!new)
-		die("realloc() failed (len=%d)\n", len);
+		die("realloc() failed (len=%zd)\n", len);
 
 	return new;
 }
