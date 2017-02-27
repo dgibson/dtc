@@ -27,7 +27,13 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-static inline void __attribute__((noreturn)) die(const char *str, ...)
+#ifdef __GNUC__
+static inline void
+__attribute__((noreturn)) __attribute__((format (printf, 1, 2)))
+die(const char *str, ...)
+#else
+static inline void die(const char *str, ...)
+#endif
 {
 	va_list ap;
 
@@ -59,7 +65,13 @@ static inline void *xrealloc(void *p, size_t len)
 }
 
 extern char *xstrdup(const char *s);
+
+#ifdef __GNUC__
+extern int __attribute__((format (printf, 2, 3)))
+xasprintf(char **strp, const char *fmt, ...);
+#else
 extern int xasprintf(char **strp, const char *fmt, ...);
+#endif
 extern char *join_path(const char *path, const char *name);
 
 /**
