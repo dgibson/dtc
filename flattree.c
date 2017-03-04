@@ -49,7 +49,7 @@ static struct version_info {
 
 struct emitter {
 	void (*cell)(void *, cell_t);
-	void (*string)(void *, char *, int);
+	void (*string)(void *, const char *, int);
 	void (*align)(void *, int);
 	void (*data)(void *, struct data);
 	void (*beginnode)(void *, struct label *labels);
@@ -64,7 +64,7 @@ static void bin_emit_cell(void *e, cell_t val)
 	*dtbuf = data_append_cell(*dtbuf, val);
 }
 
-static void bin_emit_string(void *e, char *str, int len)
+static void bin_emit_string(void *e, const char *str, int len)
 {
 	struct data *dtbuf = e;
 
@@ -144,22 +144,14 @@ static void asm_emit_cell(void *e, cell_t val)
 		(val >> 8) & 0xff, val & 0xff);
 }
 
-static void asm_emit_string(void *e, char *str, int len)
+static void asm_emit_string(void *e, const char *str, int len)
 {
 	FILE *f = e;
-	char c = 0;
 
-	if (len != 0) {
-		/* XXX: ewww */
-		c = str[len];
-		str[len] = '\0';
-	}
-
-	fprintf(f, "\t.string\t\"%s\"\n", str);
-
-	if (len != 0) {
-		str[len] = c;
-	}
+	if (len != 0)
+		fprintf(f, "\t.string\t\"%.*s\"\n", len, str);
+	else
+		fprintf(f, "\t.string\t\"%s\"\n", str);
 }
 
 static void asm_emit_align(void *e, int a)
