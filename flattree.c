@@ -318,17 +318,16 @@ static struct data flatten_reserve_list(struct reserve_info *reservelist,
 {
 	struct reserve_info *re;
 	struct data d = empty_data;
-	static struct fdt_reserve_entry null_re = {0,0};
 	int    j;
 
 	for (re = reservelist; re; re = re->next) {
-		d = data_append_re(d, &re->re);
+		d = data_append_re(d, re->address, re->size);
 	}
 	/*
 	 * Add additional reserved slots if the user asked for them.
 	 */
 	for (j = 0; j < reservenum; j++) {
-		d = data_append_re(d, &null_re);
+		d = data_append_re(d, 0, 0);
 	}
 
 	return d;
@@ -544,11 +543,11 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 			fprintf(f, "\t.globl\t%s\n", l->label);
 			fprintf(f, "%s:\n", l->label);
 		}
-		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->re.address >> 32));
+		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->address >> 32));
 		ASM_EMIT_BELONG(f, "0x%08x",
-				(unsigned int)(re->re.address & 0xffffffff));
-		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->re.size >> 32));
-		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->re.size & 0xffffffff));
+				(unsigned int)(re->address & 0xffffffff));
+		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->size >> 32));
+		ASM_EMIT_BELONG(f, "0x%08x", (unsigned int)(re->size & 0xffffffff));
 	}
 	for (i = 0; i < reservenum; i++) {
 		fprintf(f, "\t.long\t0, 0\n\t.long\t0, 0\n");

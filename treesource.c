@@ -275,8 +275,8 @@ void dt_to_source(FILE *f, struct dt_info *dti)
 		for_each_label(re->labels, l)
 			fprintf(f, "%s: ", l->label);
 		fprintf(f, "/memreserve/\t0x%016llx 0x%016llx;\n",
-			(unsigned long long)re->re.address,
-			(unsigned long long)re->re.size);
+			(unsigned long long)re->address,
+			(unsigned long long)re->size);
 	}
 
 	write_tree_source_node(f, dti->dt, 0);

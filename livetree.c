@@ -319,8 +319,8 @@ struct reserve_info *build_reserve_entry(uint64_t address, uint64_t size)
 
 	memset(new, 0, sizeof(*new));
 
-	new->re.address = address;
-	new->re.size = size;
+	new->address = address;
+	new->size = size;
 
 	return new;
 }
@@ -599,13 +599,13 @@ static int cmp_reserve_info(const void *ax, const void *bx)
 	a = *((const struct reserve_info * const *)ax);
 	b = *((const struct reserve_info * const *)bx);
 
-	if (a->re.address < b->re.address)
+	if (a->address < b->address)
 		return -1;
-	else if (a->re.address > b->re.address)
+	else if (a->address > b->address)
 		return 1;
-	else if (a->re.size < b->re.size)
+	else if (a->size < b->size)
 		return -1;
-	else if (a->re.size > b->re.size)
+	else if (a->size > b->size)
 		return 1;
 	else
 		return 0;
