@@ -107,7 +107,7 @@ static int encode_value(struct display_info *disp, char **arg, int arg_count,
 			if (disp->verbose)
 				fprintf(stderr, "\tstring: '%s'\n", ptr);
 		} else {
-			int *iptr = (int *)ptr;
+			fdt32_t *iptr = (fdt32_t *)ptr;
 			sscanf(*arg, fmt, &ival);
 			if (len == 4)
 				*iptr = cpu_to_fdt32(ival);

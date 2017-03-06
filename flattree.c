@@ -179,7 +179,7 @@ static void asm_emit_data(void *e, struct data d)
 		emit_offset_label(f, m->ref, m->offset);
 
 	while ((d.len - off) >= sizeof(uint32_t)) {
-		asm_emit_cell(e, fdt32_to_cpu(*((uint32_t *)(d.val+off))));
+		asm_emit_cell(e, fdt32_to_cpu(*((fdt32_t *)(d.val+off))));
 		off += sizeof(uint32_t);
 	}
 
@@ -608,7 +608,7 @@ static void flat_read_chunk(struct inbuf *inb, void *p, int len)
 
 static uint32_t flat_read_word(struct inbuf *inb)
 {
-	uint32_t val;
+	fdt32_t val;
 
 	assert(((inb->ptr - inb->base) % sizeof(val)) == 0);
 
@@ -717,13 +717,15 @@ static struct reserve_info *flat_read_mem_reserve(struct inbuf *inb)
 	 * First pass, count entries.
 	 */
 	while (1) {
+		uint64_t address, size;
+
 		flat_read_chunk(inb, &re, sizeof(re));
-		re.address  = fdt64_to_cpu(re.address);
-		re.size = fdt64_to_cpu(re.size);
-		if (re.size == 0)
+		address  = fdt64_to_cpu(re.address);
+		size = fdt64_to_cpu(re.size);
+		if (size == 0)
 			break;
 
-		new = build_reserve_entry(re.address, re.size);
+		new = build_reserve_entry(address, size);
 		reservelist = add_reserve_entry(reservelist, new);
 	}
 
@@ -816,6 +818,7 @@ static struct node *unflatten_tree(struct inbuf *dtbuf,
 struct dt_info *dt_from_blob(const char *fname)
 {
 	FILE *f;
+	fdt32_t magic_buf, totalsize_buf;
 	uint32_t magic, totalsize, version, size_dt, boot_cpuid_phys;
 	uint32_t off_dt, off_str, off_mem_rsvmap;
 	int rc;
@@ -832,7 +835,7 @@ struct dt_info *dt_from_blob(const char *fname)
 
 	f = srcfile_relative_open(fname, NULL);
 
-	rc = fread(&magic, sizeof(magic), 1, f);
+	rc = fread(&magic_buf, sizeof(magic_buf), 1, f);
 	if (ferror(f))
 		die("Error reading DT blob magic number: %s\n",
 		    strerror(errno));
@@ -843,11 +846,11 @@ struct dt_info *dt_from_blob(const char *fname)
 			die("Mysterious short read reading magic number\n");
 	}
 
-	magic = fdt32_to_cpu(magic);
+	magic = fdt32_to_cpu(magic_buf);
 	if (magic != FDT_MAGIC)
 		die("Blob has incorrect magic number\n");
 
-	rc = fread(&totalsize, sizeof(totalsize), 1, f);
+	rc = fread(&totalsize_buf, sizeof(totalsize_buf), 1, f);
 	if (ferror(f))
 		die("Error reading DT blob size: %s\n", strerror(errno));
 	if (rc < 1) {
@@ -857,7 +860,7 @@ struct dt_info *dt_from_blob(const char *fname)
 			die("Mysterious short read reading blob size\n");
 	}
 
-	totalsize = fdt32_to_cpu(totalsize);
+	totalsize = fdt32_to_cpu(totalsize_buf);
 	if (totalsize < FDT_V1_SIZE)
 		die("DT blob size (%d) is too small\n", totalsize);
 

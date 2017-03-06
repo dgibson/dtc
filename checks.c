@@ -534,13 +534,13 @@ static void fixup_phandle_references(struct check *c, struct dt_info *dti,
 					FAIL(c, dti, "Reference to non-existent node or "
 							"label \"%s\"\n", m->ref);
 				else /* mark the entry as unresolved */
-					*((cell_t *)(prop->val.val + m->offset)) =
+					*((fdt32_t *)(prop->val.val + m->offset)) =
 						cpu_to_fdt32(0xffffffff);
 				continue;
 			}
 
 			phandle = get_node_phandle(dt, refnode);
-			*((cell_t *)(prop->val.val + m->offset)) = cpu_to_fdt32(phandle);
+			*((fdt32_t *)(prop->val.val + m->offset)) = cpu_to_fdt32(phandle);
 		}
 	}
 }

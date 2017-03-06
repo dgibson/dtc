@@ -137,7 +137,7 @@ static void write_propval_string(FILE *f, struct data val)
 static void write_propval_cells(FILE *f, struct data val)
 {
 	void *propend = val.val + val.len;
-	cell_t *cp = (cell_t *)val.val;
+	fdt32_t *cp = (fdt32_t *)val.val;
 	struct marker *m = val.markers;
 
 	fprintf(f, "<");

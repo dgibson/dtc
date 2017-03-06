@@ -171,9 +171,9 @@ struct data data_merge(struct data d1, struct data d2)
 struct data data_append_integer(struct data d, uint64_t value, int bits)
 {
 	uint8_t value_8;
-	uint16_t value_16;
-	uint32_t value_32;
-	uint64_t value_64;
+	fdt16_t value_16;
+	fdt32_t value_32;
+	fdt64_t value_64;
 
 	switch (bits) {
 	case 8:

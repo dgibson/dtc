@@ -105,7 +105,7 @@ static int show_data(struct display_info *disp, const char *data, int len)
 	for (i = 0; i < len; i += size, p += size) {
 		if (i)
 			printf(" ");
-		value = size == 4 ? fdt32_to_cpu(*(const uint32_t *)p) :
+		value = size == 4 ? fdt32_to_cpu(*(const fdt32_t *)p) :
 			size == 2 ? (*p << 8) | p[1] : *p;
 		printf(fmt, value);
 	}

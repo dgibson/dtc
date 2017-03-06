@@ -29,7 +29,7 @@
 
 #include "testdata.h"
 
-struct {
+static struct {
 	void *blob;
 	const char *filename;
 } trees[] = {
