@@ -72,12 +72,8 @@ struct check {
 #define CHECK(_nm, _fn, _d, ...) \
 	CHECK_ENTRY(_nm, _fn, _d, false, false, __VA_ARGS__)
 
-#ifdef __GNUC__
-static inline void check_msg(struct check *c, struct dt_info *dti,
-			     const char *fmt, ...) __attribute__((format (printf, 3, 4)));
-#endif
-static inline void check_msg(struct check *c, struct dt_info *dti,
-			     const char *fmt, ...)
+static inline void  PRINTF(3, 4) check_msg(struct check *c, struct dt_info *dti,
+					   const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);

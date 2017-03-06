@@ -43,7 +43,6 @@
 #define debug(...)
 #endif
 
-
 #define DEFAULT_FDT_VERSION	17
 
 /*
