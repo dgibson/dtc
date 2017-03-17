@@ -116,7 +116,21 @@ BIN += fdtput
 
 SCRIPTS = dtdiff
 
-all: $(BIN) libfdt
+# We need both Python and swig to build pylibfdt.
+.PHONY: maybe_pylibfdt
+maybe_pylibfdt: FORCE
+	if pkg-config --cflags python >/dev/null 2>&1; then \
+		if which swig >/dev/null 2>&1; then \
+			can_build=yes; \
+		fi; \
+	fi; \
+	if [ "$$can_build" = "yes" ]; then \
+		$(MAKE) pylibfdt; \
+	else \
+		echo "## Skipping pylibgfdt (install python dev and swig to build)"; \
+	fi
+
+all: $(BIN) libfdt maybe_pylibfdt
 
 
 ifneq ($(DEPTARGETS),)
@@ -203,6 +217,22 @@ dist:
 	cat ../dtc-$(dtc_version).tar | \
 		gzip -9 > ../dtc-$(dtc_version).tar.gz
 
+
+#
+# Rules for pylibfdt
+#
+PYLIBFDT_srcdir = pylibfdt
+PYLIBFDT_objdir = pylibfdt
+
+include $(PYLIBFDT_srcdir)/Makefile.pylibfdt
+
+.PHONY: pylibfdt
+pylibfdt: $(PYLIBFDT_objdir)/_libfdt.so
+
+pylibfdt_clean:
+	@$(VECHO) CLEAN "(pylibfdt)"
+	rm -f $(addprefix $(PYLIBFDT_objdir)/,$(PYLIBFDT_cleanfiles))
+
 #
 # Release signing and uploading
 # This is for maintainer convenience, don't try this at home.
@@ -244,7 +274,7 @@ include tests/Makefile.tests
 STD_CLEANFILES = *~ *.o *.$(SHAREDLIB_EXT) *.d *.a *.i *.s core a.out vgcore.* \
 	*.tab.[ch] *.lex.c *.output
 
-clean: libfdt_clean tests_clean
+clean: libfdt_clean pylibfdt_clean tests_clean
 	@$(VECHO) CLEAN
 	rm -f $(STD_CLEANFILES)
 	rm -f $(VERSION_FILE)

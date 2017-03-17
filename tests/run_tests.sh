@@ -771,6 +771,26 @@ fdtdump_tests () {
     run_fdtdump_test fdtdump.dts
 }
 
+pylibfdt_tests () {
+    TMP=/tmp/tests.stderr.$$
+    python pylibfdt_tests.py -v 2> $TMP
+
+    # Use the 'ok' message meaning the test passed, 'ERROR' meaning it failed
+    # and the summary line for total tests (e.g. 'Ran 17 tests in 0.002s').
+    # We could add pass + fail to get total tests, but this provides a useful
+    # sanity check.
+    pass_count=$(grep "\.\.\. ok$" $TMP | wc -l)
+    fail_count=$(grep "^ERROR: " $TMP | wc -l)
+    total_tests=$(sed -n 's/^Ran \([0-9]*\) tests.*$/\1/p' $TMP)
+    cat $TMP
+    rm $TMP
+
+    # Extract the test results and add them to our totals
+    tot_fail=$((tot_fail + $fail_count))
+    tot_pass=$((tot_pass + $pass_count))
+    tot_tests=$((tot_tests + $total_tests))
+}
+
 while getopts "vt:me" ARG ; do
     case $ARG in
 	"v")
@@ -790,6 +810,11 @@ done
 
 if [ -z "$TESTSETS" ]; then
     TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump"
+
+    # Test pylibfdt if the libfdt Python module is available.
+    if [ -f ../pylibfdt/_libfdt.so ]; then
+        TESTSETS="$TESTSETS pylibfdt"
+    fi
 fi
 
 # Make sure we don't have stale blobs lying around
@@ -817,6 +842,9 @@ for set in $TESTSETS; do
 	    ;;
 	"fdtdump")
 	    fdtdump_tests
+	    ;;
+	"pylibfdt")
+	    pylibfdt_tests
 	    ;;
     esac
 done
