@@ -22,6 +22,7 @@ CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
 
 BISON = bison
 LEX = flex
+SWIG = swig
 
 INSTALL = /usr/bin/install
 DESTDIR =

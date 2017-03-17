@@ -1,0 +1,17 @@
+# Makefile.pylibfdt
+#
+
+PYLIBFDT_srcs = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_SRCS))
+WRAP = $(PYLIBFDT_objdir)/libfdt_wrap.c
+PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
+
+$(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
+	@$(VECHO) PYMOD $@
+	python $(PYLIBFDT_objdir)/setup.py "$(CPPFLAGS)" $^
+	mv _libfdt.so $(PYMODULE)
+
+$(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
+	@$(VECHO) SWIG $@
+	$(SWIG) -python -o $@ $<
+
+PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so
