@@ -127,7 +127,7 @@ maybe_pylibfdt: FORCE
 	if [ "$$can_build" = "yes" ]; then \
 		$(MAKE) pylibfdt; \
 	else \
-		echo "## Skipping pylibgfdt (install python dev and swig to build)"; \
+		echo "## Skipping pylibfdt (install python dev and swig to build)"; \
 	fi
 
 all: $(BIN) libfdt maybe_pylibfdt
