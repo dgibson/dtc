@@ -7,9 +7,8 @@ PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
 $(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
 	@$(VECHO) PYMOD $@
-	SOURCES="$^" CPPFLAGS="$(CPPFLAGS)" \
+	SOURCES="$^" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)" \
 	python $(PYLIBFDT_objdir)/setup.py --quiet build_ext --inplace
-	mv _libfdt.so $(PYMODULE)
 
 $(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
 	@$(VECHO) SWIG $@
