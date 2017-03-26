@@ -195,7 +195,7 @@ install-includes:
 	$(INSTALL) -d $(DESTDIR)$(INCLUDEDIR)
 	$(INSTALL) -m 644 $(LIBFDT_include) $(DESTDIR)$(INCLUDEDIR)
 
-install: install-bin install-lib install-includes
+install: install-bin install-lib install-includes maybe_install_pylibfdt
 
 $(VERSION_FILE): Makefile FORCE
 	$(call filechk,version)
