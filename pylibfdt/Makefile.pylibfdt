@@ -8,6 +8,7 @@ PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 $(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
 	@$(VECHO) PYMOD $@
 	SOURCES="$^" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)" \
+	VERSION="$(dtc_version)" \
 	python $(PYLIBFDT_objdir)/setup.py --quiet build_ext --inplace
 
 $(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
@@ -17,7 +18,7 @@ $(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
 install_pylibfdt: $(WRAP) $(PYMODULE)
 	$(VECHO) INSTALL-PYLIB; \
 	SOURCES="$(PYLIBFDT_srcs) $(WRAP)" CPPFLAGS="$(CPPFLAGS)" \
-	OBJDIR="$(PYLIBFDT_objdir)" \
+	OBJDIR="$(PYLIBFDT_objdir)" VERSION="$(dtc_version)" \
 	python $(PYLIBFDT_objdir)/setup.py --quiet install \
 		$(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
 

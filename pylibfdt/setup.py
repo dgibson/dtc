@@ -16,6 +16,7 @@ progname = sys.argv[0]
 files = os.environ['SOURCES'].split()
 cflags = os.environ['CPPFLAGS'].split()
 objdir = os.environ['OBJDIR']
+version = os.environ['VERSION']
 
 libfdt_module = Extension(
     '_libfdt',
@@ -24,7 +25,7 @@ libfdt_module = Extension(
 )
 
 setup (name = 'libfdt',
-       version = '0.1',
+       version = version,
        author      = "Simon Glass <sjg@chromium.org>",
        description = """Python binding for libfdt""",
        ext_modules = [libfdt_module],
