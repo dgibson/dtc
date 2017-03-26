@@ -2,6 +2,9 @@
 
 """
 setup.py file for SWIG libfdt
+
+Files to be built into the extension are provided in SOURCES
+C flags to use are provided in CPPFLAGS
 """
 
 from distutils.core import setup, Extension
@@ -9,21 +12,14 @@ import os
 import sys
 
 progname = sys.argv[0]
-cflags = sys.argv[1]
-files = sys.argv[2:]
-
-if cflags:
-    cflags = [flag for flag in cflags.split(' ') if flag]
-else:
-    cflags = None
+files = os.environ['SOURCES'].split()
+cflags = os.environ['CPPFLAGS'].split()
 
 libfdt_module = Extension(
     '_libfdt',
     sources = files,
-    extra_compile_args =  cflags
+    extra_compile_args = cflags
 )
-
-sys.argv = [progname, '--quiet', 'build_ext', '--inplace']
 
 setup (name = 'libfdt',
        version = '0.1',
