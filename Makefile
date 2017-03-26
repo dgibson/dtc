@@ -23,6 +23,7 @@ CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
 BISON = bison
 LEX = flex
 SWIG = swig
+PKG_CONFIG ?= pkg-config
 
 INSTALL = /usr/bin/install
 DESTDIR =
@@ -119,7 +120,7 @@ SCRIPTS = dtdiff
 # We need both Python and swig to build pylibfdt.
 .PHONY: maybe_pylibfdt
 maybe_pylibfdt: FORCE
-	if pkg-config --cflags python >/dev/null 2>&1; then \
+	if $(PKG_CONFIG) --cflags python >/dev/null 2>&1; then \
 		if which swig >/dev/null 2>&1; then \
 			can_build=yes; \
 		fi; \
