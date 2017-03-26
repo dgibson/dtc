@@ -50,6 +50,12 @@ If you add new features, please check code coverage:
     # Open 'htmlcov/index.html' in your browser
 
 
+To disable building the python library, even if swig and Python are available,
+use:
+
+    make NO_PYTHON=1
+
+
 More work remains to support all of libfdt, including access to numeric
 values.
 

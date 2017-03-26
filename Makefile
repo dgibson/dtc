@@ -120,6 +120,7 @@ SCRIPTS = dtdiff
 # We need both Python and swig to build pylibfdt.
 .PHONY: maybe_pylibfdt
 maybe_pylibfdt: FORCE
+	if [ -n "${NO_PYTHON}" ]; then exit; fi; \
 	if $(PKG_CONFIG) --cflags python >/dev/null 2>&1; then \
 		if which swig >/dev/null 2>&1; then \
 			can_build=yes; \
