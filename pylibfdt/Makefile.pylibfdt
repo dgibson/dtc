@@ -5,11 +5,13 @@ PYLIBFDT_srcs = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_SRCS))
 WRAP = $(PYLIBFDT_objdir)/libfdt_wrap.c
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
+run_setup = SOURCES="$(1)" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)" \
+	VERSION="$(dtc_version)" \
+	python $(PYLIBFDT_objdir)/setup.py --quiet $(2)
+
 $(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
 	@$(VECHO) PYMOD $@
-	SOURCES="$^" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)" \
-	VERSION="$(dtc_version)" \
-	python $(PYLIBFDT_objdir)/setup.py --quiet build_ext --inplace
+	$(call run_setup, $^, build_ext --inplace)
 
 $(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
 	@$(VECHO) SWIG $@
@@ -17,10 +19,8 @@ $(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
 
 install_pylibfdt: $(WRAP) $(PYMODULE)
 	$(VECHO) INSTALL-PYLIB; \
-	SOURCES="$(PYLIBFDT_srcs) $(WRAP)" CPPFLAGS="$(CPPFLAGS)" \
-	OBJDIR="$(PYLIBFDT_objdir)" VERSION="$(dtc_version)" \
-	python $(PYLIBFDT_objdir)/setup.py --quiet install \
-		$(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
+	$(call run_setup, $(PYLIBFDT_srcs) $(WRAP), \
+		install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX)))
 
 maybe_install_pylibfdt:
 	if [ -e $(PYMODULE) ]; then \
