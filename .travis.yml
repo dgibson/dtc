@@ -1,5 +1,16 @@
 language: c
 
+matrix:
+  include:
+    - addons:
+        apt:
+          packages:
+            - swig
+            - python-dev
+    - addons:
+        apt:
+          packages:
+
 script:
         - make
         - make check
