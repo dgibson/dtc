@@ -102,6 +102,7 @@ test_tree1_struct:
 
 	BEGIN_NODE("subsubnode")
 	PROP_STR(test_tree1, compatible, "subsubnode1\0subsubnode")
+	PROP_STR(test_tree1, placeholder, "this is a placeholder string\0string2")
 	PROP_INT(test_tree1, prop_int, TEST_VALUE_1)
 	END_NODE
 
@@ -141,6 +142,7 @@ test_tree1_strings:
 	STRING(test_tree1, linux_phandle, "linux,phandle")
 	STRING(test_tree1, phandle, "phandle")
 	STRING(test_tree1, reg, "reg")
+	STRING(test_tree1, placeholder, "placeholder")
 	STRING(test_tree1, address_cells, "#address-cells")
 	STRING(test_tree1, size_cells, "#size-cells")
 test_tree1_strings_end:
