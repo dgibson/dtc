@@ -13,7 +13,7 @@ $(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
 	@$(VECHO) PYMOD $@
 	$(call run_setup, $^, build_ext --inplace)
 
-$(WRAP): $(PYLIBFDT_srcdir)/libfdt.swig
+$(WRAP): $(PYLIBFDT_srcdir)/libfdt.i
 	@$(VECHO) SWIG $@
 	$(SWIG) -python -o $@ $<
 
