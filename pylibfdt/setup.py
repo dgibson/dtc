@@ -24,11 +24,12 @@ libfdt_module = Extension(
     extra_compile_args = cflags
 )
 
-setup (name = 'libfdt',
-       version = version,
-       author      = "Simon Glass <sjg@chromium.org>",
-       description = """Python binding for libfdt""",
-       ext_modules = [libfdt_module],
-       package_dir = {'': objdir},
-       py_modules = ["libfdt"],
-       )
+setup(
+    name='libfdt',
+    version= version,
+    author='Simon Glass <sjg@chromium.org>',
+    description='Python binding for libfdt',
+    ext_modules=[libfdt_module],
+    package_dir={'': objdir},
+    py_modules=['libfdt'],
+)
