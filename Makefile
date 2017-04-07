@@ -117,10 +117,11 @@ BIN += fdtput
 
 SCRIPTS = dtdiff
 
+all: $(BIN) libfdt
+
 # We need both Python and swig to build pylibfdt.
 .PHONY: maybe_pylibfdt
 maybe_pylibfdt: FORCE
-	if [ -n "${NO_PYTHON}" ]; then exit; fi; \
 	if $(PKG_CONFIG) --cflags python >/dev/null 2>&1; then \
 		if which swig >/dev/null 2>&1; then \
 			can_build=yes; \
@@ -132,7 +133,9 @@ maybe_pylibfdt: FORCE
 		echo "## Skipping pylibfdt (install python dev and swig to build)"; \
 	fi
 
-all: $(BIN) libfdt maybe_pylibfdt
+ifeq ($(NO_PYTHON),)
+all: maybe_pylibfdt
+endif
 
 
 ifneq ($(DEPTARGETS),)
@@ -195,7 +198,11 @@ install-includes:
 	$(INSTALL) -d $(DESTDIR)$(INCLUDEDIR)
 	$(INSTALL) -m 644 $(LIBFDT_include) $(DESTDIR)$(INCLUDEDIR)
 
-install: install-bin install-lib install-includes maybe_install_pylibfdt
+install: install-bin install-lib install-includes
+
+ifeq ($(NO_PYTHON),)
+install: install_pylibfdt
+endif
 
 $(VERSION_FILE): Makefile FORCE
 	$(call filechk,version)
@@ -267,7 +274,9 @@ TESTS_BIN += convert-dtsv0
 TESTS_BIN += fdtput
 TESTS_BIN += fdtget
 TESTS_BIN += fdtdump
+ifeq ($(NO_PYTHON),)
 TESTS_PYLIBFDT += maybe_pylibfdt
+endif
 
 include tests/Makefile.tests
 

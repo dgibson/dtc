@@ -25,11 +25,4 @@ install_pylibfdt: $(WRAP) $(PYMODULE)
 	$(call run_setup, $(PYLIBFDT_srcs) $(WRAP), \
 		install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX)))
 
-maybe_install_pylibfdt:
-	if [ -e $(PYMODULE) ]; then \
-		if [ -z "$(NO_PYTHON)" ]; then \
-			$(MAKE) install_pylibfdt; \
-		fi; \
-	fi
-
 PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so
