@@ -267,6 +267,7 @@ TESTS_BIN += convert-dtsv0
 TESTS_BIN += fdtput
 TESTS_BIN += fdtget
 TESTS_BIN += fdtdump
+TESTS_PYLIBFDT += maybe_pylibfdt
 
 include tests/Makefile.tests
 

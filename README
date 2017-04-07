@@ -50,12 +50,18 @@ If you add new features, please check code coverage:
     # Open 'htmlcov/index.html' in your browser
 
 
-To install the library use:
+To install the library via the normal setup.py method, use:
 
-    make install_pylibfdt SETUP_PREFIX=/path/to/install_dir
+    ./pylibfdt/setup.py [--prefix=/path/to/install_dir]
 
-If SETUP_PREFIX is not provided, the default prefix is used, typically '/usr'
-or '/usr/local'. See Python's distutils documentation for details.
+If --prefix is not provided, the default prefix is used, typically '/usr'
+or '/usr/local'. See Python's distutils documentation for details. You can
+also install via the Makefile if you like, but the above is more common.
+
+To install both libfdt and pylibfdt you can use:
+
+    make install [SETUP_PREFIX=/path/to/install_dir] \
+            [PREFIX=/path/to/install_dir]
 
 To disable building the python library, even if swig and Python are available,
 use:

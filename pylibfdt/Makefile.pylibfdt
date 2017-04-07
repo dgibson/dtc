@@ -5,13 +5,16 @@ PYLIBFDT_srcs = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_SRCS))
 WRAP = $(PYLIBFDT_objdir)/libfdt_wrap.c
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
-run_setup = SOURCES="$(1)" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)" \
-	VERSION="$(dtc_version)" \
-	python $(PYLIBFDT_objdir)/setup.py --quiet $(2)
+define run_setup
+	SOURCES="$(1)" CPPFLAGS="$(CPPFLAGS)" OBJDIR="$(PYLIBFDT_objdir)"
+	VERSION="$(dtc_version)"
+	$(PYLIBFDT_objdir)/setup.py --quiet $(2)
+endef
 
 $(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
 	@$(VECHO) PYMOD $@
 	$(call run_setup, $^, build_ext --inplace)
+	mv _libfdt.so $@
 
 $(WRAP): $(PYLIBFDT_srcdir)/libfdt.i
 	@$(VECHO) SWIG $@
