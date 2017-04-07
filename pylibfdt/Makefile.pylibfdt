@@ -1,8 +1,8 @@
 # Makefile.pylibfdt
 #
 
-PYLIBFDT_srcs = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_SRCS))
-WRAP = $(PYLIBFDT_objdir)/libfdt_wrap.c
+PYLIBFDT_srcs = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_SRCS)) \
+		$(PYLIBFDT_srcdir)/libfdt.i
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
 define run_setup
@@ -11,18 +11,14 @@ define run_setup
 	$(PYLIBFDT_objdir)/setup.py --quiet $(2)
 endef
 
-$(PYMODULE): $(PYLIBFDT_srcs) $(WRAP)
+$(PYMODULE): $(PYLIBFDT_srcs)
 	@$(VECHO) PYMOD $@
 	$(call run_setup, $^, build_ext --inplace)
 	mv _libfdt.so $@
 
-$(WRAP): $(PYLIBFDT_srcdir)/libfdt.i
-	@$(VECHO) SWIG $@
-	$(SWIG) -python -o $@ $<
-
-install_pylibfdt: $(WRAP) $(PYMODULE)
+install_pylibfdt: $(PYMODULE)
 	$(VECHO) INSTALL-PYLIB; \
-	$(call run_setup, $(PYLIBFDT_srcs) $(WRAP), \
+	$(call run_setup, $(PYLIBFDT_srcs), \
 		install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX)))
 
 PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so
