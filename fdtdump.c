@@ -165,7 +165,7 @@ static bool valid_header(char *p, off_t len)
 	if (len < sizeof(struct fdt_header) ||
 	    fdt_magic(p) != FDT_MAGIC ||
 	    fdt_version(p) > MAX_VERSION ||
-	    fdt_last_comp_version(p) >= MAX_VERSION ||
+	    fdt_last_comp_version(p) > MAX_VERSION ||
 	    fdt_totalsize(p) >= len ||
 	    fdt_off_dt_struct(p) >= len ||
 	    fdt_off_dt_strings(p) >= len)
