@@ -183,6 +183,11 @@ int main(int argc, char *argv[])
 	bool scan = false;
 	off_t len;
 
+	fprintf(stderr, "\n"
+"**** fdtdump is a low-level debugging tool, not meant for general use.\n"
+"**** If you want to decompile a dtb, you probably want\n"
+"****     dtc -I dtb -O dts <filename>\n\n"
+		);
 	while ((opt = util_getopt_long()) != EOF) {
 		switch (opt) {
 		case_USAGE_COMMON_FLAGS
