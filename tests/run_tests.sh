@@ -157,7 +157,7 @@ run_fdtdump_test() {
     file="$1"
     shorten_echo fdtdump-runtest.sh "$file"
     printf ":	"
-    base_run_test sh fdtdump-runtest.sh "$file"
+    base_run_test sh fdtdump-runtest.sh "$file" 2>/dev/null
 }
 
 BAD_FIXUP_TREES="bad_index \
