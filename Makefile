@@ -18,7 +18,7 @@ CONFIG_LOCALVERSION =
 CPPFLAGS = -I libfdt -I .
 WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
-CFLAGS = -g -Os -fPIC -Werror $(WARNINGS)
+CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS)
 
 BISON = bison
 LEX = flex
@@ -36,11 +36,13 @@ HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 	    sed -e 's/\(cygwin\).*/cygwin/')
 
 ifeq ($(HOSTOS),darwin)
-SHAREDLIB_EXT=dylib
-SHAREDLIB_LINK_OPTIONS=-dynamiclib -Wl,-install_name -Wl,
+SHAREDLIB_EXT     = dylib
+SHAREDLIB_CFLAGS  = -fPIC
+SHAREDLIB_LDFLAGS = -fPIC -dynamiclib -Wl,-install_name -Wl,
 else
-SHAREDLIB_EXT=so
-SHAREDLIB_LINK_OPTIONS=-shared -Wl,--version-script=$(LIBFDT_version) -Wl,-soname,
+SHAREDLIB_EXT     = so
+SHAREDLIB_CFLAGS  = -fPIC
+SHAREDLIB_LDFLAGS = -fPIC -shared -Wl,--version-script=$(LIBFDT_version) -Wl,-soname,
 endif
 
 #
@@ -330,7 +332,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 
 $(LIBFDT_lib):
 	@$(VECHO) LD $@
-	$(CC) $(LDFLAGS) -fPIC $(SHAREDLIB_LINK_OPTIONS)$(LIBFDT_soname) -o $(LIBFDT_lib) $^
+	$(CC) $(LDFLAGS) $(SHAREDLIB_LDFLAGS)$(LIBFDT_soname) -o $(LIBFDT_lib) $^
 
 %.lex.c: %.l
 	@$(VECHO) LEX $@
