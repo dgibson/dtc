@@ -31,6 +31,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 #include <libfdt_env.h>
 #include <fdt.h>
