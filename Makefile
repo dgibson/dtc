@@ -120,6 +120,7 @@ BIN += dtc
 BIN += fdtdump
 BIN += fdtget
 BIN += fdtput
+BIN += fdtoverlay
 
 SCRIPTS = dtdiff
 
@@ -150,6 +151,7 @@ ifneq ($(DEPTARGETS),)
 -include $(FDTDUMP_OBJS:%.o=%.d)
 -include $(FDTGET_OBJS:%.o=%.d)
 -include $(FDTPUT_OBJS:%.o=%.d)
+-include $(FDTOVERLAY_OBJS:%.o=%.d)
 endif
 
 
@@ -226,6 +228,8 @@ fdtget:	$(FDTGET_OBJS) $(LIBFDT_archive)
 
 fdtput:	$(FDTPUT_OBJS) $(LIBFDT_archive)
 
+fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_archive)
+
 dist:
 	git archive --format=tar --prefix=dtc-$(dtc_version)/ HEAD \
 		> ../dtc-$(dtc_version).tar
@@ -280,6 +284,7 @@ TESTS_BIN += convert-dtsv0
 TESTS_BIN += fdtput
 TESTS_BIN += fdtget
 TESTS_BIN += fdtdump
+TESTS_BIN += fdtoverlay
 ifeq ($(NO_PYTHON),)
 TESTS_PYLIBFDT += maybe_pylibfdt
 endif
