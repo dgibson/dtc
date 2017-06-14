@@ -160,6 +160,14 @@ run_fdtdump_test() {
     base_run_test sh fdtdump-runtest.sh "$file" 2>/dev/null
 }
 
+run_fdtoverlay_test() {
+    expect="$1"
+    shift
+    shorten_echo fdtoverlay-runtest.sh "$expect" "$@"
+    printf ":	"
+    base_run_test sh fdtoverlay-runtest.sh "$expect" "$@"
+}
+
 BAD_FIXUP_TREES="bad_index \
 		empty \
 		empty_index \
@@ -771,6 +779,20 @@ fdtdump_tests () {
     run_fdtdump_test fdtdump.dts
 }
 
+fdtoverlay_tests() {
+    base=overlay_base.dts
+    basedtb=overlay_base.fdoverlay.test.dtb
+    overlay=overlay_overlay_manual_fixups.dts
+    overlaydtb=overlay_overlay_manual_fixups.fdoverlay.test.dtb
+    targetdtb=target.fdoverlay.test.dtb
+
+    run_dtc_test -@ -I dts -O dtb -o $basedtb $base
+    run_dtc_test -@ -I dts -O dtb -o $overlaydtb $overlay
+
+    # test that the new property is installed
+    run_fdtoverlay_test foobar "/test-node" "test-str-property" "-ts" ${basedtb} ${targetdtb} ${overlaydtb}
+}
+
 pylibfdt_tests () {
     TMP=/tmp/tests.stderr.$$
     python pylibfdt_tests.py -v 2> $TMP
@@ -809,7 +831,7 @@ while getopts "vt:me" ARG ; do
 done
 
 if [ -z "$TESTSETS" ]; then
-    TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump"
+    TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump fdtoverlay"
 
     # Test pylibfdt if the libfdt Python module is available.
     if [ -f ../pylibfdt/_libfdt.so ]; then
@@ -845,6 +867,9 @@ for set in $TESTSETS; do
 	    ;;
 	"pylibfdt")
 	    pylibfdt_tests
+	    ;;
+        "fdtoverlay")
+	    fdtoverlay_tests
 	    ;;
     esac
 done
