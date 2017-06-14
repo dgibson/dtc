@@ -205,6 +205,12 @@ libfdt_overlay_tests () {
 
     run_test overlay overlay_base_manual_symbols.test.dtb overlay_overlay_manual_fixups.test.dtb
 
+    # test simplified plugin syntax
+    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_simple.dtb overlay_overlay_simple.dts
+
+    # verify non-generation of local fixups
+    run_test check_path overlay_overlay_simple.dtb not-exists "/__local_fixups__"
+
     # Bad fixup tests
     for test in $BAD_FIXUP_TREES; do
 	tree="overlay_bad_fixup_$test"
