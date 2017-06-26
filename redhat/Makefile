@@ -11,7 +11,7 @@ else
   DS=@
 endif
 
-BREW_OPTIONS:=--scratch
+BREW_OPTIONS:=$(BREW_FLAGS) --scratch
 
 # Hide progress bar in scripts
 ifeq ($(NOPROGRESS),1)
