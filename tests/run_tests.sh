@@ -428,7 +428,7 @@ dtc_tests () {
     run_dtc_test -I dts -O dtb -o dtc_path-references.test.dtb path-references.dts
     run_test path-references dtc_path-references.test.dtb
 
-    run_test phandle_format dtc_references.test.dtb both
+    run_test phandle_format dtc_references.test.dtb epapr
     for f in legacy epapr both; do
 	run_dtc_test -I dts -O dtb -H $f -o dtc_references.test.$f.dtb references.dts
 	run_test phandle_format dtc_references.test.$f.dtb $f
