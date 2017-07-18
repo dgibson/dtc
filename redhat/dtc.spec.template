@@ -74,6 +74,11 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n libfdt -p /sbin/ldconfig
 
 %changelog
+* Mon Mar 06 2017 Miroslav Rezanina <mrezanin@redhat.com> - 1.4.3-1
+- Rebase to 1.4.3 [bz#1427157]
+- Resolves: bz#1427157
+  (package libfdt 1.4.3, when available)
+
 * Tue Aug 19 2014 Miroslav Rezanina <mrezanin@redhat.com> - 1.4.0-2
 - Update power macro for ppc64le
 
