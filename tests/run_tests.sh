@@ -791,6 +791,21 @@ fdtoverlay_tests() {
 
     # test that the new property is installed
     run_fdtoverlay_test foobar "/test-node" "test-str-property" "-ts" ${basedtb} ${targetdtb} ${overlaydtb}
+
+    stacked_base=stacked_overlay_base.dts
+    stacked_basedtb=stacked_overlay_base.fdtoverlay.test.dtb
+    stacked_bar=stacked_overlay_bar.dts
+    stacked_bardtb=stacked_overlay_bar.fdtoverlay.test.dtb
+    stacked_baz=stacked_overlay_baz.dts
+    stacked_bazdtb=stacked_overlay_baz.fdtoverlay.test.dtb
+    stacked_targetdtb=stacked_overlay_target.fdtoverlay.test.dtb
+
+    run_dtc_test -@ -I dts -O dtb -o $stacked_basedtb $stacked_base
+    run_dtc_test -@ -I dts -O dtb -o $stacked_bardtb $stacked_bar
+    run_dtc_test -@ -I dts -O dtb -o $stacked_bazdtb $stacked_baz
+
+    # test that baz correctly inserted the property
+    run_fdtoverlay_test baz "/foonode/barnode/baznode" "baz-property" "-ts" ${stacked_basedtb} ${stacked_targetdtb} ${stacked_bardtb} ${stacked_bazdtb}
 }
 
 pylibfdt_tests () {
