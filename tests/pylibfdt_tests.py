@@ -295,5 +295,18 @@ class PyLibfdtTests(unittest.TestCase):
         node2 = self.fdt.path_offset('/subnode@2')
         self.assertEquals(0x2000, self.fdt.get_phandle(node2))
 
+    def testParentOffset(self):
+        """Test for the parent_offset() method"""
+        self.assertEquals(-libfdt.NOTFOUND,
+                          self.fdt.parent_offset(0, QUIET_NOTFOUND))
+        with self.assertRaises(FdtException) as e:
+            self.fdt.parent_offset(0)
+        self.assertEquals(e.exception.err, -libfdt.NOTFOUND)
+
+        node1 = self.fdt.path_offset('/subnode@2')
+        self.assertEquals(0, self.fdt.parent_offset(node1))
+        node2 = self.fdt.path_offset('/subnode@2/subsubnode@0')
+        self.assertEquals(node1, self.fdt.parent_offset(node2))
+
 if __name__ == "__main__":
     unittest.main()
