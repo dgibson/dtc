@@ -348,6 +348,18 @@ class Fdt:
             return pdata
         return bytearray(pdata[0])
 
+    def get_phandle(self, nodeoffset):
+        """Get the phandle of a node
+
+        Args:
+            nodeoffset: Node offset to check
+
+        Returns:
+            phandle of node, or 0 if the node has no phandle or another error
+            occurs
+        """
+        return fdt_get_phandle(self._fdt, nodeoffset)
+
 
 class Property:
     """Holds a device tree property name and value.

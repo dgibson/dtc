@@ -289,5 +289,11 @@ class PyLibfdtTests(unittest.TestCase):
         node2 = self.fdt.path_offset('/subnode@2')
         self.assertEquals(0x2000, libfdt.fdt_get_phandle(self.fdt._fdt, node2))
 
+    def testGetPhandle(self):
+        """Test for the get_phandle() method"""
+        self.assertEquals(0, self.fdt.get_phandle(0))
+        node2 = self.fdt.path_offset('/subnode@2')
+        self.assertEquals(0x2000, self.fdt.get_phandle(node2))
+
 if __name__ == "__main__":
     unittest.main()
