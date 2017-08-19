@@ -375,6 +375,20 @@ class Fdt:
         """
         return check_err(fdt_parent_offset(self._fdt, nodeoffset), quiet)
 
+    def node_offset_by_phandle(self, phandle, quiet=()):
+        """Get the offset of a node with the given phandle
+
+        Args:
+            phandle: Phandle to search for
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            The offset of node with that phandle, if any
+
+        Raises:
+            FdtException if no node found or other error occurs
+        """
+        return check_err(fdt_node_offset_by_phandle(self._fdt, phandle), quiet)
 
 class Property:
     """Holds a device tree property name and value.
