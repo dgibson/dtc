@@ -900,3 +900,4 @@ fi
 echo "* Strange test result:	$tot_strange"
 echo "**********"
 
+[ "$tot_tests" -eq "$tot_pass" ] || exit 1
