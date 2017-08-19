@@ -283,6 +283,11 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(-libfdt.BADPATH,
                           self.fdt.path_offset('missing', QUIET_ALL))
 
+    def testIntegers(self):
+        """Check that integers can be passed and returned"""
+        self.assertEquals(0, libfdt.fdt_get_phandle(self.fdt._fdt, 0))
+        node2 = self.fdt.path_offset('/subnode@2')
+        self.assertEquals(0x2000, libfdt.fdt_get_phandle(self.fdt._fdt, node2))
 
 if __name__ == "__main__":
     unittest.main()
