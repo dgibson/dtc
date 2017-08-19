@@ -53,7 +53,7 @@ import sys
 import types
 import unittest
 
-sys.path.append('../pylibfdt')
+sys.path.insert(0, '../pylibfdt')
 import libfdt
 from libfdt import FdtException, QUIET_NOTFOUND, QUIET_ALL
 
@@ -66,7 +66,7 @@ def get_err(err_code):
     Returns:
         String error code
     """
-    return 'pylibfdt error %d: %s' % (-err_code, libfdt.fdt_strerror(-err_code))
+    return 'pylibfdt error %d: %s' % (-err_code, libfdt.strerror(-err_code))
 
 def _ReadFdt(fname):
     """Read a device tree file into an Fdt object, ready for use
