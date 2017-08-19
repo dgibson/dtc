@@ -73,6 +73,17 @@ More work remains to support all of libfdt, including access to numeric
 values.
 
 
+Tests
+-----
+
+Test files are kept in the tests/ directory. Use 'make check' to build and run
+all tests.
+
+If you want to adjust a test file, be aware that tree_tree1.dts is compiled
+and checked against a binary tree from assembler macros in trees.S. So
+if you change that file you must change tree.S also.
+
+
 Mailing list
 ------------
 The following list is for discussion about dtc and libfdt implementation
