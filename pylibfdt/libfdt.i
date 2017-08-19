@@ -174,6 +174,23 @@ class Fdt:
         self._fdt = bytearray(data)
         check_err(fdt_check_header(self._fdt));
 
+    def subnode_offset(self, parentoffset, name, quiet=()):
+        """Get the offset of a named subnode
+
+        Args:
+            parentoffset: Offset of the parent node to check
+            name: Name of the required subnode, e.g. 'subnode@1'
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            The node offset of the found node, if any
+
+        Raises
+            FdtException if there is no node with that name, or other error
+        """
+        return check_err(fdt_subnode_offset(self._fdt, parentoffset, name),
+                         quiet)
+
     def path_offset(self, path, quiet=()):
         """Get the offset for a given path
 

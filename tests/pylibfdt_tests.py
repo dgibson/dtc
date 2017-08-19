@@ -118,6 +118,18 @@ class PyLibfdtTests(unittest.TestCase):
             fdt = libfdt.Fdt('a string')
         self.assertEquals(e.exception.err, -libfdt.BADMAGIC)
 
+    def testSubnodeOffset(self):
+        """check that we can locate a subnode by name"""
+        node1 = self.fdt.path_offset('/subnode@1')
+        self.assertEquals(self.fdt.subnode_offset(0, 'subnode@1'), node1)
+
+        with self.assertRaises(FdtException) as e:
+            self.fdt.subnode_offset(0, 'missing')
+        self.assertEquals(e.exception.err, -libfdt.NOTFOUND)
+
+        node2 = self.fdt.path_offset('/subnode@1/subsubnode')
+        self.assertEquals(self.fdt.subnode_offset(node1, 'subsubnode'), node2)
+
     def testPathOffset(self):
         """Check that we can find the offset of a node"""
         self.assertEquals(self.fdt.path_offset('/'), 0)
