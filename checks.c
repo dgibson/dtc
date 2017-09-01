@@ -956,6 +956,115 @@ static void check_obsolete_chosen_interrupt_controller(struct check *c,
 WARNING(obsolete_chosen_interrupt_controller,
 	check_obsolete_chosen_interrupt_controller, NULL);
 
+struct provider {
+	const char *prop_name;
+	const char *cell_name;
+	bool optional;
+};
+
+static void check_property_phandle_args(struct check *c,
+					  struct dt_info *dti,
+				          struct node *node,
+				          struct property *prop,
+				          const struct provider *provider)
+{
+	struct node *root = dti->dt;
+	int cell, cellsize = 0;
+
+	if (prop->val.len % sizeof(cell_t)) {
+		FAIL(c, dti, "property '%s' size (%d) is invalid, expected multiple of %ld in node %s",
+		     prop->name, prop->val.len, sizeof(cell_t), node->fullpath);
+		return;
+	}
+
+	for (cell = 0; cell < prop->val.len / sizeof(cell_t); cell += cellsize + 1) {
+		struct node *provider_node;
+		struct property *cellprop;
+		int phandle;
+
+		phandle = propval_cell_n(prop, cell);
+		/*
+		 * Some bindings use a cell value 0 or -1 to skip over optional
+		 * entries when each index position has a specific definition.
+		 */
+		if (phandle == 0 || phandle == -1) {
+			cellsize = 0;
+			continue;
+		}
+
+		/* If we have markers, verify the current cell is a phandle */
+		if (prop->val.markers) {
+			struct marker *m = prop->val.markers;
+			for_each_marker_of_type(m, REF_PHANDLE) {
+				if (m->offset == (cell * sizeof(cell_t)))
+					break;
+			}
+			if (!m)
+				FAIL(c, dti, "Property '%s', cell %d is not a phandle reference in %s",
+				     prop->name, cell, node->fullpath);
+		}
+
+		provider_node = get_node_by_phandle(root, phandle);
+		if (!provider_node) {
+			FAIL(c, dti, "Could not get phandle node for %s:%s(cell %d)",
+			     node->fullpath, prop->name, cell);
+			break;
+		}
+
+		cellprop = get_property(provider_node, provider->cell_name);
+		if (cellprop) {
+			cellsize = propval_cell(cellprop);
+		} else if (provider->optional) {
+			cellsize = 0;
+		} else {
+			FAIL(c, dti, "Missing property '%s' in node %s or bad phandle (referred from %s:%s[%d])",
+			     provider->cell_name,
+			     provider_node->fullpath,
+			     node->fullpath, prop->name, cell);
+			break;
+		}
+
+		if (prop->val.len < ((cell + cellsize + 1) * sizeof(cell_t))) {
+			FAIL(c, dti, "%s property size (%d) too small for cell size %d in %s",
+			     prop->name, prop->val.len, cellsize, node->fullpath);
+		}
+	}
+}
+
+static void check_provider_cells_property(struct check *c,
+					  struct dt_info *dti,
+				          struct node *node)
+{
+	struct provider *provider = c->data;
+	struct property *prop;
+
+	prop = get_property(node, provider->prop_name);
+	if (!prop)
+		return;
+
+	check_property_phandle_args(c, dti, node, prop, provider);
+}
+#define WARNING_PROPERTY_PHANDLE_CELLS(nm, propname, cells_name, ...) \
+	static struct provider nm##_provider = { (propname), (cells_name), __VA_ARGS__ }; \
+	WARNING(nm##_property, check_provider_cells_property, &nm##_provider, &phandle_references);
+
+WARNING_PROPERTY_PHANDLE_CELLS(clocks, "clocks", "#clock-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(cooling_device, "cooling-device", "#cooling-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(dmas, "dmas", "#dma-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(hwlocks, "hwlocks", "#hwlock-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(interrupts_extended, "interrupts-extended", "#interrupt-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(io_channels, "io-channels", "#io-channel-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(iommus, "iommus", "#iommu-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(mboxes, "mboxes", "#mbox-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(msi_parent, "msi-parent", "#msi-cells", true);
+WARNING_PROPERTY_PHANDLE_CELLS(mux_controls, "mux-controls", "#mux-control-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(phys, "phys", "#phy-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(power_domains, "power-domains", "#power-domain-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(pwms, "pwms", "#pwm-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(resets, "resets", "#reset-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(sound_dais, "sound-dais", "#sound-dai-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(thermal_sensors, "thermal-sensors", "#thermal-sensor-cells");
+
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
 	&node_name_chars, &node_name_format, &property_name_chars,
@@ -986,6 +1095,23 @@ static struct check *check_table[] = {
 
 	&avoid_default_addr_size,
 	&obsolete_chosen_interrupt_controller,
+
+	&clocks_property,
+	&cooling_device_property,
+	&dmas_property,
+	&hwlocks_property,
+	&interrupts_extended_property,
+	&io_channels_property,
+	&iommus_property,
+	&mboxes_property,
+	&msi_parent_property,
+	&mux_controls_property,
+	&phys_property,
+	&power_domains_property,
+	&pwms_property,
+	&resets_property,
+	&sound_dais_property,
+	&thermal_sensors_property,
 
 	&always_fail,
 };
