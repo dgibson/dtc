@@ -1135,6 +1135,86 @@ static void check_deprecated_gpio_property(struct check *c,
 }
 CHECK(deprecated_gpio_property, check_deprecated_gpio_property, NULL);
 
+static bool node_is_interrupt_provider(struct node *node)
+{
+	struct property *prop;
+
+	prop = get_property(node, "interrupt-controller");
+	if (prop)
+		return true;
+
+	prop = get_property(node, "interrupt-map");
+	if (prop)
+		return true;
+
+	return false;
+}
+static void check_interrupts_property(struct check *c,
+				      struct dt_info *dti,
+				      struct node *node)
+{
+	struct node *root = dti->dt;
+	struct node *irq_node = NULL, *parent = node;
+	struct property *irq_prop, *prop = NULL;
+	int irq_cells, phandle;
+
+	irq_prop = get_property(node, "interrupts");
+	if (!irq_prop)
+		return;
+
+	if (irq_prop->val.len % sizeof(cell_t))
+		FAIL(c, dti, "property '%s' size (%d) is invalid, expected multiple of %ld in node %s",
+		     irq_prop->name, irq_prop->val.len, sizeof(cell_t),
+		     node->fullpath);
+
+	while (parent && !prop) {
+		if (parent != node && node_is_interrupt_provider(parent)) {
+			irq_node = parent;
+			break;
+		}
+
+		prop = get_property(parent, "interrupt-parent");
+		if (prop) {
+			phandle = propval_cell(prop);
+			irq_node = get_node_by_phandle(root, phandle);
+			if (!irq_node) {
+				FAIL(c, dti, "Bad interrupt-parent phandle for %s",
+				     node->fullpath);
+				return;
+			}
+			if (!node_is_interrupt_provider(irq_node))
+				FAIL(c, dti,
+				     "Missing interrupt-controller or interrupt-map property in %s",
+				     irq_node->fullpath);
+
+			break;
+		}
+
+		parent = parent->parent;
+	}
+
+	if (!irq_node) {
+		FAIL(c, dti, "Missing interrupt-parent for %s", node->fullpath);
+		return;
+	}
+
+	prop = get_property(irq_node, "#interrupt-cells");
+	if (!prop) {
+		FAIL(c, dti, "Missing #interrupt-cells in interrupt-parent %s",
+		     irq_node->fullpath);
+		return;
+	}
+
+	irq_cells = propval_cell(prop);
+	if (irq_prop->val.len % (irq_cells * sizeof(cell_t))) {
+		FAIL(c, dti,
+		     "interrupts size is (%d), expected multiple of %d in %s",
+		     irq_prop->val.len, (int)(irq_cells * sizeof(cell_t)),
+		     node->fullpath);
+	}
+}
+WARNING(interrupts_property, check_interrupts_property, &phandle_references);
+
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
 	&node_name_chars, &node_name_format, &property_name_chars,
@@ -1185,6 +1265,7 @@ static struct check *check_table[] = {
 
 	&deprecated_gpio_property,
 	&gpios_property,
+	&interrupts_property,
 
 	&always_fail,
 };
