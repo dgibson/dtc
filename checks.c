@@ -1065,6 +1065,76 @@ WARNING_PROPERTY_PHANDLE_CELLS(resets, "resets", "#reset-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(sound_dais, "sound-dais", "#sound-dai-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(thermal_sensors, "thermal-sensors", "#thermal-sensor-cells");
 
+static bool prop_is_gpio(struct property *prop)
+{
+	char *str;
+
+	/*
+	 * *-gpios and *-gpio can appear in property names,
+	 * so skip over any false matches (only one known ATM)
+	 */
+	if (strstr(prop->name, "nr-gpio"))
+		return false;
+
+	str = strrchr(prop->name, '-');
+	if (str)
+		str++;
+	else
+		str = prop->name;
+	if (!(streq(str, "gpios") || streq(str, "gpio")))
+		return false;
+
+	return true;
+}
+
+static void check_gpios_property(struct check *c,
+					  struct dt_info *dti,
+				          struct node *node)
+{
+	struct property *prop;
+
+	/* Skip GPIO hog nodes which have 'gpios' property */
+	if (get_property(node, "gpio-hog"))
+		return;
+
+	for_each_property(node, prop) {
+		struct provider provider;
+
+		if (!prop_is_gpio(prop))
+			continue;
+
+		provider.prop_name = prop->name;
+		provider.cell_name = "#gpio-cells";
+		provider.optional = false;
+		check_property_phandle_args(c, dti, node, prop, &provider);
+	}
+
+}
+WARNING(gpios_property, check_gpios_property, NULL, &phandle_references);
+
+static void check_deprecated_gpio_property(struct check *c,
+					   struct dt_info *dti,
+				           struct node *node)
+{
+	struct property *prop;
+
+	for_each_property(node, prop) {
+		char *str;
+
+		if (!prop_is_gpio(prop))
+			continue;
+
+		str = strstr(prop->name, "gpio");
+		if (!streq(str, "gpio"))
+			continue;
+
+		FAIL(c, dti, "'[*-]gpio' is deprecated, use '[*-]gpios' instead for %s:%s",
+		     node->fullpath, prop->name);
+	}
+
+}
+CHECK(deprecated_gpio_property, check_deprecated_gpio_property, NULL);
+
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
 	&node_name_chars, &node_name_format, &property_name_chars,
@@ -1112,6 +1182,9 @@ static struct check *check_table[] = {
 	&resets_property,
 	&sound_dais_property,
 	&thermal_sensors_property,
+
+	&deprecated_gpio_property,
+	&gpios_property,
 
 	&always_fail,
 };

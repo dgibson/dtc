@@ -551,6 +551,8 @@ dtc_tests () {
     check_tests unit-addr-leading-0x.dts unit_address_format
     check_tests unit-addr-leading-0s.dts unit_address_format
     check_tests bad-phandle-cells.dts interrupts_extended_property
+    check_tests bad-gpio.dts gpios_property
+    run_sh_test dtc-checkfails.sh deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb bad-gpio.dts
     run_sh_test dtc-checkfails.sh node_name_chars -- -I dtb -O dtb bad_node_char.dtb
     run_sh_test dtc-checkfails.sh node_name_format -- -I dtb -O dtb bad_node_format.dtb
     run_sh_test dtc-checkfails.sh prop_name_chars -- -I dtb -O dtb bad_prop_char.dtb
