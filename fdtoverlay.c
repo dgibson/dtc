@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <alloca.h>
+#include <inttypes.h>
 
 #include <libfdt.h>
 
@@ -67,6 +68,12 @@ static int do_fdtoverlay(const char *input_filename,
 	if (!blob) {
 		fprintf(stderr, "\nFailed to read base blob %s\n",
 				input_filename);
+		goto out_err;
+	}
+	if (fdt_totalsize(blob) > blob_len) {
+		fprintf(stderr,
+ "\nBase blob is incomplete (%lu / %" PRIu32 " bytes read)\n",
+			(unsigned long)blob_len, fdt_totalsize(blob));
 		goto out_err;
 	}
 	ret = 0;
