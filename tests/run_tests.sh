@@ -820,7 +820,7 @@ fdtoverlay_tests() {
 
 pylibfdt_tests () {
     TMP=/tmp/tests.stderr.$$
-    python pylibfdt_tests.py -v 2> $TMP
+    python2 pylibfdt_tests.py -v 2> $TMP
 
     # Use the 'ok' message meaning the test passed, 'ERROR' meaning it failed
     # and the summary line for total tests (e.g. 'Ran 17 tests in 0.002s').
