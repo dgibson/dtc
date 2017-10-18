@@ -53,24 +53,24 @@ struct check {
 	struct check **prereq;
 };
 
-#define CHECK_ENTRY(_nm, _fn, _d, _w, _e, ...)	       \
-	static struct check *_nm##_prereqs[] = { __VA_ARGS__ }; \
-	static struct check _nm = { \
-		.name = #_nm, \
-		.fn = (_fn), \
-		.data = (_d), \
-		.warn = (_w), \
-		.error = (_e), \
+#define CHECK_ENTRY(nm_, fn_, d_, w_, e_, ...)	       \
+	static struct check *nm_##_prereqs[] = { __VA_ARGS__ }; \
+	static struct check nm_ = { \
+		.name = #nm_, \
+		.fn = (fn_), \
+		.data = (d_), \
+		.warn = (w_), \
+		.error = (e_), \
 		.status = UNCHECKED, \
-		.num_prereqs = ARRAY_SIZE(_nm##_prereqs), \
-		.prereq = _nm##_prereqs, \
+		.num_prereqs = ARRAY_SIZE(nm_##_prereqs), \
+		.prereq = nm_##_prereqs, \
 	};
-#define WARNING(_nm, _fn, _d, ...) \
-	CHECK_ENTRY(_nm, _fn, _d, true, false, __VA_ARGS__)
-#define ERROR(_nm, _fn, _d, ...) \
-	CHECK_ENTRY(_nm, _fn, _d, false, true, __VA_ARGS__)
-#define CHECK(_nm, _fn, _d, ...) \
-	CHECK_ENTRY(_nm, _fn, _d, false, false, __VA_ARGS__)
+#define WARNING(nm_, fn_, d_, ...) \
+	CHECK_ENTRY(nm_, fn_, d_, true, false, __VA_ARGS__)
+#define ERROR(nm_, fn_, d_, ...) \
+	CHECK_ENTRY(nm_, fn_, d_, false, true, __VA_ARGS__)
+#define CHECK(nm_, fn_, d_, ...) \
+	CHECK_ENTRY(nm_, fn_, d_, false, false, __VA_ARGS__)
 
 static inline void  PRINTF(3, 4) check_msg(struct check *c, struct dt_info *dti,
 					   const char *fmt, ...)

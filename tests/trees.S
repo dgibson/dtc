@@ -9,8 +9,7 @@
 
 #define TREE_HDR(tree) \
 	.balign	8		; \
-	.globl	_##tree		; \
-_##tree:	\
+	.globl	tree		; \
 tree:	\
 	FDTLONG(FDT_MAGIC)	; \
 	FDTLONG(tree##_end - tree) ; \
@@ -208,8 +207,7 @@ bad_prop_char_end:
 
 	/* overflow_size_strings */
 	.balign	8
-	.globl	_ovf_size_strings
-_ovf_size_strings:
+	.globl	ovf_size_strings
 ovf_size_strings:
 	FDTLONG(FDT_MAGIC)
 	FDTLONG(ovf_size_strings_end - ovf_size_strings)

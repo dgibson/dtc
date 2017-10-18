@@ -1,5 +1,5 @@
-#ifndef _TESTS_H
-#define _TESTS_H
+#ifndef TESTS_H
+#define TESTS_H
 /*
  * libfdt - Flat Device Tree manipulation
  *	Testcase definitions
@@ -126,4 +126,4 @@ void *open_blob_rw(void *blob);
 
 #include "util.h"
 
-#endif /* _TESTS_H */
+#endif /* TESTS_H */

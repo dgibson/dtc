@@ -1,5 +1,5 @@
-#ifndef _DTC_H
-#define _DTC_H
+#ifndef DTC_H
+#define DTC_H
 
 /*
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
@@ -289,4 +289,4 @@ struct dt_info *dt_from_source(const char *f);
 
 struct dt_info *dt_from_fs(const char *dirname);
 
-#endif /* _DTC_H */
+#endif /* DTC_H */
