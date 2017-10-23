@@ -8,6 +8,7 @@ tmp.*
 /asm_tree_dump
 /boot-cpuid
 /char_literal
+/check_header
 /check_path
 /del_node
 /del_property
