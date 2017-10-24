@@ -540,7 +540,10 @@ struct node *get_node_by_phandle(struct node *tree, cell_t phandle)
 {
 	struct node *child, *node;
 
-	assert((phandle != 0) && (phandle != -1));
+	if ((phandle == 0) || (phandle == -1)) {
+		assert(generate_fixups);
+		return NULL;
+	}
 
 	if (tree->phandle == phandle) {
 		if (tree->deleted)
