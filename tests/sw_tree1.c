@@ -111,6 +111,8 @@ int main(int argc, char *argv[])
 				CONFIG("Bad allocation mode \"%s\" specified",
 				       argv[1]);
 		}
+	} else {
+		CONFIG("sw_tree1 <dtb file> [<allocation mode>]");
 	}
 
 	fdt = xmalloc(size);
