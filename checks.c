@@ -696,8 +696,8 @@ static void check_pci_bridge(struct check *c, struct dt_info *dti, struct node *
 
 	node->bus = &pci_bus;
 
-	if (!strneq(node->name, "pci", node->basenamelen) &&
-	    !strneq(node->name, "pcie", node->basenamelen))
+	if (!strprefixeq(node->name, node->basenamelen, "pci") &&
+	    !strprefixeq(node->name, node->basenamelen, "pcie"))
 		FAIL(c, dti, "Node %s node name is not \"pci\" or \"pcie\"",
 			     node->fullpath);
 
@@ -828,7 +828,7 @@ static bool node_is_compatible(struct node *node, const char *compat)
 
 	for (str = prop->val.val, end = str + prop->val.len; str < end;
 	     str += strnlen(str, end - str) + 1) {
-		if (strneq(str, compat, end - str))
+		if (strprefixeq(str, end - str, compat))
 			return true;
 	}
 	return false;
