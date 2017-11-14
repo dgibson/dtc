@@ -88,7 +88,7 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 		    int len, const void *val)
 {
 	const struct fdt_property *prop;
-	int retlen;
+	int retlen, namelen;
 	uint32_t tag, nameoff, proplen;
 	const char *propname;
 
@@ -106,8 +106,13 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 	if (tag != FDT_PROP)
 		FAIL("Incorrect tag 0x%08x on property \"%s\"", tag, name);
 
-	propname = fdt_string(fdt, nameoff);
-	if (!propname || !streq(propname, name))
+	propname = fdt_get_string(fdt, nameoff, &namelen);
+	if (!propname)
+		FAIL("Couldn't get property name: %s", fdt_strerror(namelen));
+	if (namelen != strlen(propname))
+		FAIL("Incorrect prop name length: %d instead of %zd",
+		     namelen, strlen(propname));
+	if (!streq(propname, name))
 		FAIL("Property name mismatch \"%s\" instead of \"%s\"",
 		     propname, name);
 	if (proplen != retlen)

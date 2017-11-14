@@ -61,5 +61,6 @@ tmp.*
 /sw_tree1
 /sw_states
 /truncated_property
+/truncated_string
 /utilfdt_test
 /value-labels

@@ -415,6 +415,7 @@ libfdt_tests () {
 
     # Tests for behaviour on various sorts of corrupted trees
     run_test truncated_property
+    run_test truncated_string
 
     # Check aliases support in fdt_path_offset
     run_dtc_test -I dts -O dtb -o aliases.dtb aliases.dts

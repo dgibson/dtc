@@ -65,7 +65,7 @@ LIBFDT_1.2 {
 		fdt_stringlist_get;
 		fdt_resize;
 		fdt_overlay_apply;
-
+		fdt_get_string;
 	local:
 		*;
 };

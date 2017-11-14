@@ -39,6 +39,9 @@ tree##_rsvmap_end:		;
 	FDTLONG(len)		; \
 	FDTLONG(tree##_##name - tree##_strings) ;
 
+#define PROP_EMPTY(tree, name) \
+	PROPHDR(tree, name, 0)	;
+
 #define PROP_INT(tree, name, val) \
 	PROPHDR(tree, name, 4) \
 	FDTLONG(val)		;
@@ -233,3 +236,26 @@ ovf_size_strings_strings:
 	ovf_size_strings_bad_string = ovf_size_strings_strings + 0x10000000
 ovf_size_strings_strings_end:
 ovf_size_strings_end:
+
+
+	/* truncated_string */
+	TREE_HDR(truncated_string)
+	EMPTY_RSVMAP(truncated_string)
+
+truncated_string_struct:
+	BEGIN_NODE("")
+	PROP_EMPTY(truncated_string, good_string)
+	PROP_EMPTY(truncated_string, bad_string)
+	END_NODE
+	FDTLONG(FDT_END)
+truncated_string_struct_end:
+
+truncated_string_strings:
+	STRING(truncated_string, good_string, "good")
+truncated_string_bad_string:
+	.byte	'b'
+	.byte	'a'
+	.byte	'd'
+	/* NOTE: terminating \0 deliberately missing */
+truncated_string_strings_end:
+truncated_string_end:
