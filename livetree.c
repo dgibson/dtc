@@ -216,7 +216,7 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 	return old_node;
 }
 
-void add_orphan_node(struct node *dt, struct node *new_node, char *ref)
+struct node * add_orphan_node(struct node *dt, struct node *new_node, char *ref)
 {
 	static unsigned int next_orphan_fragment = 0;
 	struct node *node;
@@ -236,6 +236,7 @@ void add_orphan_node(struct node *dt, struct node *new_node, char *ref)
 	name_node(node, name);
 
 	add_child(dt, node);
+	return dt;
 }
 
 struct node *chain_node(struct node *first, struct node *list)
