@@ -1066,7 +1066,7 @@ WARNING_PROPERTY_PHANDLE_CELLS(phys, "phys", "#phy-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(power_domains, "power-domains", "#power-domain-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(pwms, "pwms", "#pwm-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(resets, "resets", "#reset-cells");
-WARNING_PROPERTY_PHANDLE_CELLS(sound_dais, "sound-dais", "#sound-dai-cells");
+WARNING_PROPERTY_PHANDLE_CELLS(sound_dai, "sound-dai", "#sound-dai-cells");
 WARNING_PROPERTY_PHANDLE_CELLS(thermal_sensors, "thermal-sensors", "#thermal-sensor-cells");
 
 static bool prop_is_gpio(struct property *prop)
@@ -1269,7 +1269,7 @@ static struct check *check_table[] = {
 	&power_domains_property,
 	&pwms_property,
 	&resets_property,
-	&sound_dais_property,
+	&sound_dai_property,
 	&thermal_sensors_property,
 
 	&deprecated_gpio_property,
