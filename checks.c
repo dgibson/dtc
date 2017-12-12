@@ -620,6 +620,22 @@ WARNING_IF_NOT_STRING(label_is_string, "label");
 
 WARNING_IF_NOT_STRING_LIST(compatible_is_string_list, "compatible");
 
+static void check_names_is_string_list(struct check *c, struct dt_info *dti,
+				       struct node *node)
+{
+	struct property *prop;
+
+	for_each_property(node, prop) {
+		const char *s = strrchr(prop->name, '-');
+		if (!s || !streq(s, "-names"))
+			continue;
+
+		c->data = prop->name;
+		check_is_string_list(c, dti, node);
+	}
+}
+WARNING(names_is_string_list, check_names_is_string_list, NULL);
+
 static void fixup_addr_size_cells(struct check *c, struct dt_info *dti,
 				  struct node *node)
 {
@@ -1271,7 +1287,7 @@ static struct check *check_table[] = {
 	&device_type_is_string, &model_is_string, &status_is_string,
 	&label_is_string,
 
-	&compatible_is_string_list,
+	&compatible_is_string_list, &names_is_string_list,
 
 	&property_name_chars_strict,
 	&node_name_chars_strict,

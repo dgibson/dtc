@@ -6,6 +6,7 @@
 	status = <0xdeadbeef>;
 	label = <0xdeadbeef>;
 
+	foobar-names = "foo", <1>;
 
 	node {
 		compatible = "good", <0xdeadbeef>;
