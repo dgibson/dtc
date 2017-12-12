@@ -586,6 +586,7 @@ WARNING_IF_NOT_CELL(interrupt_cells_is_cell, "#interrupt-cells");
 WARNING_IF_NOT_STRING(device_type_is_string, "device_type");
 WARNING_IF_NOT_STRING(model_is_string, "model");
 WARNING_IF_NOT_STRING(status_is_string, "status");
+WARNING_IF_NOT_STRING(label_is_string, "label");
 
 static void fixup_addr_size_cells(struct check *c, struct dt_info *dti,
 				  struct node *node)
@@ -1236,6 +1237,7 @@ static struct check *check_table[] = {
 
 	&address_cells_is_cell, &size_cells_is_cell, &interrupt_cells_is_cell,
 	&device_type_is_string, &model_is_string, &status_is_string,
+	&label_is_string,
 
 	&property_name_chars_strict,
 	&node_name_chars_strict,
