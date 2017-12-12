@@ -636,6 +636,28 @@ static void check_names_is_string_list(struct check *c, struct dt_info *dti,
 }
 WARNING(names_is_string_list, check_names_is_string_list, NULL);
 
+static void check_alias_paths(struct check *c, struct dt_info *dti,
+				    struct node *node)
+{
+	struct property *prop;
+
+	if (!streq(node->name, "aliases"))
+		return;
+
+	for_each_property(node, prop) {
+		if (!prop->val.val || !get_node_by_path(dti->dt, prop->val.val)) {
+			FAIL(c, dti, "aliases property '%s' is not a valid node (%s)",
+			     prop->name, prop->val.val);
+			continue;
+		}
+		if (strspn(prop->name, LOWERCASE DIGITS "-") != strlen(prop->name))
+			FAIL(c, dti, "aliases property name '%s' is not valid",
+			     prop->name);
+
+	}
+}
+WARNING(alias_paths, check_alias_paths, NULL);
+
 static void fixup_addr_size_cells(struct check *c, struct dt_info *dti,
 				  struct node *node)
 {
@@ -1353,6 +1375,8 @@ static struct check *check_table[] = {
 	&deprecated_gpio_property,
 	&gpios_property,
 	&interrupts_property,
+
+	&alias_paths,
 
 	&always_fail,
 };
