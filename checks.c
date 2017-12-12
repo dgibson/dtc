@@ -981,6 +981,31 @@ static void check_avoid_default_addr_size(struct check *c, struct dt_info *dti,
 WARNING(avoid_default_addr_size, check_avoid_default_addr_size, NULL,
 	&addr_size_cells);
 
+static void check_avoid_unnecessary_addr_size(struct check *c, struct dt_info *dti,
+					      struct node *node)
+{
+	struct property *prop;
+	struct node *child;
+	bool has_reg = false;
+
+	if (!node->parent || node->addr_cells < 0 || node->size_cells < 0)
+		return;
+
+	if (get_property(node, "ranges") || !node->children)
+		return;
+
+	for_each_child(node, child) {
+		prop = get_property(child, "reg");
+		if (prop)
+			has_reg = true;
+	}
+
+	if (!has_reg)
+		FAIL(c, dti, "unnecessary #address-cells/#size-cells without \"ranges\" or child \"reg\" property in %s",
+		     node->fullpath);
+}
+WARNING(avoid_unnecessary_addr_size, check_avoid_unnecessary_addr_size, NULL, &avoid_default_addr_size);
+
 static void check_obsolete_chosen_interrupt_controller(struct check *c,
 						       struct dt_info *dti,
 						       struct node *node)
@@ -1305,6 +1330,7 @@ static struct check *check_table[] = {
 	&simple_bus_reg,
 
 	&avoid_default_addr_size,
+	&avoid_unnecessary_addr_size,
 	&obsolete_chosen_interrupt_controller,
 
 	&clocks_property,
