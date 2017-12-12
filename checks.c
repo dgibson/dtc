@@ -179,6 +179,36 @@ static void check_is_string(struct check *c, struct dt_info *dti,
 #define ERROR_IF_NOT_STRING(nm, propname) \
 	ERROR(nm, check_is_string, (propname))
 
+static void check_is_string_list(struct check *c, struct dt_info *dti,
+				 struct node *node)
+{
+	int rem, l;
+	struct property *prop;
+	char *propname = c->data;
+	char *str;
+
+	prop = get_property(node, propname);
+	if (!prop)
+		return; /* Not present, assumed ok */
+
+	str = prop->val.val;
+	rem = prop->val.len;
+	while (rem > 0) {
+		l = strnlen(str, rem);
+		if (l == rem) {
+			FAIL(c, dti, "\"%s\" property in %s is not a string list",
+			     propname, node->fullpath);
+			break;
+		}
+		rem -= l + 1;
+		str += l + 1;
+	}
+}
+#define WARNING_IF_NOT_STRING_LIST(nm, propname) \
+	WARNING(nm, check_is_string_list, (propname))
+#define ERROR_IF_NOT_STRING_LIST(nm, propname) \
+	ERROR(nm, check_is_string_list, (propname))
+
 static void check_is_cell(struct check *c, struct dt_info *dti,
 			  struct node *node)
 {
@@ -587,6 +617,8 @@ WARNING_IF_NOT_STRING(device_type_is_string, "device_type");
 WARNING_IF_NOT_STRING(model_is_string, "model");
 WARNING_IF_NOT_STRING(status_is_string, "status");
 WARNING_IF_NOT_STRING(label_is_string, "label");
+
+WARNING_IF_NOT_STRING_LIST(compatible_is_string_list, "compatible");
 
 static void fixup_addr_size_cells(struct check *c, struct dt_info *dti,
 				  struct node *node)
@@ -1238,6 +1270,8 @@ static struct check *check_table[] = {
 	&address_cells_is_cell, &size_cells_is_cell, &interrupt_cells_is_cell,
 	&device_type_is_string, &model_is_string, &status_is_string,
 	&label_is_string,
+
+	&compatible_is_string_list,
 
 	&property_name_chars_strict,
 	&node_name_chars_strict,
