@@ -1052,6 +1052,56 @@ static void check_obsolete_chosen_interrupt_controller(struct check *c,
 WARNING(obsolete_chosen_interrupt_controller,
 	check_obsolete_chosen_interrupt_controller, NULL);
 
+static void check_chosen_node_is_root(struct check *c, struct dt_info *dti,
+				      struct node *node)
+{
+	if (!streq(node->name, "chosen"))
+		return;
+
+	if (node->parent != dti->dt)
+		FAIL(c, dti, "chosen node '%s' must be at root node",
+		     node->fullpath);
+}
+WARNING(chosen_node_is_root, check_chosen_node_is_root, NULL);
+
+static void check_chosen_node_bootargs(struct check *c, struct dt_info *dti,
+				       struct node *node)
+{
+	struct property *prop;
+
+	if (!streq(node->name, "chosen"))
+		return;
+
+	prop = get_property(node, "bootargs");
+	if (!prop)
+		return;
+
+	c->data = prop->name;
+	check_is_string(c, dti, node);
+}
+WARNING(chosen_node_bootargs, check_chosen_node_bootargs, NULL);
+
+static void check_chosen_node_stdout_path(struct check *c, struct dt_info *dti,
+					  struct node *node)
+{
+	struct property *prop;
+
+	if (!streq(node->name, "chosen"))
+		return;
+
+	prop = get_property(node, "stdout-path");
+	if (!prop) {
+		prop = get_property(node, "linux,stdout-path");
+		if (!prop)
+			return;
+		FAIL(c, dti, "Use 'stdout-path' instead of 'linux,stdout-path'");
+	}
+
+	c->data = prop->name;
+	check_is_string(c, dti, node);
+}
+WARNING(chosen_node_stdout_path, check_chosen_node_stdout_path, NULL);
+
 struct provider {
 	const char *prop_name;
 	const char *cell_name;
@@ -1354,6 +1404,7 @@ static struct check *check_table[] = {
 	&avoid_default_addr_size,
 	&avoid_unnecessary_addr_size,
 	&obsolete_chosen_interrupt_controller,
+	&chosen_node_is_root, &chosen_node_bootargs, &chosen_node_stdout_path,
 
 	&clocks_property,
 	&cooling_device_property,
