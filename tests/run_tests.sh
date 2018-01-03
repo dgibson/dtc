@@ -6,6 +6,11 @@ if [ -z "$CC" ]; then
     CC=gcc
 fi
 
+# stat differs between platforms
+if [ -z "$STATSZ" ]; then
+	STATSZ="stat -c %s"
+fi
+
 export QUIET_TEST=1
 STOP_ON_FAIL=0
 
@@ -114,7 +119,7 @@ run_wrap_error_test () {
 # $2: align base
 check_align () {
     shorten_echo "check_align $@:	"
-    local size=$(stat -c %s "$1")
+    local size=$($STATSZ "$1")
     local align="$2"
     (
 	if [ $(($size % $align)) -eq 0 ] ;then
@@ -717,7 +722,7 @@ fdtput_tests () {
     text=lorem.txt
 
     # Allow just enough space for $text
-    run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
+    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb $dts
 
     # run_fdtput_test <expected-result> <file> <node> <property> <flags> <value>
     run_fdtput_test "a_model" $dtb / model -ts "a_model"
@@ -736,7 +741,7 @@ fdtput_tests () {
     run_fdtput_test "$(cat $text $text)" $dtb /randomnode blob -ts "$(cat $text $text)"
 
     # Start again with a fresh dtb
-    run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
+    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb $dts
 
     # Node creation
     run_wrap_error_test $DTPUT $dtb -c /baldrick sod
@@ -764,7 +769,7 @@ fdtput_tests () {
     run_wrap_test $DTPUT $dtb -cp /chosen/son
 
     # Start again with a fresh dtb
-    run_dtc_test -O dtb -p $(stat -c %s $text) -o $dtb $dts
+    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb $dts
 
     # Node delete
     run_wrap_test $DTPUT $dtb -c /chosen/node1 /chosen/node2 /chosen/node3
