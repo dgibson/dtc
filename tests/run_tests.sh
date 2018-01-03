@@ -8,7 +8,14 @@ fi
 
 # stat differs between platforms
 if [ -z "$STATSZ" ]; then
-	STATSZ="stat -c %s"
+	stat --version 2>/dev/null | grep -q 'GNU'
+	GNUSTAT=$?
+	if [ "$GNUSTAT" -ne 0 ]; then
+		# Assume BSD stat if we can't detect as GNU stat
+		STATSZ="stat -f %Uz"
+	else
+		STATSZ="stat -c %s"
+	fi
 fi
 
 export QUIET_TEST=1
