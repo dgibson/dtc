@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <alloca.h>
 #include <inttypes.h>
 
 #include <libfdt.h>
@@ -79,7 +78,7 @@ static int do_fdtoverlay(const char *input_filename,
 	ret = 0;
 
 	/* allocate blob pointer array */
-	ovblob = alloca(sizeof(*ovblob) * argc);
+	ovblob = malloc(sizeof(*ovblob) * argc);
 	memset(ovblob, 0, sizeof(*ovblob) * argc);
 
 	/* read and keep track of the overlay blobs */
@@ -121,6 +120,7 @@ out_err:
 			if (ovblob[i])
 				free(ovblob[i]);
 		}
+		free(ovblob);
 	}
 	free(blob);
 
