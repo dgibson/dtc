@@ -54,9 +54,12 @@ tests:	$(TESTS) $(TESTS_TREES)
 
 $(LIB_TESTS): %: $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_archive)
 
+# Not necessary on all platforms; allow -ldl to be excluded instead of forcing
+# other platforms to patch it out.
+LIBDL = -ldl
 $(DL_LIB_TESTS): %: %.o $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_archive)
 	@$(VECHO) LD [libdl] $@
-	$(LINK.c) -o $@ $^ -ldl
+	$(LINK.c) -o $@ $^ $(LIBDL)
 
 $(LIBTREE_TESTS): %: $(TESTS_PREFIX)testutils.o $(TESTS_PREFIX)trees.o \
 		util.o $(LIBFDT_archive)
