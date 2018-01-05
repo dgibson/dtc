@@ -130,19 +130,23 @@ SCRIPTS = dtdiff
 
 all: $(BIN) libfdt
 
-# We need both Python and swig to build pylibfdt.
-.PHONY: maybe_pylibfdt
-maybe_pylibfdt: FORCE
+# We need both Python and swig to build/install pylibfdt.
+# This builds the given make ${target} if those deps are found.
+check_python_deps = \
 	if $(PKG_CONFIG) --cflags python2 >/dev/null 2>&1; then \
 		if which swig >/dev/null 2>&1; then \
 			can_build=yes; \
 		fi; \
 	fi; \
-	if [ "$$can_build" = "yes" ]; then \
-		$(MAKE) pylibfdt; \
+	if [ "$${can_build}" = "yes" ]; then \
+		$(MAKE) $${target}; \
 	else \
-		echo "## Skipping pylibfdt (install python dev and swig to build)"; \
-	fi
+		echo "\#\# Skipping pylibfdt (install python dev and swig to build)"; \
+	fi ;
+
+.PHONY: maybe_pylibfdt
+maybe_pylibfdt: FORCE
+	target=pylibfdt; $(check_python_deps)
 
 ifeq ($(NO_PYTHON),)
 all: maybe_pylibfdt
@@ -213,8 +217,12 @@ install-includes:
 
 install: install-bin install-lib install-includes
 
+.PHONY: maybe_install_pylibfdt
+maybe_install_pylibfdt: FORCE
+	target=install_pylibfdt; $(check_python_deps)
+
 ifeq ($(NO_PYTHON),)
-install: install_pylibfdt
+install: maybe_install_pylibfdt
 endif
 
 $(VERSION_FILE): Makefile FORCE
