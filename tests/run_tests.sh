@@ -599,6 +599,9 @@ dtc_tests () {
     check_tests unit-addr-unique.dts unique_unit_address
     check_tests bad-phandle-cells.dts interrupts_extended_property
     check_tests bad-gpio.dts gpios_property
+    check_tests bad-graph.dts graph_child_address
+    check_tests bad-graph.dts graph_port
+    check_tests bad-graph.dts graph_endpoint
     run_sh_test dtc-checkfails.sh deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb bad-gpio.dts
     check_tests bad-interrupt-cells.dts interrupts_property
     run_sh_test dtc-checkfails.sh node_name_chars -- -I dtb -O dtb bad_node_char.dtb
