@@ -239,10 +239,23 @@ dtc_overlay_tests () {
     run_test check_path overlay_base.test.dtb not-exists "/__fixups__"
     run_test check_path overlay_base.test.dtb not-exists "/__local_fixups__"
 
+    # With syntactic sugar
     run_dtc_test -I dts -O dtb -o overlay_overlay.test.dtb overlay_overlay.dts
     run_test check_path overlay_overlay.test.dtb not-exists "/__symbols__"
     run_test check_path overlay_overlay.test.dtb exists "/__fixups__"
     run_test check_path overlay_overlay.test.dtb exists "/__local_fixups__"
+
+    # Without syntactic sugar
+    run_dtc_test -I dts -O dtb -o overlay_overlay_nosugar.test.dtb overlay_overlay.dts
+    run_test check_path overlay_overlay_nosugar.test.dtb not-exists "/__symbols__"
+    run_test check_path overlay_overlay_nosugar.test.dtb exists "/__fixups__"
+    run_test check_path overlay_overlay_nosugar.test.dtb exists "/__local_fixups__"
+
+    # Check building works the same as manual constructions
+    run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_nosugar.test.dtb
+
+    run_dtc_test -I dts -O dtb -o overlay_overlay_manual_fixups.test.dtb overlay_overlay_manual_fixups.dts
+    run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_manual_fixups.test.dtb
 
     run_test overlay overlay_base.test.dtb overlay_overlay.test.dtb
 
