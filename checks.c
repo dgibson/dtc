@@ -317,6 +317,11 @@ static void check_unit_address_vs_reg(struct check *c, struct dt_info *dti,
 	const char *unitname = get_unitname(node);
 	struct property *prop = get_property(node, "reg");
 
+	if (get_subnode(node, "__overlay__")) {
+		/* HACK: Overlay fragments are a special case */
+		return;
+	}
+
 	if (!prop) {
 		prop = get_property(node, "ranges");
 		if (prop && !prop->val.len)
