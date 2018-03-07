@@ -1023,6 +1023,36 @@ static void check_avoid_unnecessary_addr_size(struct check *c, struct dt_info *d
 }
 WARNING(avoid_unnecessary_addr_size, check_avoid_unnecessary_addr_size, NULL, &avoid_default_addr_size);
 
+static void check_unique_unit_address(struct check *c, struct dt_info *dti,
+					      struct node *node)
+{
+	struct node *childa;
+
+	if (node->addr_cells < 0 || node->size_cells < 0)
+		return;
+
+	if (!node->children)
+		return;
+
+	for_each_child(node, childa) {
+		struct node *childb;
+		const char *addr_a = get_unitname(childa);
+
+		if (!strlen(addr_a))
+			continue;
+
+		for_each_child(node, childb) {
+			const char *addr_b = get_unitname(childb);
+			if (childa == childb)
+				break;
+
+			if (streq(addr_a, addr_b))
+				FAIL(c, dti, childb, "duplicate unit-address (also used in node %s)", childa->fullpath);
+		}
+	}
+}
+WARNING(unique_unit_address, check_unique_unit_address, NULL, &avoid_default_addr_size);
+
 static void check_obsolete_chosen_interrupt_controller(struct check *c,
 						       struct dt_info *dti,
 						       struct node *node)
@@ -1396,6 +1426,7 @@ static struct check *check_table[] = {
 
 	&avoid_default_addr_size,
 	&avoid_unnecessary_addr_size,
+	&unique_unit_address,
 	&obsolete_chosen_interrupt_controller,
 	&chosen_node_is_root, &chosen_node_bootargs, &chosen_node_stdout_path,
 

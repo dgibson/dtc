@@ -596,6 +596,7 @@ dtc_tests () {
     check_tests unit-addr-without-reg.dts unit_address_vs_reg
     check_tests unit-addr-leading-0x.dts unit_address_format
     check_tests unit-addr-leading-0s.dts unit_address_format
+    check_tests unit-addr-unique.dts unique_unit_address
     check_tests bad-phandle-cells.dts interrupts_extended_property
     check_tests bad-gpio.dts gpios_property
     run_sh_test dtc-checkfails.sh deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb bad-gpio.dts
