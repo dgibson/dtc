@@ -42,7 +42,8 @@ static void check_path_buf(void *fdt, const char *path, int pathlen, int buflen)
 	memset(buf, POISON, sizeof(buf)); /* poison the buffer */
 
 	len = fdt_get_path(fdt, offset, buf, buflen);
-	verbose_printf("get_path() %s -> %d -> %s\n", path, offset, buf);
+	verbose_printf("get_path() %s -> %d -> %s\n", path, offset,
+		       len >= 0 ? buf : "<error>");
 
 	if (buflen <= pathlen) {
 		if (len != -FDT_ERR_NOSPACE)
