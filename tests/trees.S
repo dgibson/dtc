@@ -259,3 +259,23 @@ truncated_string_bad_string:
 	/* NOTE: terminating \0 deliberately missing */
 truncated_string_strings_end:
 truncated_string_end:
+
+
+	/* truncated_memrsv */
+	TREE_HDR(truncated_memrsv)
+
+truncated_memrsv_struct:
+	BEGIN_NODE("")
+	END_NODE
+	FDTLONG(FDT_END)
+truncated_memrsv_struct_end:
+
+truncated_memrsv_strings:
+truncated_memrsv_strings_end:
+
+	.balign	8
+truncated_memrsv_rsvmap:
+	RSVMAP_ENTRY(TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L)
+truncated_memrsv_rsvmap_end:
+
+truncated_memrsv_end:

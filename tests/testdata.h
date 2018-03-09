@@ -48,4 +48,5 @@ extern struct fdt_header bad_node_format;
 extern struct fdt_header bad_prop_char;
 extern struct fdt_header ovf_size_strings;
 extern struct fdt_header truncated_string;
+extern struct fdt_header truncated_memrsv;
 #endif /* ! __ASSEMBLY */

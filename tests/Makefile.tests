@@ -29,7 +29,7 @@ LIB_TESTS_L = get_mem_rsv \
 	check_path check_header
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
-LIBTREE_TESTS_L = truncated_property truncated_string
+LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv
 LIBTREE_TESTS = $(LIBTREE_TESTS_L:%=$(TESTS_PREFIX)%)
 
 DL_LIB_TESTS_L = asm_tree_dump value-labels
