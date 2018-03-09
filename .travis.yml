@@ -13,6 +13,7 @@ matrix:
           packages:
             - swig
             - python-dev
+            - valgrind
         coverity_scan:
           project:
             name: dtc
@@ -20,11 +21,14 @@ matrix:
           notification_email: david@gibson.dropbear.id.au
           build_command: make
           branch_pattern: coverity_scan
+      script:
+        - make
+        - make check && make checkm
 
+    # Check it builds properly without the python bits
     - addons:
         apt:
           packages:
-
-script:
+      script:
         - make
         - make check
