@@ -11,7 +11,7 @@
    allocation methods causes uninitialized data in alignment gap
    Memcheck:Param
    write(buf)
-   fun:__write_nocancel
+   fun:write
    fun:utilfdt_write_err
    fun:save_blob
    fun:main
