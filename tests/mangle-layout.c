@@ -44,13 +44,9 @@ static void expand_buf(struct bufstate *buf, int newsize)
 
 static void new_header(struct bufstate *buf, int version, const void *fdt)
 {
-	int hdrsize;
+	int hdrsize = fdt_header_size_(version);
 
-	if (version == 16)
-		hdrsize = FDT_V16_SIZE;
-	else if (version == 17)
-		hdrsize = FDT_V17_SIZE;
-	else
+	if ((version != 16) && (version != 17))
 		CONFIG("Bad version %d", version);
 
 	expand_buf(buf, hdrsize);
