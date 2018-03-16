@@ -63,7 +63,7 @@ static int do_fdtoverlay(const char *input_filename,
 	off_t blob_len, ov_len, total_len;
 	int i, ret = -1;
 
-	blob = utilfdt_read_len(input_filename, &blob_len);
+	blob = utilfdt_read(input_filename, &blob_len);
 	if (!blob) {
 		fprintf(stderr, "\nFailed to read base blob %s\n",
 				input_filename);
@@ -84,7 +84,7 @@ static int do_fdtoverlay(const char *input_filename,
 	/* read and keep track of the overlay blobs */
 	total_len = 0;
 	for (i = 0; i < argc; i++) {
-		ovblob[i] = utilfdt_read_len(argv[i], &ov_len);
+		ovblob[i] = utilfdt_read(argv[i], &ov_len);
 		if (!ovblob[i]) {
 			fprintf(stderr, "\nFailed to read overlay %s\n",
 					argv[i]);

@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 		usage("missing input filename");
 	file = argv[optind];
 
-	buf = utilfdt_read_len(file, &len);
+	buf = utilfdt_read(file, &len);
 	if (!buf)
 		die("could not read: %s\n", file);
 

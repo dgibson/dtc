@@ -227,7 +227,7 @@ char get_escape_char(const char *s, int *i)
 	return val;
 }
 
-int utilfdt_read_err_len(const char *filename, char **buffp, off_t *len)
+int utilfdt_read_err(const char *filename, char **buffp, off_t *len)
 {
 	int fd = 0;	/* assume stdin */
 	char *buf = NULL;
@@ -264,20 +264,15 @@ int utilfdt_read_err_len(const char *filename, char **buffp, off_t *len)
 		free(buf);
 	else
 		*buffp = buf;
-	*len = bufsize;
+	if (len)
+		*len = bufsize;
 	return ret;
 }
 
-int utilfdt_read_err(const char *filename, char **buffp)
-{
-	off_t len;
-	return utilfdt_read_err_len(filename, buffp, &len);
-}
-
-char *utilfdt_read_len(const char *filename, off_t *len)
+char *utilfdt_read(const char *filename, off_t *len)
 {
 	char *buff;
-	int ret = utilfdt_read_err_len(filename, &buff, len);
+	int ret = utilfdt_read_err(filename, &buff, len);
 
 	if (ret) {
 		fprintf(stderr, "Couldn't open blob from '%s': %s\n", filename,
@@ -286,12 +281,6 @@ char *utilfdt_read_len(const char *filename, off_t *len)
 	}
 	/* Successful read */
 	return buff;
-}
-
-char *utilfdt_read(const char *filename)
-{
-	off_t len;
-	return utilfdt_read_len(filename, &len);
 }
 
 int utilfdt_write_err(const char *filename, const void *blob)
