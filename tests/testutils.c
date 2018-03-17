@@ -159,8 +159,6 @@ int nodename_eq(const char *s1, const char *s2)
 		return 0;
 }
 
-#define CHUNKSIZE	128
-
 void *load_blob(const char *filename)
 {
 	char *blob;
