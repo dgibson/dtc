@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
 
 	test_init(argc, argv);
 
+	vg_prepare_blob(fdt, fdt_totalsize(fdt));
+
 	off = fdt_first_property_offset(fdt, 0);
 	good = fdt_get_property_by_offset(fdt, off, NULL);
 

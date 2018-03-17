@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
 
 	test_init(argc, argv);
 
+	vg_prepare_blob(fdt, fdt_totalsize(fdt));
+
 	prop = fdt_getprop(fdt, 0, "truncated", &len);
 	if (prop)
 		FAIL("fdt_getprop() succeeded on truncated property");

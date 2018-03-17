@@ -29,6 +29,7 @@ matrix:
     - addons:
         apt:
           packages:
+            - valgrind
       script:
         - make
         - make check
