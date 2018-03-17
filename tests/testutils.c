@@ -30,6 +30,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <valgrind/memcheck.h>
+
 #include <libfdt.h>
 
 #include "tests.h"
@@ -179,11 +181,20 @@ void *load_blob_arg(int argc, char *argv[])
 
 void save_blob(const char *filename, void *fdt)
 {
-	int ret = utilfdt_write_err(filename, fdt);
+	size_t size = fdt_totalsize(fdt);
+	void *tmp;
+	int ret;
 
+	/* Make a temp copy of the blob so that valgrind won't check
+	 * about uninitialized bits in the pieces between blocks */
+	tmp = xmalloc(size);
+	fdt_move(fdt, tmp, size);
+	VALGRIND_MAKE_MEM_DEFINED(tmp, size);
+	ret = utilfdt_write_err(filename, tmp);
 	if (ret)
 		CONFIG("Couldn't write blob to \"%s\": %s", filename,
 		       strerror(ret));
+	free(tmp);
 }
 
 void *open_blob_rw(void *blob)
