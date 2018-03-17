@@ -37,6 +37,8 @@ static struct {
 	TREE(test_tree1),
 	TREE(bad_node_char), TREE(bad_node_format), TREE(bad_prop_char),
 	TREE(ovf_size_strings),
+	TREE(truncated_property), TREE(truncated_string),
+	TREE(truncated_memrsv),
 };
 
 #define NUM_TREES	(sizeof(trees) / sizeof(trees[0]))

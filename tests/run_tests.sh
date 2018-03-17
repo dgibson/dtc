@@ -445,6 +445,15 @@ libfdt_tests () {
     run_wrap_error_test $DTC -I dtb -O dts -o /dev/null ovf_size_strings.dtb
 
     run_test check_header test_tree1.dtb
+
+    # check full tests
+    for good in test_tree1.dtb; do
+	run_test check_full $good
+    done
+    for bad in truncated_property.dtb truncated_string.dtb \
+				      truncated_memrsv.dtb; do
+	run_test check_full -n $bad
+    done
 }
 
 dtc_tests () {
