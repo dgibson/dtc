@@ -101,7 +101,7 @@ char get_escape_char(const char *s, int *i);
  * @param len		If non-NULL, the amount of data we managed to read
  * @return Pointer to allocated buffer containing fdt, or NULL on error
  */
-char *utilfdt_read(const char *filename, off_t *len);
+char *utilfdt_read(const char *filename, size_t *len);
 
 /**
  * Read a device tree file into a buffer. Does not report errors, but only
@@ -113,7 +113,7 @@ char *utilfdt_read(const char *filename, off_t *len);
  * @param len		If non-NULL, the amount of data we managed to read
  * @return 0 if ok, else an errno value representing the error
  */
-int utilfdt_read_err(const char *filename, char **buffp, off_t *len);
+int utilfdt_read_err(const char *filename, char **buffp, size_t *len);
 
 /**
  * Write a device tree buffer to a file. This will report any errors on

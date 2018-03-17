@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	char *buf;
 	bool debug = false;
 	bool scan = false;
-	off_t len;
+	size_t len;
 
 	fprintf(stderr, "\n"
 "**** fdtdump is a low-level debugging tool, not meant for general use.\n"

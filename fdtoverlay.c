@@ -60,7 +60,7 @@ static int do_fdtoverlay(const char *input_filename,
 {
 	char *blob = NULL;
 	char **ovblob = NULL;
-	off_t blob_len, ov_len, total_len;
+	size_t blob_len, ov_len, total_len;
 	int i, ret = -1;
 
 	blob = utilfdt_read(input_filename, &blob_len);

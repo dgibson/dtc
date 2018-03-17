@@ -227,11 +227,11 @@ char get_escape_char(const char *s, int *i)
 	return val;
 }
 
-int utilfdt_read_err(const char *filename, char **buffp, off_t *len)
+int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
 {
 	int fd = 0;	/* assume stdin */
 	char *buf = NULL;
-	off_t bufsize = 1024, offset = 0;
+	size_t bufsize = 1024, offset = 0;
 	int ret = 0;
 
 	*buffp = NULL;
@@ -269,7 +269,7 @@ int utilfdt_read_err(const char *filename, char **buffp, off_t *len)
 	return ret;
 }
 
-char *utilfdt_read(const char *filename, off_t *len)
+char *utilfdt_read(const char *filename, size_t *len)
 {
 	char *buff;
 	int ret = utilfdt_read_err(filename, &buff, len);
