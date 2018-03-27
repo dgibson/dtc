@@ -255,7 +255,7 @@ static void check_duplicate_node_names(struct check *c, struct dt_info *dti,
 		     child2;
 		     child2 = child2->next_sibling)
 			if (streq(child->name, child2->name))
-				FAIL(c, dti, node, "Duplicate node name");
+				FAIL(c, dti, child2, "Duplicate node name");
 }
 ERROR(duplicate_node_names, check_duplicate_node_names, NULL);
 
