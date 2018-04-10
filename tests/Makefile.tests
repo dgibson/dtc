@@ -11,7 +11,7 @@ LIB_TESTS_L = get_mem_rsv \
 	addr_size_cells \
 	stringlist \
 	setprop_inplace nop_property nop_node \
-	sw_tree1 \
+	sw_tree1 sw_states \
 	move_and_save mangle-layout nopulate \
 	open_pack rw_tree1 set_name setprop del_property del_node \
 	appendprop1 appendprop2 propname_escapes \

@@ -58,6 +58,7 @@ tmp.*
 /subnode_offset
 /supernode_atdepth_offset
 /sw_tree1
+/sw_states
 /truncated_property
 /utilfdt_test
 /value-labels

@@ -345,6 +345,7 @@ libfdt_tests () {
     tree1_tests sw_tree1.test.dtb
     tree1_tests unfinished_tree1.test.dtb
     run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
+    run_test sw_states
 
     # Resizing tests
     for mode in resize realloc; do
