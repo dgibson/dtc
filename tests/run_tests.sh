@@ -568,6 +568,13 @@ dtc_tests () {
     run_dtc_test -I dts -O dtb -o dtc_tree1_delete.test.dtb test_tree1_delete.dts
     tree1_tests dtc_tree1_delete.test.dtb
 
+    # Check omit-if-no-ref functionality
+    run_dtc_test -I dts -O dtb -o omit-no-ref.test.dtb omit-no-ref.dts
+    run_test check_path omit-no-ref.test.dtb not-exists "/node1"
+    run_test check_path omit-no-ref.test.dtb not-exists "/node2"
+    run_test check_path omit-no-ref.test.dtb exists "/node3"
+    run_test check_path omit-no-ref.test.dtb exists "/node4"
+
     run_dtc_test -I dts -O dts -o delete_reinstate_multilabel.dts.test.dts delete_reinstate_multilabel.dts
     run_wrap_test cmp delete_reinstate_multilabel.dts.test.dts delete_reinstate_multilabel_ref.dts
 
