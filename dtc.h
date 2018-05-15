@@ -77,7 +77,14 @@ enum markertype {
 	REF_PHANDLE,
 	REF_PATH,
 	LABEL,
+	TYPE_UINT8,
+	TYPE_UINT16,
+	TYPE_UINT32,
+	TYPE_UINT64,
+	TYPE_BLOB,
+	TYPE_STRING,
 };
+extern const char *markername(enum markertype markertype);
 
 struct  marker {
 	enum markertype type;
