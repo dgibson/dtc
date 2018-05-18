@@ -190,7 +190,7 @@ class PyLibfdtTests(unittest.TestCase):
         poffset = self.fdt.first_property_offset(root)
         prop = self.fdt.get_property_by_offset(poffset)
         self.assertEquals(prop.name, 'compatible')
-        self.assertEquals(prop.value, 'test_tree1\0')
+        self.assertEquals(prop, 'test_tree1\0')
 
         with self.assertRaises(FdtException) as e:
             self.fdt.get_property_by_offset(-2)

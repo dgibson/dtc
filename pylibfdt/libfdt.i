@@ -418,7 +418,8 @@ class Fdt:
         """
         return check_err(fdt_node_offset_by_phandle(self._fdt, phandle), quiet)
 
-class Property:
+
+class Property(bytearray):
     """Holds a device tree property name and value.
 
     This holds a copy of a property taken from the device tree. It does not
@@ -427,11 +428,11 @@ class Property:
 
     Properties:
         name: Property name
-        value: Proper value as a bytearray
+        value: Property value as a bytearray
     """
     def __init__(self, name, value):
+        bytearray.__init__(self, value)
         self.name = name
-        self.value = value
 %}
 
 %rename(fdt_property) fdt_property_func;
