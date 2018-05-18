@@ -297,9 +297,10 @@ class PyLibfdtTests(unittest.TestCase):
 
     def testIntegers(self):
         """Check that integers can be passed and returned"""
-        self.assertEquals(0, libfdt.fdt_get_phandle(self.fdt._fdt, 0))
+        self.assertEquals(0, libfdt.fdt_get_phandle(self.fdt.as_bytearray(), 0))
         node2 = self.fdt.path_offset('/subnode@2')
-        self.assertEquals(0x2000, libfdt.fdt_get_phandle(self.fdt._fdt, node2))
+        self.assertEquals(
+                0x2000, libfdt.fdt_get_phandle(self.fdt.as_bytearray(), node2))
 
     def testGetPhandle(self):
         """Test for the get_phandle() method"""

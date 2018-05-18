@@ -174,6 +174,17 @@ class Fdt:
         self._fdt = bytearray(data)
         check_err(fdt_check_header(self._fdt));
 
+    def as_bytearray(self):
+        """Get the device tree contents as a bytearray
+
+        This can be passed directly to libfdt functions that access a
+        const void * for the device tree.
+
+        Returns:
+            bytearray containing the device tree
+        """
+        return bytearray(self._fdt)
+
     def subnode_offset(self, parentoffset, name, quiet=()):
         """Get the offset of a named subnode
 
