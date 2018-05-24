@@ -66,12 +66,12 @@ static void dump_blob(void *blob, bool debug)
 
 	printf("/dts-v1/;\n");
 	printf("// magic:\t\t0x%x\n", fdt32_to_cpu(bph->magic));
-	printf("// totalsize:\t\t0x%x (%d)\n", totalsize, totalsize);
+	printf("// totalsize:\t\t0x%x (%u)\n", totalsize, totalsize);
 	printf("// off_dt_struct:\t0x%x\n", off_dt);
 	printf("// off_dt_strings:\t0x%x\n", off_str);
 	printf("// off_mem_rsvmap:\t0x%x\n", off_mem_rsvmap);
-	printf("// version:\t\t%d\n", version);
-	printf("// last_comp_version:\t%d\n",
+	printf("// version:\t\t%u\n", version);
+	printf("// last_comp_version:\t%u\n",
 	       fdt32_to_cpu(bph->last_comp_version));
 	if (version >= 2)
 		printf("// boot_cpuid_phys:\t0x%x\n",
