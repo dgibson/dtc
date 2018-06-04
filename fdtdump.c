@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #include <libfdt.h>
 #include <libfdt_env.h>
@@ -65,23 +66,24 @@ static void dump_blob(void *blob, bool debug)
 	shift = 4;
 
 	printf("/dts-v1/;\n");
-	printf("// magic:\t\t0x%x\n", fdt32_to_cpu(bph->magic));
-	printf("// totalsize:\t\t0x%x (%u)\n", totalsize, totalsize);
-	printf("// off_dt_struct:\t0x%x\n", off_dt);
-	printf("// off_dt_strings:\t0x%x\n", off_str);
-	printf("// off_mem_rsvmap:\t0x%x\n", off_mem_rsvmap);
-	printf("// version:\t\t%u\n", version);
-	printf("// last_comp_version:\t%u\n",
+	printf("// magic:\t\t0x%"PRIx32"\n", fdt32_to_cpu(bph->magic));
+	printf("// totalsize:\t\t0x%"PRIx32" (%"PRIu32")\n",
+	       totalsize, totalsize);
+	printf("// off_dt_struct:\t0x%"PRIx32"\n", off_dt);
+	printf("// off_dt_strings:\t0x%"PRIx32"\n", off_str);
+	printf("// off_mem_rsvmap:\t0x%"PRIx32"\n", off_mem_rsvmap);
+	printf("// version:\t\t%"PRIu32"\n", version);
+	printf("// last_comp_version:\t%"PRIu32"\n",
 	       fdt32_to_cpu(bph->last_comp_version));
 	if (version >= 2)
-		printf("// boot_cpuid_phys:\t0x%x\n",
+		printf("// boot_cpuid_phys:\t0x%"PRIx32"\n",
 		       fdt32_to_cpu(bph->boot_cpuid_phys));
 
 	if (version >= 3)
-		printf("// size_dt_strings:\t0x%x\n",
+		printf("// size_dt_strings:\t0x%"PRIx32"\n",
 		       fdt32_to_cpu(bph->size_dt_strings));
 	if (version >= 17)
-		printf("// size_dt_struct:\t0x%x\n",
+		printf("// size_dt_struct:\t0x%"PRIx32"\n",
 		       fdt32_to_cpu(bph->size_dt_struct));
 	printf("\n");
 
@@ -91,14 +93,14 @@ static void dump_blob(void *blob, bool debug)
 		if (addr == 0 && size == 0)
 			break;
 
-		printf("/memreserve/ %#llx %#llx;\n",
-		       (unsigned long long)addr, (unsigned long long)size);
+		printf("/memreserve/ %#"PRIx64" %#"PRIx64";\n",
+		       addr, size);
 	}
 
 	p = p_struct;
 	while ((tag = fdt32_to_cpu(GET_CELL(p))) != FDT_END) {
 
-		dumpf("%04zx: tag: 0x%08x (%s)\n",
+		dumpf("%04zx: tag: 0x%08"PRIx32" (%s)\n",
 		        (uintptr_t)p - blob_off - 4, tag, tagname(tag));
 
 		if (tag == FDT_BEGIN_NODE) {
@@ -127,7 +129,7 @@ static void dump_blob(void *blob, bool debug)
 		}
 
 		if (tag != FDT_PROP) {
-			fprintf(stderr, "%*s ** Unknown tag 0x%08x\n", depth * shift, "", tag);
+			fprintf(stderr, "%*s ** Unknown tag 0x%08"PRIx32"\n", depth * shift, "", tag);
 			break;
 		}
 		sz = fdt32_to_cpu(GET_CELL(p));
