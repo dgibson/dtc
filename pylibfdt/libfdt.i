@@ -365,7 +365,7 @@ class Fdt:
             quiet: Errors to ignore (empty to raise on all errors)
 
         Returns:
-            Value of property as a bytearray, or -ve error number
+            Value of property as a string of bytes, or -ve error number
 
         Raises:
             FdtError if any error occurs (e.g. the property is not found)
@@ -374,7 +374,8 @@ class Fdt:
                                quiet)
         if isinstance(pdata, (int)):
             return pdata
-        return bytearray(pdata[0])
+        # Use bytes() rather than string(). This works on both Python 2 and 3
+        return bytes(pdata[0])
 
     def get_phandle(self, nodeoffset):
         """Get the phandle of a node
