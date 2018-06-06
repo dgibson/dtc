@@ -220,6 +220,24 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(libfdt.strerror(-libfdt.NOTFOUND),
                           'FDT_ERR_NOTFOUND')
 
+    def testNextNodeOffset(self):
+        """Check that we can walk through nodes"""
+        node_list = []
+        node = 0
+        depth = 0
+        while depth >= 0:
+            node_list.append([depth, self.fdt.get_name(node)])
+            node, depth = self.fdt.next_node(node, depth, (libfdt.BADOFFSET,))
+        self.assertEquals(node_list, [
+            [0, ''],
+            [1, 'subnode@1'],
+            [2, 'subsubnode'],
+            [2, 'ss1'],
+            [1, 'subnode@2'],
+            [2, 'subsubnode@0'],
+            [2, 'ss2'],
+            ])
+
     def testFirstNextSubnodeOffset(self):
         """Check that we can walk through subnodes"""
         node_list = []

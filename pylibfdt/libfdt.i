@@ -185,6 +185,25 @@ class Fdt:
         """
         return bytearray(self._fdt)
 
+    def next_node(self, nodeoffset, depth, quiet=()):
+        """Find the next subnode
+
+        Args:
+            nodeoffset: Node offset of previous node
+            depth: The depth of the node at nodeoffset. This is used to
+                calculate the depth of the returned node
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Typle:
+                Offset of the next node, if any, else a -ve error
+                Depth of the returned node, if any, else undefined
+
+        Raises:
+            FdtException if no more nodes found or other error occurs
+        """
+        return check_err(fdt_next_node(self._fdt, nodeoffset, depth), quiet)
+
     def first_subnode(self, nodeoffset, quiet=()):
         """Find the first subnode of a parent node
 
@@ -466,6 +485,7 @@ typedef int fdt32_t;
         fdt = fdt; /* avoid unused variable warning */
 }
 
+/* typemap used for fdt_get_property_by_offset() */
 %typemap(out) (struct fdt_property *) {
 	PyObject *buff;
 
@@ -487,6 +507,19 @@ typedef int fdt32_t;
 	else
 		$result = Py_BuildValue("s#", $1, *arg4);
 }
+
+/* typemaps used for fdt_next_node() */
+%typemap(in, numinputs=1) int *depth (int depth) {
+   depth = (int) PyInt_AsLong($input);
+   $1 = &depth;
+}
+
+%typemap(argout) int *depth {
+        PyObject *val = Py_BuildValue("i", *arg$argnum);
+        resultobj = SWIG_Python_AppendOutput(resultobj, val);
+}
+
+%apply int *depth { int *depth };
 
 /* We have both struct fdt_property and a function fdt_property() */
 %warnfilter(302) fdt_property;
