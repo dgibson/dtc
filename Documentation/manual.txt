@@ -693,3 +693,34 @@ Where options are:
     -i, --input         Input base DT blob
     -o, --output        Output DT blob
     -v, --verbose       Verbose message output
+
+4 ) fdtget -- Read properties from device tree
+
+This command can be used to obtain individual values from the device tree in a
+nicely formatted way. You can specify multiple nodes to display (when using -p)
+or multiple node/property pairs (when not using -p). For the latter, each
+property is displayed on its own line, with a space between each cell within
+the property.
+
+The syntax of the fdtget command is:
+
+    fdtget <options> <dt file> [<node> <property>]...
+    fdtget -p <options> <dt file> [<node> ]...
+
+where options are:
+
+    <type>    s=string, i=int, u=unsigned, x=hex
+        Optional modifier prefix:
+            hh or b=byte, h=2 byte, l=4 byte (default)
+
+    Options: -[t:pld:hV]
+    -t, --type <arg>    Type of data
+    -p, --properties    List properties for each node
+    -l, --list          List subnodes for each node
+    -d, --default <arg> Default value to display when the property is missing
+    -h, --help          Print this help and exit
+    -V, --version       Print version and exit
+
+If -t is not provided, fdtget will try to figure out the type, trying to detect
+strings, string lists and the size of each value in the property. This is
+similar to how fdtdump works, and uses the same heuristics.
