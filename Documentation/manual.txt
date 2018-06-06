@@ -724,3 +724,36 @@ where options are:
 If -t is not provided, fdtget will try to figure out the type, trying to detect
 strings, string lists and the size of each value in the property. This is
 similar to how fdtdump works, and uses the same heuristics.
+
+
+5 ) fdtput - Write properties to a device tree
+
+The syntax of the fdtput command is:
+
+    fdtput <options> <dt file> <node> <property> [<value>...]
+    fdtput -c <options> <dt file> [<node>...]
+    fdtput -r <options> <dt file> [<node>...]
+    fdtput -d <options> <dt file> <node> [<property>...]
+
+Options are:
+
+    <type>    s=string, i=int, u=unsigned, x=hex
+        Optional modifier prefix:
+            hh or b=byte, h=2 byte, l=4 byte (default)
+
+    -c, --create     Create nodes if they don't already exist
+    -r, --remove     Delete nodes (and any subnodes) if they already exist
+    -d, --delete     Delete properties if they already exist
+    -p, --auto-path  Automatically create nodes as needed for the node path
+    -t, --type <arg> Type of data
+    -v, --verbose    Display each value decoded from command line
+    -h, --help       Print this help and exit
+    -V, --version    Print version and exit
+
+The option determines which usage is selected and therefore the operation that
+is performed. The first usage adds or updates properties; the rest are used to
+create/delete nodes and delete properties.
+
+For the first usage, the command line arguments are joined together into a
+single value which is written to the property. The -t option is required so
+that fdtput knows how to decode its arguments.
