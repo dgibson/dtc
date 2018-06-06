@@ -357,5 +357,13 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(node2, self.fdt.node_offset_by_phandle(0x2001))
 
 
+    def testReserveMap(self):
+        """Test that we can access the memory reserve map"""
+        self.assertEquals(2, self.fdt.num_mem_rsv())
+        self.assertEquals([ 0xdeadbeef00000000, 0x100000],
+                          self.fdt.get_mem_rsv(0))
+        self.assertEquals([123456789, 010000], self.fdt.get_mem_rsv(1))
+
+
 if __name__ == "__main__":
     unittest.main()

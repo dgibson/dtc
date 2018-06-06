@@ -315,6 +315,25 @@ class Fdt:
         """
         return fdt_size_dt_struct(self._fdt)
 
+    def num_mem_rsv(self, quiet=()):
+        """Return the number of memory reserve-map records
+
+        Returns:
+            Number of memory reserve-map records
+        """
+        return check_err(fdt_num_mem_rsv(self._fdt), quiet)
+
+    def get_mem_rsv(self, index, quiet=()):
+        """Return the indexed memory reserve-map record
+
+        Args:
+            index: Record to return (0=first)
+
+        Returns:
+            Number of memory reserve-map records
+        """
+        return check_err(fdt_get_mem_rsv(self._fdt, index), quiet)
+
     def subnode_offset(self, parentoffset, name, quiet=()):
         """Get the offset of a named subnode
 
@@ -585,6 +604,21 @@ typedef int fdt32_t;
 }
 
 %apply int *depth { int *depth };
+
+/* typemaps for fdt_get_mem_rsv */
+%typemap(in, numinputs=0) uint64_t * (uint64_t temp) {
+   $1 = &temp;
+}
+
+%typemap(argout) uint64_t * {
+        PyObject *val = PyLong_FromUnsignedLong(*arg$argnum);
+        if (!result) {
+           if (PyTuple_GET_SIZE(resultobj) == 0)
+              resultobj = val;
+           else
+              resultobj = SWIG_Python_AppendOutput(resultobj, val);
+        }
+}
 
 /* We have both struct fdt_property and a function fdt_property() */
 %warnfilter(302) fdt_property;
