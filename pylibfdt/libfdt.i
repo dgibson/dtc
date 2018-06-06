@@ -185,6 +185,52 @@ class Fdt:
         """
         return bytearray(self._fdt)
 
+    def first_subnode(self, nodeoffset, quiet=()):
+        """Find the first subnode of a parent node
+
+        Args:
+            nodeoffset: Node offset of parent node
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            The offset of the first subnode, if any
+
+        Raises:
+            FdtException if no subnodes found or other error occurs
+        """
+        return check_err(fdt_first_subnode(self._fdt, nodeoffset), quiet)
+
+    def next_subnode(self, nodeoffset, quiet=()):
+        """Find the next subnode
+
+        Args:
+            nodeoffset: Node offset of previous subnode
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            The offset of the next subnode, if any
+
+        Raises:
+            FdtException if no more subnodes found or other error occurs
+        """
+        return check_err(fdt_next_subnode(self._fdt, nodeoffset), quiet)
+
+    def totalsize(self):
+        """Return the total size of the device tree
+
+        Returns:
+            Total tree size in bytes
+        """
+        return check_err(fdt_totalsize(self._fdt))
+
+    def off_dt_struct(self):
+        """Return the start of the device tree struct area
+
+        Returns:
+            Start offset of struct area
+        """
+        return check_err(fdt_off_dt_struct(self._fdt))
+
     def subnode_offset(self, parentoffset, name, quiet=()):
         """Get the offset of a named subnode
 
@@ -216,6 +262,20 @@ class Fdt:
             FdtException if the path is not valid or not found
         """
         return check_err(fdt_path_offset(self._fdt, path), quiet)
+
+    def get_name(self, nodeoffset):
+        """Get the name of a node
+
+        Args:
+            nodeoffset: Offset of node to check
+
+        Returns:
+            Node name
+
+        Raises:
+            FdtException on error (e.g. nodeoffset is invalid)
+        """
+        return check_err_null(fdt_get_name(self._fdt, nodeoffset))[0]
 
     def first_property_offset(self, nodeoffset, quiet=()):
         """Get the offset of the first property in a node offset
@@ -251,20 +311,6 @@ class Fdt:
         return check_err(fdt_next_property_offset(self._fdt, prop_offset),
                          quiet)
 
-    def get_name(self, nodeoffset):
-        """Get the name of a node
-
-        Args:
-            nodeoffset: Offset of node to check
-
-        Returns:
-            Node name
-
-        Raises:
-            FdtException on error (e.g. nodeoffset is invalid)
-        """
-        return check_err_null(fdt_get_name(self._fdt, nodeoffset))[0]
-
     def get_property_by_offset(self, prop_offset, quiet=()):
         """Obtains a property that can be examined
 
@@ -285,52 +331,6 @@ class Fdt:
             return pdata
         return Property(pdata[0], pdata[1])
 
-    def first_subnode(self, nodeoffset, quiet=()):
-        """Find the first subnode of a parent node
-
-        Args:
-            nodeoffset: Node offset of parent node
-            quiet: Errors to ignore (empty to raise on all errors)
-
-        Returns:
-            The offset of the first subnode, if any
-
-        Raises:
-            FdtException if no subnode found or other error occurs
-        """
-        return check_err(fdt_first_subnode(self._fdt, nodeoffset), quiet)
-
-    def next_subnode(self, nodeoffset, quiet=()):
-        """Find the next subnode
-
-        Args:
-            nodeoffset: Node offset of previous subnode
-            quiet: Errors to ignore (empty to raise on all errors)
-
-        Returns:
-            The offset of the next subnode, if any
-
-        Raises:
-            FdtException if no more subnode found or other error occurs
-        """
-        return check_err(fdt_next_subnode(self._fdt, nodeoffset), quiet)
-
-    def totalsize(self):
-        """Return the total size of the device tree
-
-        Returns:
-            Total tree size in bytes
-        """
-        return check_err(fdt_totalsize(self._fdt))
-
-    def off_dt_struct(self):
-        """Return the start of the device tree struct area
-
-        Returns:
-            Start offset of struct area
-        """
-        return check_err(fdt_off_dt_struct(self._fdt))
-
     def pack(self, quiet=()):
         """Pack the device tree to remove unused space
 
@@ -343,18 +343,6 @@ class Fdt:
             FdtException if any error occurs
         """
         return check_err(fdt_pack(self._fdt), quiet)
-
-    def delprop(self, nodeoffset, prop_name):
-        """Delete a property from a node
-
-        Args:
-            nodeoffset: Node offset containing property to delete
-            prop_name: Name of property to delete
-
-        Raises:
-            FdtError if the property does not exist, or another error occurs
-        """
-        return check_err(fdt_delprop(self._fdt, nodeoffset, prop_name))
 
     def getprop(self, nodeoffset, prop_name, quiet=()):
         """Get a property from a node
@@ -403,6 +391,18 @@ class Fdt:
             FdtException if no parent found or other error occurs
         """
         return check_err(fdt_parent_offset(self._fdt, nodeoffset), quiet)
+
+    def delprop(self, nodeoffset, prop_name):
+        """Delete a property from a node
+
+        Args:
+            nodeoffset: Node offset containing property to delete
+            prop_name: Name of property to delete
+
+        Raises:
+            FdtError if the property does not exist, or another error occurs
+        """
+        return check_err(fdt_delprop(self._fdt, nodeoffset, prop_name))
 
     def node_offset_by_phandle(self, phandle, quiet=()):
         """Get the offset of a node with the given phandle
