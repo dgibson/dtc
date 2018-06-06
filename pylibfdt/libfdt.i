@@ -528,6 +528,60 @@ class Fdt:
         """
         return check_err(fdt_parent_offset(self._fdt, nodeoffset), quiet)
 
+    def setprop(self, nodeoffset, prop_name, val, quiet=()):
+        """Set the value of a property
+
+        Args:
+            nodeoffset: Node offset containing the property to create/update
+            prop_name: Name of property
+            val: Value to write (string or bytearray)
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtException if no parent found or other error occurs
+        """
+        return check_err(fdt_setprop(self._fdt, nodeoffset, prop_name, val,
+                                     len(val)), quiet)
+
+    def setprop_u32(self, nodeoffset, prop_name, val, quiet=()):
+        """Set the value of a property
+
+        Args:
+            nodeoffset: Node offset containing the property to create/update
+            prop_name: Name of property
+            val: Value to write (integer)
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtException if no parent found or other error occurs
+        """
+        return check_err(fdt_setprop_u32(self._fdt, nodeoffset, prop_name, val),
+                         quiet)
+
+    def setprop_u64(self, nodeoffset, prop_name, val, quiet=()):
+        """Set the value of a property
+
+        Args:
+            nodeoffset: Node offset containing the property to create/update
+            prop_name: Name of property
+            val: Value to write (integer)
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtException if no parent found or other error occurs
+        """
+        return check_err(fdt_setprop_u64(self._fdt, nodeoffset, prop_name, val),
+                         quiet)
+
     def delprop(self, nodeoffset, prop_name):
         """Delete a property from a node
 
@@ -623,6 +677,11 @@ typedef int fdt32_t;
 		$result = Py_None;
 	else
 		$result = Py_BuildValue("s#", $1, *arg4);
+}
+
+/* typemap used for fdt_setprop() */
+%typemap(in) (const void *val) {
+    $1 = PyString_AsString($input);   /* char *str */
 }
 
 /* typemaps used for fdt_next_node() */

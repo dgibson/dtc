@@ -49,6 +49,7 @@
 #     EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import struct
 import sys
 import types
 import unittest
@@ -56,6 +57,18 @@ import unittest
 sys.path.insert(0, '../pylibfdt')
 import libfdt
 from libfdt import Fdt, FdtException, QUIET_NOTFOUND, QUIET_ALL
+
+small_size = 160
+full_size = 1024
+
+TEST_VALUE_1 = 0xdeadbeef
+
+TEST_VALUE64_1H = 0xdeadbeef
+TEST_VALUE64_1L = 0x01abcdef
+TEST_VALUE64_1 = (TEST_VALUE64_1H << 32) | TEST_VALUE64_1L
+
+TEST_STRING_1 = 'hello world'
+
 
 def get_err(err_code):
     """Convert an error code into an error message
@@ -379,6 +392,41 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(256, fdt.totalsize())
         fdt.pack()
         self.assertTrue(fdt.totalsize() < 128)
+
+    def testSetProp(self):
+        """Test that we can update and create properties"""
+        node = self.fdt.path_offset('/subnode@1')
+        self.fdt.setprop(node, 'compatible', TEST_STRING_1)
+        self.assertEquals(TEST_STRING_1, self.fdt.getprop(node, 'compatible'))
+
+        # Check that this property is missing, and that we don't have space to
+        # add it
+        self.assertEquals(-libfdt.NOTFOUND,
+                          self.fdt.getprop(node, 'missing', QUIET_NOTFOUND))
+        self.assertEquals(-libfdt.NOSPACE,
+                          self.fdt.setprop(node, 'missing', TEST_STRING_1,
+                                           quiet=(libfdt.NOSPACE,)))
+
+        # Expand the device tree so we now have room
+        self.fdt.resize(self.fdt.totalsize() + 50)
+        self.fdt.setprop(node, 'missing', TEST_STRING_1)
+        self.assertEquals(TEST_STRING_1, self.fdt.getprop(node, 'missing'))
+
+    def testSetPropU32(self):
+        """Test that we can update and create integer properties"""
+        node = 0
+        prop = 'prop-int'
+        self.fdt.setprop_u32(node, prop, TEST_VALUE_1)
+        self.assertEquals(struct.pack('>I', TEST_VALUE_1),
+                          self.fdt.getprop(node, prop))
+
+    def testSetPropU64(self):
+        """Test that we can update and create integer properties"""
+        node = 0
+        prop = 'prop-int64'
+        self.fdt.setprop_u64(node, prop, TEST_VALUE64_1)
+        self.assertEquals(struct.pack('>Q', TEST_VALUE64_1),
+                          self.fdt.getprop(node, prop))
 
 
 if __name__ == "__main__":
