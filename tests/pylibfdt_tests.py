@@ -55,7 +55,7 @@ import unittest
 
 sys.path.insert(0, '../pylibfdt')
 import libfdt
-from libfdt import FdtException, QUIET_NOTFOUND, QUIET_ALL
+from libfdt import Fdt, FdtException, QUIET_NOTFOUND, QUIET_ALL
 
 def get_err(err_code):
     """Convert an error code into an error message
@@ -363,6 +363,22 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals([ 0xdeadbeef00000000, 0x100000],
                           self.fdt.get_mem_rsv(0))
         self.assertEquals([123456789, 010000], self.fdt.get_mem_rsv(1))
+
+    def testEmpty(self):
+        """Test that we can create an empty tree"""
+        self.assertEquals(-libfdt.NOSPACE,
+                          Fdt.create_empty_tree(1, (libfdt.NOSPACE,)))
+        fdt = Fdt.create_empty_tree(128)
+        self.assertEquals(128, fdt.totalsize())
+
+    def testOpenInto(self):
+        """Test that we can resize a tree"""
+        fdt = Fdt.create_empty_tree(128)
+        self.assertEquals(128, fdt.totalsize())
+        fdt.resize(256)
+        self.assertEquals(256, fdt.totalsize())
+        fdt.pack()
+        self.assertTrue(fdt.totalsize() < 128)
 
 
 if __name__ == "__main__":

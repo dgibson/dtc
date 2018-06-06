@@ -434,6 +434,39 @@ class Fdt:
             return pdata
         return Property(pdata[0], pdata[1])
 
+    @staticmethod
+    def create_empty_tree(size, quiet=()):
+        """Create an empty device tree ready for use
+
+        Args:
+            size: Size of device tree in bytes
+
+        Returns:
+            Fdt object containing the device tree
+        """
+        data = bytearray(size)
+        err = check_err(fdt_create_empty_tree(data, size), quiet)
+        if err:
+            return err
+        return Fdt(data)
+
+    def resize(self, size, quiet=()):
+        """Move the device tree into a larger or smaller space
+
+        This creates a new device tree of size @size and moves the existing
+        device tree contents over to that. It can be used to create more space
+        in a device tree. Note that the Fdt object remains the same, but it
+        now has a new bytearray holding the contents.
+
+        Args:
+            size: Required new size of device tree in bytes
+        """
+        fdt = bytearray(size)
+        err = check_err(fdt_open_into(self._fdt, fdt, size), quiet)
+        if err:
+            return err
+        self._fdt = fdt
+
     def pack(self, quiet=()):
         """Pack the device tree to remove unused space
 
