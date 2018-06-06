@@ -275,8 +275,16 @@ class PyLibfdtTests(unittest.TestCase):
 
     def testHeader(self):
         """Test that we can access the header values"""
+        self.assertEquals(self.fdt.magic(), 0xd00dfeed)
         self.assertEquals(self.fdt.totalsize(), len(self.fdt._fdt))
         self.assertEquals(self.fdt.off_dt_struct(), 88)
+        self.assertEquals(self.fdt.off_dt_strings(), 652)
+        self.assertEquals(self.fdt.off_mem_rsvmap(), 40)
+        self.assertEquals(self.fdt.version(), 17)
+        self.assertEquals(self.fdt.last_comp_version(), 16)
+        self.assertEquals(self.fdt.boot_cpuid_phys(), 0)
+        self.assertEquals(self.fdt.size_dt_strings(), 105)
+        self.assertEquals(self.fdt.size_dt_struct(), 564)
 
     def testPack(self):
         """Test that we can pack the tree after deleting something"""

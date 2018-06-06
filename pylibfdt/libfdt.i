@@ -234,21 +234,86 @@ class Fdt:
         """
         return check_err(fdt_next_subnode(self._fdt, nodeoffset), quiet)
 
+    def magic(self):
+        """Return the magic word from the header
+
+        Returns:
+            Magic word
+        """
+        # Use a mask to ensure that this does not return a -ve number
+        return fdt_magic(self._fdt) & 0xffffffff
+
     def totalsize(self):
         """Return the total size of the device tree
 
         Returns:
             Total tree size in bytes
         """
-        return check_err(fdt_totalsize(self._fdt))
+        return fdt_totalsize(self._fdt)
 
     def off_dt_struct(self):
-        """Return the start of the device tree struct area
+        """Return the start of the device-tree struct area
 
         Returns:
             Start offset of struct area
         """
-        return check_err(fdt_off_dt_struct(self._fdt))
+        return fdt_off_dt_struct(self._fdt)
+
+    def off_dt_strings(self):
+        """Return the start of the device-tree string area
+
+        Returns:
+            Start offset of string area
+        """
+        return fdt_off_dt_strings(self._fdt)
+
+    def off_mem_rsvmap(self):
+        """Return the start of the memory reserve map
+
+        Returns:
+            Start offset of memory reserve map
+        """
+        return fdt_off_mem_rsvmap(self._fdt)
+
+    def version(self):
+        """Return the version of the device tree
+
+        Returns:
+            Version number of the device tree
+        """
+        return fdt_version(self._fdt)
+
+    def last_comp_version(self):
+        """Return the last compatible version of the device tree
+
+        Returns:
+            Last compatible version number of the device tree
+        """
+        return fdt_last_comp_version(self._fdt)
+
+    def boot_cpuid_phys(self):
+        """Return the physical boot CPU ID
+
+        Returns:
+            Physical boot CPU ID
+        """
+        return fdt_boot_cpuid_phys(self._fdt)
+
+    def size_dt_strings(self):
+        """Return the start of the device-tree string area
+
+        Returns:
+            Start offset of string area
+        """
+        return fdt_size_dt_strings(self._fdt)
+
+    def size_dt_struct(self):
+        """Return the start of the device-tree struct area
+
+        Returns:
+            Start offset of struct area
+        """
+        return fdt_size_dt_struct(self._fdt)
 
     def subnode_offset(self, parentoffset, name, quiet=()):
         """Get the offset of a named subnode
