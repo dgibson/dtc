@@ -488,7 +488,9 @@ class Fdt:
             quiet: Errors to ignore (empty to raise on all errors)
 
         Returns:
-            Value of property as a string of bytes, or -ve error number
+            Value of property as a Property object (which can be used as a
+               bytearray/string), or -ve error number. On failure, returns an
+               integer error
 
         Raises:
             FdtError if any error occurs (e.g. the property is not found)
@@ -497,8 +499,7 @@ class Fdt:
                                quiet)
         if isinstance(pdata, (int)):
             return pdata
-        # Use bytes() rather than string(). This works on both Python 2 and 3
-        return bytes(pdata[0])
+        return Property(prop_name, bytearray(pdata[0]))
 
     def get_phandle(self, nodeoffset):
         """Get the phandle of a node
@@ -623,6 +624,21 @@ class Property(bytearray):
     def __init__(self, name, value):
         bytearray.__init__(self, value)
         self.name = name
+
+    def as_cell(self, fmt):
+        return struct.unpack('>' + fmt, self)[0]
+
+    def as_uint32(self):
+        return self.as_cell('L')
+
+    def as_int32(self):
+        return self.as_cell('l')
+
+    def as_uint64(self):
+        return self.as_cell('Q')
+
+    def as_int64(self):
+        return self.as_cell('q')
 %}
 
 %rename(fdt_property) fdt_property_func;

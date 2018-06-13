@@ -888,6 +888,7 @@ fdtoverlay_tests() {
 }
 
 pylibfdt_tests () {
+    run_dtc_test -I dts -O dtb -o test_props.dtb test_props.dts
     TMP=/tmp/tests.stderr.$$
     python pylibfdt_tests.py -v 2> $TMP
 

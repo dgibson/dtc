@@ -102,6 +102,7 @@ class PyLibfdtTests(unittest.TestCase):
     def setUp(self):
         """Read in the device tree we use for testing"""
         self.fdt = _ReadFdt('test_tree1.dtb')
+        self.fdt2 = _ReadFdt('test_props.dtb')
 
     def GetPropList(self, node_path):
         """Read a list of properties from a node
@@ -368,6 +369,17 @@ class PyLibfdtTests(unittest.TestCase):
         node2 = self.fdt.path_offset('/subnode@2/subsubnode@0')
         self.assertEquals(node2, self.fdt.node_offset_by_phandle(0x2001))
 
+    def get_prop(self, name):
+        return self.fdt2.getprop(0, name)
+
+    def testGetIntProperties(self):
+        """Test that we can access properties as integers"""
+        self.assertEquals(0xdeadbeef, self.get_prop("prop-hex32").as_uint32())
+        self.assertEquals(123, self.get_prop("prop-uint32").as_uint32())
+        self.assertEquals(-2, self.get_prop("prop-int32").as_int32())
+        self.assertEquals(9223372036854775807,
+                          self.get_prop("prop-uint64").as_uint64())
+        self.assertEquals(-2, self.get_prop("prop-int64").as_int64())
 
     def testReserveMap(self):
         """Test that we can access the memory reserve map"""
