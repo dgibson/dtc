@@ -240,8 +240,7 @@ class Fdt:
         Returns:
             Magic word
         """
-        # Use a mask to ensure that this does not return a -ve number
-        return fdt_magic(self._fdt) & 0xffffffff
+        return fdt_magic(self._fdt)
 
     def totalsize(self):
         """Return the total size of the device tree
@@ -628,7 +627,11 @@ class Property(bytearray):
 
 %rename(fdt_property) fdt_property_func;
 
-typedef int fdt32_t;
+/*
+ * fdt32_t is a big-endian 32-bit value defined to uint32_t in libfdt_env.h
+ * so use the same type here.
+ */
+typedef uint32_t fdt32_t;
 
 %include "libfdt/fdt.h"
 
@@ -716,15 +719,15 @@ typedef int fdt32_t;
 %warnfilter(302) fdt_property;
 
 /* These are macros in the header so have to be redefined here */
-int fdt_magic(const void *fdt);
-int fdt_totalsize(const void *fdt);
-int fdt_off_dt_struct(const void *fdt);
-int fdt_off_dt_strings(const void *fdt);
-int fdt_off_mem_rsvmap(const void *fdt);
-int fdt_version(const void *fdt);
-int fdt_last_comp_version(const void *fdt);
-int fdt_boot_cpuid_phys(const void *fdt);
-int fdt_size_dt_strings(const void *fdt);
-int fdt_size_dt_struct(const void *fdt);
+uint32_t fdt_magic(const void *fdt);
+uint32_t fdt_totalsize(const void *fdt);
+uint32_t fdt_off_dt_struct(const void *fdt);
+uint32_t fdt_off_dt_strings(const void *fdt);
+uint32_t fdt_off_mem_rsvmap(const void *fdt);
+uint32_t fdt_version(const void *fdt);
+uint32_t fdt_last_comp_version(const void *fdt);
+uint32_t fdt_boot_cpuid_phys(const void *fdt);
+uint32_t fdt_size_dt_strings(const void *fdt);
+uint32_t fdt_size_dt_struct(const void *fdt);
 
 %include <../libfdt/libfdt.h>
