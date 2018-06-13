@@ -474,10 +474,17 @@ class Fdt:
         Args:
             quiet: Errors to ignore (empty to raise on all errors)
 
+        Returns:
+            Error code, or 0 if OK
+
         Raises:
             FdtException if any error occurs
         """
-        return check_err(fdt_pack(self._fdt), quiet)
+        err = check_err(fdt_pack(self._fdt), quiet)
+        if err:
+            return err
+        del self._fdt[self.totalsize():]
+        return err
 
     def getprop(self, nodeoffset, prop_name, quiet=()):
         """Get a property from a node

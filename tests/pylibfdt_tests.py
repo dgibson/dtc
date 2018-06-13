@@ -308,6 +308,7 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(orig_size, self.fdt.totalsize())
         self.assertEquals(self.fdt.pack(), 0)
         self.assertTrue(self.fdt.totalsize() < orig_size)
+        self.assertEquals(self.fdt.totalsize(), len(self.fdt.as_bytearray()))
 
     def testBadPropertyOffset(self):
         """Test that bad property offsets are detected"""
