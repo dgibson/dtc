@@ -465,6 +465,21 @@ class PyLibfdtTests(unittest.TestCase):
         self.assertEquals(TEST_STRING_3,
                           self.fdt.getprop(node, prop).as_str())
 
+    def testSetName(self):
+        """Test that we can update a node name"""
+        node = self.fdt.path_offset('/subnode@1')
+        old_val = self.fdt.get_name(node)
+        self.fdt.set_name(node, 'test')
+        self.assertEquals('test', self.fdt.get_name(node))
+
+        with self.assertRaises(ValueError) as e:
+            self.fdt.set_name(node, 'some\0name')
+        self.assertIn('embedded nul', str(e.exception))
+
+        with self.assertRaises(ValueError) as e:
+            self.fdt.set_name(node, 'name\0')
+        self.assertIn('embedded nul', str(e.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

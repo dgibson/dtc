@@ -535,6 +535,23 @@ class Fdt:
         """
         return check_err(fdt_parent_offset(self._fdt, nodeoffset), quiet)
 
+    def set_name(self, nodeoffset, name, quiet=()):
+        """Set the name of a node
+
+        Args:
+            nodeoffset: Node offset of node to update
+            name: New node name (string without \0)
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtException if no parent found or other error occurs
+        """
+        if chr(0) in name:
+            raise ValueError('Property contains embedded nul characters')
+        return check_err(fdt_set_name(self._fdt, nodeoffset, name), quiet)
+
     def setprop(self, nodeoffset, prop_name, val, quiet=()):
         """Set the value of a property
 
