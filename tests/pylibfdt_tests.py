@@ -68,6 +68,8 @@ TEST_VALUE64_1L = 0x01abcdef
 TEST_VALUE64_1 = (TEST_VALUE64_1H << 32) | TEST_VALUE64_1L
 
 TEST_STRING_1 = 'hello world'
+TEST_STRING_2 = 'hi world'
+TEST_STRING_3 = u'unicode ' + unichr(467)
 
 
 def get_err(err_code):
@@ -439,6 +441,29 @@ class PyLibfdtTests(unittest.TestCase):
         self.fdt.setprop_u64(node, prop, TEST_VALUE64_1)
         self.assertEquals(struct.pack('>Q', TEST_VALUE64_1),
                           self.fdt.getprop(node, prop))
+
+    def testSetPropStr(self):
+        """Test that we can set a property to a particular string"""
+        node = 0
+        prop = 'prop-str'
+        self.assertEquals(TEST_STRING_1, self.fdt.getprop(node, prop).as_str())
+        self.fdt.setprop_str(node, prop, TEST_STRING_2)
+        self.assertEquals(TEST_STRING_2, self.fdt.getprop(node, prop).as_str())
+        with self.assertRaises(ValueError) as e:
+            self.fdt.getprop(node, 'prop-int').as_str()
+        self.assertIn('lacks nul termination', str(e.exception))
+
+        node2 = self.fdt.path_offset('/subnode@1/subsubnode')
+        with self.assertRaises(ValueError) as e:
+            self.fdt.getprop(node2, 'compatible').as_str()
+        self.assertIn('embedded nul', str(e.exception))
+
+        # Expand the device tree so we now have room
+        self.fdt.resize(self.fdt.totalsize() + 50)
+        prop = 'prop-unicode'
+        self.fdt.setprop_str(node, prop, TEST_STRING_3)
+        self.assertEquals(TEST_STRING_3,
+                          self.fdt.getprop(node, prop).as_str())
 
 
 if __name__ == "__main__":

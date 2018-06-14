@@ -589,6 +589,28 @@ class Fdt:
         return check_err(fdt_setprop_u64(self._fdt, nodeoffset, prop_name, val),
                          quiet)
 
+    def setprop_str(self, nodeoffset, prop_name, val, quiet=()):
+        """Set the string value of a property
+
+        The property is set to the string, with a nul terminator added
+
+        Args:
+            nodeoffset: Node offset containing the property to create/update
+            prop_name: Name of property
+            val: Value to write (string without nul terminator). Unicode is
+                supposed by encoding to UTF-8
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtException if no parent found or other error occurs
+        """
+        val = val.encode('utf-8') + '\0'
+        return check_err(fdt_setprop(self._fdt, nodeoffset, prop_name,
+                                     val, len(val)), quiet)
+
     def delprop(self, nodeoffset, prop_name):
         """Delete a property from a node
 
@@ -646,6 +668,14 @@ class Property(bytearray):
 
     def as_int64(self):
         return self.as_cell('q')
+
+    def as_str(self):
+        """Unicode is supported by decoding from UTF-8"""
+        if self[-1] != 0:
+            raise ValueError('Property lacks nul termination')
+        if 0 in self[:-1]:
+            raise ValueError('Property contains embedded nul characters')
+        return self[:-1].decode('utf-8')
 %}
 
 %rename(fdt_property) fdt_property_func;
