@@ -627,7 +627,7 @@ dtc_tests () {
     check_tests bad-interrupt-cells.dts interrupts_property
     run_sh_test dtc-checkfails.sh node_name_chars -- -I dtb -O dtb bad_node_char.dtb
     run_sh_test dtc-checkfails.sh node_name_format -- -I dtb -O dtb bad_node_format.dtb
-    run_sh_test dtc-checkfails.sh prop_name_chars -- -I dtb -O dtb bad_prop_char.dtb
+    run_sh_test dtc-checkfails.sh property_name_chars -- -I dtb -O dtb bad_prop_char.dtb
 
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label1.dts
     run_sh_test dtc-checkfails.sh duplicate_label -- -I dts -O dtb reuse-label2.dts
