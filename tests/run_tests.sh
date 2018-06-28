@@ -551,6 +551,13 @@ dtc_tests () {
 	run_test dtbs_equal_ordered $tree odts_$tree.test.dtb
     done
 
+    # Check -Odts preserving type information
+    for tree in type-preservation.dts; do
+        run_dtc_test -I dts -O dts -o $tree.test.dts $tree
+        run_dtc_test -I dts -O dts $tree.test.dts
+        run_wrap_test cmp $tree $tree.test.dts
+    done
+
     # Check version conversions
     for tree in test_tree1.dtb ; do
 	 for aver in 1 2 3 16 17; do

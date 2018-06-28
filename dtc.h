@@ -74,6 +74,7 @@ typedef uint32_t cell_t;
 
 /* Data blobs */
 enum markertype {
+	TYPE_NONE,
 	REF_PHANDLE,
 	REF_PATH,
 	LABEL,
