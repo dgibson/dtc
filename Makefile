@@ -24,6 +24,7 @@ BISON = bison
 LEX = flex
 SWIG = swig
 PKG_CONFIG ?= pkg-config
+PYTHON ?= python2
 
 INSTALL = /usr/bin/install
 INSTALL_PROGRAM = $(INSTALL)
@@ -147,7 +148,7 @@ all: $(BIN) libfdt
 # We need both Python and swig to build/install pylibfdt.
 # This builds the given make ${target} if those deps are found.
 check_python_deps = \
-	if $(PKG_CONFIG) --cflags python2 >/dev/null 2>&1; then \
+	if $(PKG_CONFIG) --cflags $(PYTHON) >/dev/null 2>&1; then \
 		if which swig >/dev/null 2>&1; then \
 			can_build=yes; \
 		fi; \

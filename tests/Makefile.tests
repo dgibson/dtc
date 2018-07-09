@@ -81,18 +81,18 @@ tests_clean:
 	rm -rf $(TESTS_CLEANDIRS)
 
 check:	tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
-	cd $(TESTS_PREFIX); ./run_tests.sh
+	cd $(TESTS_PREFIX); PYTHON=$(PYTHON) ./run_tests.sh
 
 ifeq ($(NO_VALGRIND),1)
 checkm:
 	@echo "make checkm requires valgrind, but NO_VALGRIND=1"
 else
 checkm: tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
-	cd $(TESTS_PREFIX); ./run_tests.sh -m
+	cd $(TESTS_PREFIX); PYTHON=$(PYTHON) ./run_tests.sh -m
 endif
 
 checkv:	tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
-	cd $(TESTS_PREFIX); ./run_tests.sh -v
+	cd $(TESTS_PREFIX); PYTHON=$(PYTHON) ./run_tests.sh -v
 
 ifneq ($(DEPTARGETS),)
 -include $(TESTS_DEPFILES)

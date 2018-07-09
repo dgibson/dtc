@@ -13,10 +13,10 @@ endif
 
 $(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP) $(VERSION_FILE)
 	@$(VECHO) PYMOD $@
-	$(SETUP) $(SETUPFLAGS) build_ext --build-lib=../$(PYLIBFDT_objdir)
+	$(PYTHON) $(SETUP) $(SETUPFLAGS) build_ext --build-lib=../$(PYLIBFDT_objdir)
 
 install_pylibfdt: $(PYMODULE)
 	@$(VECHO) INSTALL-PYLIB
-	$(SETUP) $(SETUPFLAGS) install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
+	$(PYTHON) $(SETUP) $(SETUPFLAGS) install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
 
 PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so

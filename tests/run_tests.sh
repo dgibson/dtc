@@ -933,7 +933,7 @@ fdtoverlay_tests() {
 pylibfdt_tests () {
     run_dtc_test -I dts -O dtb -o test_props.dtb test_props.dts
     TMP=/tmp/tests.stderr.$$
-    python pylibfdt_tests.py -v 2> $TMP
+    $PYTHON pylibfdt_tests.py -v 2> $TMP
 
     # Use the 'ok' message meaning the test passed, 'ERROR' meaning it failed
     # and the summary line for total tests (e.g. 'Ran 17 tests in 0.002s').
