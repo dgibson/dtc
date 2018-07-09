@@ -35,10 +35,13 @@ static enum {
 	FIXED = 0,
 	RESIZE,
 	REALLOC,
+	NEWALLOC,
 } alloc_mode;
 
 static void realloc_fdt(void **fdt, size_t *size, bool created)
 {
+	int err;
+
 	switch (alloc_mode) {
 	case FIXED:
 		if (!(*fdt))
@@ -52,7 +55,10 @@ static void realloc_fdt(void **fdt, size_t *size, bool created)
 			*fdt = xmalloc(SPACE);
 		} else if (*size < SPACE) {
 			*size += 1;
-			fdt_resize(*fdt, *fdt, *size);
+			err = fdt_resize(*fdt, *fdt, *size);
+			if (err < 0)
+				FAIL("fdt_resize() failed: %s",
+				     fdt_strerror(err));
 		} else {
 			FAIL("Ran out of space");
 		}		
@@ -61,9 +67,29 @@ static void realloc_fdt(void **fdt, size_t *size, bool created)
 	case REALLOC:
 		*size += 1;
 		*fdt = xrealloc(*fdt, *size);
-		if (created)
-			fdt_resize(*fdt, *fdt, *size);
+		if (created) {
+			err = fdt_resize(*fdt, *fdt, *size);
+			if (err < 0)
+				FAIL("fdt_resize() failed: %s",
+				     fdt_strerror(err));
+		}
 		return;
+
+	case NEWALLOC: {
+		void *buf;
+
+		*size += 1;
+		buf = xmalloc(*size);
+		if (created) {
+			err = fdt_resize(*fdt, buf, *size);
+			if (err < 0)
+				FAIL("fdt_resize() failed: %s",
+				     fdt_strerror(err));
+		}
+		free(*fdt);
+		*fdt = buf;
+		return;
+	}
 
 	default:
 		CONFIG("Bad allocation mode");
@@ -100,6 +126,9 @@ int main(int argc, char *argv[])
 			size = 0;
 		} else if (streq(argv[1], "realloc")) {
 			alloc_mode = REALLOC;
+			size = 0;
+		} else if (streq(argv[1], "newalloc")) {
+			alloc_mode = NEWALLOC;
 			size = 0;
 		} else {
 			char *endp;

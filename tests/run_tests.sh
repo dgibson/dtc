@@ -348,7 +348,7 @@ libfdt_tests () {
     run_test sw_states
 
     # Resizing tests
-    for mode in resize realloc; do
+    for mode in resize realloc newalloc; do
 	run_test sw_tree1 $mode
 	tree1_tests sw_tree1.test.dtb
 	tree1_tests unfinished_tree1.test.dtb
