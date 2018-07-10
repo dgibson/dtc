@@ -56,16 +56,31 @@ import unittest
 
 sys.path.insert(0, '../pylibfdt')
 import libfdt
-from libfdt import Fdt, FdtException, QUIET_NOTFOUND, QUIET_ALL
+from libfdt import Fdt, FdtSw, FdtException, QUIET_NOTFOUND, QUIET_ALL
 
-small_size = 160
-full_size = 1024
+TEST_ADDR_1H = 0xdeadbeef
+TEST_ADDR_1L = 0x00000000
+TEST_ADDR_1 = (TEST_ADDR_1H << 32) | TEST_ADDR_1L
+TEST_ADDR_1 = 0x8000000000000000
+TEST_SIZE_1H = 0x00000000
+TEST_SIZE_1L = 0x00100000
+TEST_SIZE_1 = (TEST_SIZE_1H << 32) | TEST_SIZE_1L
+TEST_ADDR_2H = 0
+TEST_ADDR_2L = 123456789
+TEST_ADDR_2 = (TEST_ADDR_2H << 32) | TEST_ADDR_2L
+TEST_SIZE_2H = 0
+TEST_SIZE_2L = 010000
+TEST_SIZE_2 = (TEST_SIZE_2H << 32) | TEST_SIZE_2L
 
 TEST_VALUE_1 = 0xdeadbeef
+TEST_VALUE_2 = 123456789
 
 TEST_VALUE64_1H = 0xdeadbeef
 TEST_VALUE64_1L = 0x01abcdef
 TEST_VALUE64_1 = (TEST_VALUE64_1H << 32) | TEST_VALUE64_1L
+
+PHANDLE_1 = 0x2000
+PHANDLE_2 = 0x2001
 
 TEST_STRING_1 = 'hello world'
 TEST_STRING_2 = 'hi world'
@@ -94,8 +109,8 @@ def _ReadFdt(fname):
     """
     return libfdt.Fdt(open(fname).read())
 
-class PyLibfdtTests(unittest.TestCase):
-    """Test class for pylibfdt
+class PyLibfdtBasicTests(unittest.TestCase):
+    """Test class for basic pylibfdt access functions
 
     Properties:
         fdt: Device tree file used for testing
@@ -479,6 +494,100 @@ class PyLibfdtTests(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             self.fdt.set_name(node, 'name\0')
         self.assertIn('embedded nul', str(e.exception))
+
+
+class PyLibfdtSwTests(unittest.TestCase):
+    """Test class for pylibfdt sequential-write DT creation
+    """
+    def assertOk(self, err_code):
+        self.assertEquals(0, err_code)
+
+    def testCreate(self):
+        # First check the minimum size and also the FdtSw() constructor
+        with self.assertRaisesRegexp(FdtException, get_err(libfdt.NOSPACE)):
+            self.assertEquals(-libfdt.NOSPACE, FdtSw(3))
+
+        sw = FdtSw()
+        sw.add_reservemap_entry(TEST_ADDR_1, TEST_SIZE_1)
+        sw.add_reservemap_entry(TEST_ADDR_2, TEST_SIZE_2)
+        sw.finish_reservemap()
+
+        sw.begin_node('')
+        sw.property_string('compatible', 'test_tree1')
+        sw.property_u32('prop-int', TEST_VALUE_1)
+
+        sw.property_u32('prop-int', TEST_VALUE_1)
+        sw.property_u64('prop-int64', TEST_VALUE64_1)
+        sw.property_string('prop-str', TEST_STRING_1)
+        sw.property_u32('#address-cells', 1)
+        sw.property_u32('#size-cells', 0)
+
+        sw.begin_node('subnode@1')
+        sw.property_string('compatible', 'subnode1')
+        sw.property_u32('reg', 1)
+        sw.property_cell('prop-int', TEST_VALUE_1)
+        sw.begin_node('subsubnode')
+        sw.property('compatible', 'subsubnode1\0subsubnode')
+        sw.property_cell('prop-int', TEST_VALUE_1)
+        sw.end_node()
+        sw.begin_node('ss1')
+        sw.end_node()
+        sw.end_node()
+
+        for i in range(2, 11):
+            with sw.add_node('subnode@%d' % i):
+                sw.property_u32('reg', 2)
+                sw.property_cell('linux,phandle', PHANDLE_1)
+                sw.property_cell('prop-int', TEST_VALUE_2)
+                sw.property_u32('#address-cells', 1)
+                sw.property_u32('#size-cells', 0)
+                with sw.add_node('subsubnode@0'):
+                    sw.property_u32('reg', 0)
+                    sw.property_cell('phandle', PHANDLE_2)
+                    sw.property('compatible', 'subsubnode2\0subsubnode')
+                    sw.property_cell('prop-int', TEST_VALUE_2)
+                with sw.add_node('ss2'):
+                    pass
+        sw.end_node()
+
+        fdt = sw.as_fdt()
+        self.assertEqual(2, fdt.num_mem_rsv())
+        self.assertEqual([TEST_ADDR_1, TEST_SIZE_1], fdt.get_mem_rsv(0))
+
+        # Make sure we can add a few more things
+        with sw.add_node('another'):
+            sw.property_u32('reg', 3)
+
+        # Make sure we can read from the tree too
+        node = sw.path_offset('/subnode@1')
+        self.assertEqual('subnode1' + chr(0), sw.getprop(node, 'compatible'))
+
+        # Make sure we did at least two resizes
+        self.assertTrue(len(fdt.as_bytearray()) > FdtSw.INC_SIZE * 2)
+
+
+class PyLibfdtRoTests(unittest.TestCase):
+    """Test class for read-only pylibfdt access functions
+
+    This just tests a few simple cases. Most of the tests are in
+    PyLibfdtBasicTests.
+
+    Properties:
+        fdt: Device tree file used for testing
+    """
+
+    def setUp(self):
+        """Read in the device tree we use for testing"""
+        self.fdt = libfdt.FdtRo(open('test_tree1.dtb').read())
+
+    def testAccess(self):
+        """Basic sanity check for the FdtRo class"""
+        node = self.fdt.path_offset('/subnode@1')
+        self.assertEqual('subnode1' + chr(0),
+                         self.fdt.getprop(node, 'compatible'))
+        node = self.fdt.first_subnode(node)
+        self.assertEqual('this is a placeholder string\0string2\0',
+                         self.fdt.getprop(node, 'placeholder'))
 
 
 if __name__ == "__main__":
