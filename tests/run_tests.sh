@@ -336,6 +336,8 @@ libfdt_tests () {
 
     run_dtc_test -I dts -O dtb -o addresses.test.dtb addresses.dts
     run_test addr_size_cells addresses.test.dtb
+    run_dtc_test -I dts -O dtb -o addresses2.test.dtb empty.dts
+    run_test addr_size_cells2 addresses2.test.dtb
 
     run_dtc_test -I dts -O dtb -o stringlist.test.dtb stringlist.dts
     run_test stringlist stringlist.test.dtb

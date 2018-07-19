@@ -4,6 +4,7 @@
 tmp.*
 /add_subnode_with_nops
 /addr_size_cells
+/addr_size_cells2
 /appendprop[12]
 /asm_tree_dump
 /boot-cpuid

@@ -58,10 +58,5 @@ int main(int argc, char *argv[])
 	fdt = load_blob(argv[1]);
 
 	check_node(fdt, "/", 2, 2);
-	check_node(fdt, "/identity-bus@0", 2, 2);
-	check_node(fdt, "/simple-bus@1000000", 2, 1);
-	check_node(fdt, "/c0", -FDT_ERR_BADNCELLS, -FDT_ERR_BADNCELLS);
-	check_node(fdt, "/c1", -FDT_ERR_BADNCELLS, -FDT_ERR_BADNCELLS);
-	check_node(fdt, "/c2", -FDT_ERR_BADNCELLS, -FDT_ERR_BADNCELLS);
 	PASS();
 }
