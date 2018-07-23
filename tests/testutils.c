@@ -168,18 +168,22 @@ void vg_prepare_blob(void *fdt, size_t bufsize)
 {
 	char *blob = fdt;
 	int off_memrsv, off_strings, off_struct;
+	int num_memrsv;
 	size_t size_memrsv, size_strings, size_struct;
 
-	size_memrsv = (fdt_num_mem_rsv(fdt) + 1)
-		* sizeof(struct fdt_reserve_entry);
+	off_memrsv = fdt_off_mem_rsvmap(fdt);
+	num_memrsv = fdt_num_mem_rsv(fdt);
+	if (num_memrsv < 0)
+		size_memrsv = fdt_totalsize(fdt) - off_memrsv;
+	else
+		size_memrsv = (num_memrsv + 1)
+			* sizeof(struct fdt_reserve_entry);
 
 	VALGRIND_MAKE_MEM_UNDEFINED(blob, bufsize);
 	VALGRIND_MAKE_MEM_DEFINED(blob, FDT_V1_SIZE);
 	VALGRIND_MAKE_MEM_DEFINED(blob, fdt_header_size(fdt));
 
 	if (fdt_magic(fdt) == FDT_MAGIC) {
-		off_memrsv = fdt_off_mem_rsvmap(fdt);
-
 		off_strings = fdt_off_dt_strings(fdt);
 		if (fdt_version(fdt) >= 3)
 			size_strings = fdt_size_dt_strings(fdt);
@@ -192,8 +196,6 @@ void vg_prepare_blob(void *fdt, size_t bufsize)
 		else
 			size_struct = fdt_totalsize(fdt) - off_struct;
 	} else if (fdt_magic(fdt) == FDT_SW_MAGIC) {
-		off_memrsv = fdt_off_mem_rsvmap(fdt);
-
 		size_strings = fdt_size_dt_strings(fdt);
 		off_strings = fdt_off_dt_strings(fdt) - size_strings;
 
