@@ -1029,6 +1029,76 @@ static void check_i2c_bus_reg(struct check *c, struct dt_info *dti, struct node 
 }
 WARNING(i2c_bus_reg, check_i2c_bus_reg, NULL, &reg_format, &i2c_bus_bridge);
 
+static const struct bus_type spi_bus = {
+	.name = "spi-bus",
+};
+
+static void check_spi_bus_bridge(struct check *c, struct dt_info *dti, struct node *node)
+{
+
+	if (strprefixeq(node->name, node->basenamelen, "spi")) {
+		node->bus = &spi_bus;
+	} else {
+		/* Try to detect SPI buses which don't have proper node name */
+		struct node *child;
+
+		if (node_addr_cells(node) != 1 || node_size_cells(node) != 0)
+			return;
+
+		for_each_child(node, child) {
+			struct property *prop;
+			for_each_property(child, prop) {
+				if (strprefixeq(prop->name, 4, "spi-")) {
+					node->bus = &spi_bus;
+					break;
+				}
+			}
+			if (node->bus == &spi_bus)
+				break;
+		}
+
+		if (node->bus == &spi_bus && get_property(node, "reg"))
+			FAIL(c, dti, node, "node name for SPI buses should be 'spi'");
+	}
+	if (node->bus != &spi_bus || !node->children)
+		return;
+
+	if (node_addr_cells(node) != 1)
+		FAIL(c, dti, node, "incorrect #address-cells for SPI bus");
+	if (node_size_cells(node) != 0)
+		FAIL(c, dti, node, "incorrect #size-cells for SPI bus");
+
+}
+WARNING(spi_bus_bridge, check_spi_bus_bridge, NULL, &addr_size_cells);
+
+static void check_spi_bus_reg(struct check *c, struct dt_info *dti, struct node *node)
+{
+	struct property *prop;
+	const char *unitname = get_unitname(node);
+	char unit_addr[9];
+	uint32_t reg = 0;
+	cell_t *cells = NULL;
+
+	if (!node->parent || (node->parent->bus != &spi_bus))
+		return;
+
+	prop = get_property(node, "reg");
+	if (prop)
+		cells = (cell_t *)prop->val.val;
+
+	if (!cells) {
+		FAIL(c, dti, node, "missing or empty reg property");
+		return;
+	}
+
+	reg = fdt32_to_cpu(*cells);
+	snprintf(unit_addr, sizeof(unit_addr), "%x", reg);
+	if (!streq(unitname, unit_addr))
+		FAIL(c, dti, node, "SPI bus unit address format error, expected \"%s\"",
+		     unit_addr);
+}
+WARNING(spi_bus_reg, check_spi_bus_reg, NULL, &reg_format, &spi_bus_bridge);
+
 static void check_unit_address_format(struct check *c, struct dt_info *dti,
 				      struct node *node)
 {
@@ -1651,6 +1721,9 @@ static struct check *check_table[] = {
 
 	&i2c_bus_bridge,
 	&i2c_bus_reg,
+
+	&spi_bus_bridge,
+	&spi_bus_reg,
 
 	&avoid_default_addr_size,
 	&avoid_unnecessary_addr_size,
