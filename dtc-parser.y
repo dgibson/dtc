@@ -287,6 +287,7 @@ propdata:
 		}
 	| propdataprefix DT_REF
 		{
+			$1 = data_add_marker($1, TYPE_STRING, $2);
 			$$ = data_add_marker($1, REF_PATH, $2);
 		}
 	| propdataprefix DT_INCBIN '(' DT_STRING ',' integer_prim ',' integer_prim ')'
