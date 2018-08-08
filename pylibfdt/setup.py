@@ -5,7 +5,6 @@ setup.py file for SWIG libfdt
 Copyright (C) 2017 Google, Inc.
 Written by Simon Glass <sjg@chromium.org>
 
-Files to be built into the extension are provided in SOURCES
 C flags to use are provided in CPPFLAGS
 Version is provided in VERSION
 
@@ -70,35 +69,31 @@ def GetEnvFromMakefiles():
     Returns:
         Tuple with:
             Version string
-            List of files to build
             List of extra C preprocessor flags needed
     """
     basedir = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
     makevars = ParseMakefile(os.path.join(basedir, 'Makefile'))
     version = '%s.%s.%s' % (makevars['VERSION'], makevars['PATCHLEVEL'],
                             makevars['SUBLEVEL'])
-    makevars = ParseMakefile(os.path.join(basedir, 'libfdt', 'Makefile.libfdt'))
-    files = makevars['LIBFDT_SRCS'].split()
-    files = [os.path.join(basedir, 'libfdt', fname) for fname in files]
-    files.append('pylibfdt/libfdt.i')
     cflags = ['-I%s/libfdt' % basedir]
-    return  version, files, cflags
+    return  version, cflags
 
 
 progname = sys.argv[0]
-files = os.environ.get('SOURCES', '').split()
 cflags = os.environ.get('CPPFLAGS', '').split()
 version = os.environ.get('VERSION')
 
 # If we were called directly rather than through our Makefile (which is often
 # the case with Python module installation), read the settings from the
 # Makefile.
-if not all((version, files, cflags)):
-    version, files, cflags= GetEnvFromMakefiles()
+if not all((version, cflags)):
+    version, cflags= GetEnvFromMakefiles()
 
 libfdt_module = Extension(
     '_libfdt',
-    sources = files,
+    sources = ['pylibfdt/libfdt.i'],
+    libraries = ['fdt'],
+    library_dirs = ['libfdt'],
     extra_compile_args = cflags,
 )
 
