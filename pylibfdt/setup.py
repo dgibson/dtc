@@ -70,14 +70,12 @@ def GetEnvFromMakefiles():
 
     Returns:
         Tuple with:
-            List of swig options
             Version string
             List of files to build
             List of extra C preprocessor flags needed
             Object directory to use (always '')
     """
     basedir = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
-    swig_opts = ['-I%s' % basedir]
     makevars = ParseMakefile(os.path.join(basedir, 'Makefile'))
     version = '%s.%s.%s' % (makevars['VERSION'], makevars['PATCHLEVEL'],
                             makevars['SUBLEVEL'])
@@ -85,9 +83,9 @@ def GetEnvFromMakefiles():
     files = makevars['LIBFDT_SRCS'].split()
     files = [os.path.join(basedir, 'libfdt', fname) for fname in files]
     files.append('pylibfdt/libfdt.i')
-    cflags = ['-I%s' % basedir, '-I%s/libfdt' % basedir]
+    cflags = ['-I%s/libfdt' % basedir]
     objdir = ''
-    return swig_opts, version, files, cflags, objdir
+    return  version, files, cflags, objdir
 
 
 progname = sys.argv[0]
@@ -95,19 +93,17 @@ files = os.environ.get('SOURCES', '').split()
 cflags = os.environ.get('CPPFLAGS', '').split()
 objdir = os.environ.get('OBJDIR')
 version = os.environ.get('VERSION')
-swig_opts = []
 
 # If we were called directly rather than through our Makefile (which is often
 # the case with Python module installation), read the settings from the
 # Makefile.
 if not all((version, files, cflags, objdir)):
-    swig_opts, version, files, cflags, objdir = GetEnvFromMakefiles()
+    version, files, cflags, objdir = GetEnvFromMakefiles()
 
 libfdt_module = Extension(
     '_libfdt',
     sources = files,
     extra_compile_args = cflags,
-    swig_opts = swig_opts,
 )
 
 setup(
