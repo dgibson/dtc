@@ -5,7 +5,6 @@ setup.py file for SWIG libfdt
 Copyright (C) 2017 Google, Inc.
 Written by Simon Glass <sjg@chromium.org>
 
-C flags to use are provided in CPPFLAGS
 Version is provided in VERSION
 
 If these variables are not given they are parsed from the Makefiles. This
@@ -75,26 +74,24 @@ def GetEnvFromMakefiles():
     makevars = ParseMakefile(os.path.join(basedir, 'Makefile'))
     version = '%s.%s.%s' % (makevars['VERSION'], makevars['PATCHLEVEL'],
                             makevars['SUBLEVEL'])
-    cflags = ['-I%s/libfdt' % basedir]
-    return  version, cflags
+    return version
 
 
 progname = sys.argv[0]
-cflags = os.environ.get('CPPFLAGS', '').split()
 version = os.environ.get('VERSION')
 
 # If we were called directly rather than through our Makefile (which is often
 # the case with Python module installation), read the settings from the
 # Makefile.
-if not all((version, cflags)):
-    version, cflags= GetEnvFromMakefiles()
+if not version:
+    version = GetEnvFromMakefiles()
 
 libfdt_module = Extension(
     '_libfdt',
     sources = ['pylibfdt/libfdt.i'],
+    include_dirs = ['libfdt'],
     libraries = ['fdt'],
     library_dirs = ['libfdt'],
-    extra_compile_args = cflags,
 )
 
 setup(

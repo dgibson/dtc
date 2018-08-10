@@ -5,7 +5,7 @@ PYLIBFDT_srcs = $(PYLIBFDT_srcdir)/libfdt.i
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
 define run_setup
-	CPPFLAGS="$(CPPFLAGS)" VERSION="$(dtc_version)"
+	VERSION="$(dtc_version)"
 	$(PYLIBFDT_objdir)/setup.py --quiet $(1)
 endef
 
