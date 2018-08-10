@@ -4,12 +4,14 @@
 PYLIBFDT_srcs = $(PYLIBFDT_srcdir)/libfdt.i
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
 
+SETUP = $(PYLIBFDT_srcdir)/setup.py
+
 define run_setup
 	VERSION="$(dtc_version)"
-	$(PYLIBFDT_objdir)/setup.py --quiet $(1)
+	$(SETUP) --quiet $(1)
 endef
 
-$(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive)
+$(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP)
 	@$(VECHO) PYMOD $@
 	$(call run_setup, build_ext --build-lib=$(PYLIBFDT_objdir))
 
