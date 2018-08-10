@@ -1028,7 +1028,7 @@ class NodeAdder():
  */
 typedef uint32_t fdt32_t;
 
-%include "libfdt/fdt.h"
+%include "fdt.h"
 
 %include "typemaps.i"
 
@@ -1134,4 +1134,4 @@ int fdt_property_cell(void *fdt, const char *name, uint32_t val);
  */
 int fdt_property_stub(void *fdt, const char *name, const char *val, int len);
 
-%include <../libfdt/libfdt.h>
+%include <libfdt.h>

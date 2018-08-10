@@ -16,18 +16,21 @@ VERSION_PATTERN = '^#define DTC_VERSION "DTC ([^"]*)"$'
 
 
 def get_version():
-    version_file = "version_gen.h"
+    version_file = "../version_gen.h"
     f = open(version_file, 'rt')
     m = re.match(VERSION_PATTERN, f.readline())
     return m.group(1)
 
+setupdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+os.chdir(setupdir)
 
 libfdt_module = Extension(
     '_libfdt',
-    sources = ['pylibfdt/libfdt.i'],
-    include_dirs = ['libfdt'],
+    sources = ['libfdt.i'],
+    include_dirs = ['../libfdt'],
     libraries = ['fdt'],
-    library_dirs = ['libfdt'],
+    library_dirs = ['../libfdt'],
+    swig_opts = ['-I../libfdt'],
 )
 
 setup(
@@ -36,5 +39,5 @@ setup(
     author='Simon Glass <sjg@chromium.org>',
     description='Python binding for libfdt',
     ext_modules=[libfdt_module],
-    py_modules=['pylibfdt/libfdt'],
+    py_modules=['libfdt'],
 )

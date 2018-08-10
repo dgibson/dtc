@@ -13,7 +13,7 @@ endif
 
 $(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP) $(VERSION_FILE)
 	@$(VECHO) PYMOD $@
-	$(SETUP) $(SETUPFLAGS) build_ext --build-lib=$(PYLIBFDT_objdir)
+	$(SETUP) $(SETUPFLAGS) build_ext --build-lib=../$(PYLIBFDT_objdir)
 
 install_pylibfdt: $(PYMODULE)
 	@$(VECHO) INSTALL-PYLIB
