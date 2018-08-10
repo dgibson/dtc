@@ -12,11 +12,10 @@ SETUPFLAGS += --quiet
 endif
 
 define run_setup
-	VERSION="$(dtc_version)"
 	$(SETUP) $(SETUPFLAGS) $(1)
 endef
 
-$(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP)
+$(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP) $(VERSION_FILE)
 	@$(VECHO) PYMOD $@
 	$(call run_setup, build_ext --build-lib=$(PYLIBFDT_objdir))
 
