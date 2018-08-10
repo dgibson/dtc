@@ -7,7 +7,6 @@ Written by Simon Glass <sjg@chromium.org>
 
 Files to be built into the extension are provided in SOURCES
 C flags to use are provided in CPPFLAGS
-Object file directory is provided in OBJDIR
 Version is provided in VERSION
 
 If these variables are not given they are parsed from the Makefiles. This
@@ -73,7 +72,6 @@ def GetEnvFromMakefiles():
             Version string
             List of files to build
             List of extra C preprocessor flags needed
-            Object directory to use (always '')
     """
     basedir = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
     makevars = ParseMakefile(os.path.join(basedir, 'Makefile'))
@@ -84,21 +82,19 @@ def GetEnvFromMakefiles():
     files = [os.path.join(basedir, 'libfdt', fname) for fname in files]
     files.append('pylibfdt/libfdt.i')
     cflags = ['-I%s/libfdt' % basedir]
-    objdir = ''
-    return  version, files, cflags, objdir
+    return  version, files, cflags
 
 
 progname = sys.argv[0]
 files = os.environ.get('SOURCES', '').split()
 cflags = os.environ.get('CPPFLAGS', '').split()
-objdir = os.environ.get('OBJDIR')
 version = os.environ.get('VERSION')
 
 # If we were called directly rather than through our Makefile (which is often
 # the case with Python module installation), read the settings from the
 # Makefile.
-if not all((version, files, cflags, objdir)):
-    version, files, cflags, objdir = GetEnvFromMakefiles()
+if not all((version, files, cflags)):
+    version, files, cflags= GetEnvFromMakefiles()
 
 libfdt_module = Extension(
     '_libfdt',
@@ -112,6 +108,5 @@ setup(
     author='Simon Glass <sjg@chromium.org>',
     description='Python binding for libfdt',
     ext_modules=[libfdt_module],
-    package_dir={'': objdir},
     py_modules=['pylibfdt/libfdt'],
 )
