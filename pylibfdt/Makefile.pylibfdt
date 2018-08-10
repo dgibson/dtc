@@ -11,16 +11,12 @@ ifndef V
 SETUPFLAGS += --quiet
 endif
 
-define run_setup
-	$(SETUP) $(SETUPFLAGS) $(1)
-endef
-
 $(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP) $(VERSION_FILE)
 	@$(VECHO) PYMOD $@
-	$(call run_setup, build_ext --build-lib=$(PYLIBFDT_objdir))
+	$(SETUP) $(SETUPFLAGS) build_ext --build-lib=$(PYLIBFDT_objdir)
 
 install_pylibfdt: $(PYMODULE)
-	$(VECHO) INSTALL-PYLIB; \
-	$(call run_setup, install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX)))
+	@$(VECHO) INSTALL-PYLIB
+	$(SETUP) $(SETUPFLAGS) install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
 
 PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so
