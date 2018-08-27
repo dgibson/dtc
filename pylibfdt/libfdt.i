@@ -1049,11 +1049,6 @@ typedef uint32_t fdt32_t;
     $1 = PyString_AsString($input);   /* char *str */
 }
 
-/* typemap used for fdt_add_reservemap_entry() */
-%typemap(in) uint64_t {
-   $1 = PyLong_AsUnsignedLong($input);
-}
-
 /* typemaps used for fdt_next_node() */
 %typemap(in, numinputs=1) int *depth (int depth) {
    depth = (int) PyInt_AsLong($input);
