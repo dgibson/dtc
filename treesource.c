@@ -133,9 +133,14 @@ static void write_propval_int(FILE *f, const char *p, size_t len, size_t width)
 	}
 }
 
+static bool has_data_type_information(struct marker *m)
+{
+	return m->type >= TYPE_UINT8;
+}
+
 static struct marker *next_type_marker(struct marker *m)
 {
-	while (m && (m->type == LABEL || m->type == REF_PHANDLE || m->type == REF_PATH))
+	while (m && !has_data_type_information(m))
 		m = m->next;
 	return m;
 }
@@ -225,7 +230,7 @@ static void write_propval(FILE *f, struct property *prop)
 		size_t chunk_len;
 		const char *p = &prop->val.val[m->offset];
 
-		if (m->type < TYPE_UINT8)
+		if (!has_data_type_information(m))
 			continue;
 
 		chunk_len = type_marker_length(m);

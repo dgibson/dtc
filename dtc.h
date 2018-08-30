@@ -82,7 +82,6 @@ enum markertype {
 	TYPE_UINT16,
 	TYPE_UINT32,
 	TYPE_UINT64,
-	TYPE_BLOB,
 	TYPE_STRING,
 };
 extern const char *markername(enum markertype markertype);
