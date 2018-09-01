@@ -1068,7 +1068,7 @@ typedef uint32_t fdt32_t;
 }
 
 %typemap(argout) uint64_t * {
-        PyObject *val = PyLong_FromUnsignedLong(*arg$argnum);
+        PyObject *val = PyLong_FromUnsignedLongLong(*arg$argnum);
         if (!result) {
            if (PyTuple_GET_SIZE(resultobj) == 0)
               resultobj = val;
