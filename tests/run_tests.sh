@@ -448,6 +448,11 @@ libfdt_tests () {
 
     run_test check_header test_tree1.dtb
 
+    rm -rf fstree
+    mkdir fstree
+    echo -n "foo" > fstree/non_empty_prop
+    run_dtc_test -I fs -O dts fstree
+
     # check full tests
     for good in test_tree1.dtb; do
 	run_test check_full $good
