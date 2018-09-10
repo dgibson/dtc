@@ -30,6 +30,7 @@
 #include "testdata.h"
 
 static int notequal; /* = 0 */
+static int ignore_memrsv; /* = 0 */
 
 #define MISMATCH(fmt, ...)			\
 	do { \
@@ -195,22 +196,41 @@ static void compare_node(const void *fdt1, int offset1,
 	compare_subnodes(fdt2, offset2, fdt1, offset1, 0);
 }
 
+static void badargs(char **argv)
+{
+	CONFIG("Usage: %s [-n] [-m] <dtb file> <dtb file>", argv[0]);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt1, *fdt2;
 	uint32_t cpuid1, cpuid2;
+	char **args;
+	int argsleft;
 
 	test_init(argc, argv);
-	if ((argc != 3)
-	    && ((argc != 4) || !streq(argv[1], "-n")))
-		CONFIG("Usage: %s [-n] <dtb file> <dtb file>", argv[0]);
-	if (argc == 4)
-		notequal = 1;
 
-	fdt1 = load_blob(argv[argc-2]);
-	fdt2 = load_blob(argv[argc-1]);
+	args = &argv[1];
+	argsleft = argc - 1;
 
-	compare_mem_rsv(fdt1, fdt2);
+	while (argsleft > 2) {
+		if (streq(args[0], "-n"))
+			notequal = 1;
+		else if (streq(args[0], "-m"))
+			ignore_memrsv = 1;
+		else
+			badargs(argv);
+		args++;
+		argsleft--;
+	}
+	if (argsleft != 2)
+		badargs(argv);
+
+	fdt1 = load_blob(args[0]);
+	fdt2 = load_blob(args[1]);
+
+	if (!ignore_memrsv)
+		compare_mem_rsv(fdt1, fdt2);
 	compare_node(fdt1, 0, fdt2, 0);
 
 	cpuid1 = fdt_boot_cpuid_phys(fdt1);
