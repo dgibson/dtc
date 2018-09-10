@@ -2,6 +2,7 @@
 *.dts.test.s
 *.test.dts
 tmp.*
+/fs/
 /add_subnode_with_nops
 /addr_size_cells
 /addr_size_cells2
@@ -28,6 +29,7 @@ tmp.*
 /getprop
 /incbin
 /integer-expressions
+/fs_tree1
 /mangle-layout
 /move_and_save
 /node_check_compatible

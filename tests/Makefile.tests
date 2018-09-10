@@ -27,7 +27,8 @@ LIB_TESTS_L = get_mem_rsv \
 	property_iterate \
 	subnode_iterate \
 	overlay overlay_bad_fixup \
-	check_path check_header check_full
+	check_path check_header check_full \
+	fs_tree1
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
 LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv
@@ -49,6 +50,8 @@ TESTS_DEPFILES = $(TESTS:%=%.d) \
 TESTS_CLEANFILES_L =  *.output vglog.* vgcore.* *.dtb *.test.dts *.dtsv1 tmp.*
 TESTS_CLEANFILES_L += dumptrees
 TESTS_CLEANFILES = $(TESTS) $(TESTS_CLEANFILES_L:%=$(TESTS_PREFIX)%)
+TESTS_CLEANDIRS_L = fs
+TESTS_CLEANDIRS = $(TESTS_CLEANDIRS_L:%=$(TESTS_PREFIX)%)
 
 .PHONY: tests
 tests:	$(TESTS) $(TESTS_TREES)
@@ -75,6 +78,7 @@ tests_clean:
 	@$(VECHO) CLEAN "(tests)"
 	rm -f $(STD_CLEANFILES:%=$(TESTS_PREFIX)%)
 	rm -f $(TESTS_CLEANFILES)
+	rm -rf $(TESTS_CLEANDIRS)
 
 check:	tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
 	cd $(TESTS_PREFIX); ./run_tests.sh

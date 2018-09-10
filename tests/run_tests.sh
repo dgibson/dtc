@@ -448,10 +448,13 @@ libfdt_tests () {
 
     run_test check_header test_tree1.dtb
 
-    rm -rf fstree
-    mkdir fstree
-    echo -n "foo" > fstree/non_empty_prop
-    run_dtc_test -I fs -O dts fstree
+    FSBASE=fs
+    rm -rf $FSBASE
+    mkdir -p $FSBASE
+    run_test fs_tree1 $FSBASE/test_tree1
+    run_dtc_test -I fs -O dts -o fs.test_tree1.test.dts $FSBASE/test_tree1
+    run_dtc_test -I fs -O dtb -o fs.test_tree1.test.dtb $FSBASE/test_tree1
+    run_test dtbs_equal_unordered -m fs.test_tree1.test.dtb test_tree1.dtb
 
     # check full tests
     for good in test_tree1.dtb; do
