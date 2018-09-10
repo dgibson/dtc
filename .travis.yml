@@ -25,11 +25,8 @@ matrix:
         - make
         - make check && make checkm
 
-    # Check it builds properly without the python bits
-    - addons:
-        apt:
-          packages:
-            - valgrind
-      script:
+    # Check it builds properly without optional packages:
+    #     python, valgrind
+    - script:
         - make
         - make check

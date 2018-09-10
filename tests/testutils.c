@@ -30,7 +30,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#if NO_VALGRIND
+static inline void VALGRIND_MAKE_MEM_UNDEFINED(void *p, size_t len)
+{
+}
+
+static inline void VALGRIND_MAKE_MEM_DEFINED(void *p, size_t len)
+{
+}
+#else
 #include <valgrind/memcheck.h>
+#endif
 
 #include <libfdt.h>
 

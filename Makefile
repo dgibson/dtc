@@ -39,6 +39,13 @@ INCLUDEDIR = $(PREFIX)/include
 HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 	    sed -e 's/\(cygwin\|msys\).*/\1/')
 
+NO_VALGRIND := $(shell $(PKG_CONFIG) --exists valgrind; echo $$?)
+ifeq ($(NO_VALGRIND),1)
+	CFLAGS += -DNO_VALGRIND
+else
+	CFLAGS += $(shell $(PKG_CONFIG) --cflags valgrind)
+endif
+
 ifeq ($(HOSTOS),darwin)
 SHAREDLIB_EXT     = dylib
 SHAREDLIB_CFLAGS  = -fPIC
