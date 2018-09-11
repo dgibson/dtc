@@ -108,6 +108,8 @@ struct data {
 	for_each_marker(m) \
 		if ((m)->type == (t))
 
+size_t type_marker_length(struct marker *m);
+
 void data_free(struct data d);
 
 struct data data_grow_for(struct data d, int xlen);

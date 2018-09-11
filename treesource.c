@@ -145,7 +145,7 @@ static struct marker *next_type_marker(struct marker *m)
 	return m;
 }
 
-static size_t type_marker_length(struct marker *m)
+size_t type_marker_length(struct marker *m)
 {
 	struct marker *next = next_type_marker(m->next);
 
