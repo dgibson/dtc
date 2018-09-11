@@ -46,6 +46,13 @@ else
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags valgrind)
 endif
 
+NO_YAML := $(shell $(PKG_CONFIG) --exists yaml-0.1; echo $$?)
+ifeq ($(NO_YAML),1)
+	CFLAGS += -DNO_YAML
+else
+	LDLIBS += $(shell $(PKG_CONFIG) --libs yaml-0.1)
+endif
+
 ifeq ($(HOSTOS),darwin)
 SHAREDLIB_EXT     = dylib
 SHAREDLIB_CFLAGS  = -fPIC
@@ -329,7 +336,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 #
 %: %.o
 	@$(VECHO) LD $@
-	$(LINK.c) -o $@ $^
+	$(LINK.c) -o $@ $^ $(LDLIBS)
 
 %.o: %.c
 	@$(VECHO) CC $@

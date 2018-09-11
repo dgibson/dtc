@@ -78,6 +78,9 @@ The currently supported Output Formats are:
         then simply be added to your Makefile.  Additionally, the
         assembly file exports some symbols that can be used.
 
+     - "yaml": DT encoded in YAML format. This representation is an
+       intermediate format used for validation tools.
+
 
 3) Command Line
 

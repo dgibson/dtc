@@ -568,6 +568,14 @@ dtc_tests () {
         run_wrap_test cmp $tree $tree.test.dts
     done
 
+    # Check -Oyaml output
+    if pkg-config --exists yaml-0.1; then
+            for tree in type-preservation; do
+                run_dtc_test -I dts -O yaml -o $tree.test.dt.yaml $tree.dts
+                run_wrap_test cmp $tree.dt.yaml $tree.test.dt.yaml
+            done
+    fi
+
     # Check version conversions
     for tree in test_tree1.dtb ; do
 	 for aver in 1 2 3 16 17; do
