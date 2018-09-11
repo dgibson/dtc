@@ -689,6 +689,35 @@ class Fdt(FdtRo):
         """
         return check_err(fdt_delprop(self._fdt, nodeoffset, prop_name), quiet)
 
+    def add_subnode(self, parentoffset, name, quiet=()):
+        """Add a new subnode to a node
+
+        Args:
+            parentoffset: Parent offset to add the subnode to
+            name: Name of node to add
+
+        Returns:
+            offset of the node created, or negative error code on failure
+
+        Raises:
+            FdtError if there is not enough space, or another error occurs
+        """
+        return check_err(fdt_add_subnode(self._fdt, parentoffset, name), quiet)
+
+    def del_node(self, nodeoffset, quiet=()):
+        """Delete a node
+
+        Args:
+            nodeoffset: Offset of node to delete
+
+        Returns:
+            Error code, or 0 if OK
+
+        Raises:
+            FdtError if an error occurs
+        """
+        return check_err(fdt_del_node(self._fdt, nodeoffset), quiet)
+
 
 class Property(bytearray):
     """Holds a device tree property name and value.

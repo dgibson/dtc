@@ -139,6 +139,24 @@ class PyLibfdtBasicTests(unittest.TestCase):
             poffset = self.fdt.next_property_offset(poffset, QUIET_NOTFOUND)
         return prop_list
 
+    def GetSubnodes(self, node_path):
+        """Read a list of subnodes from a node
+
+        Args:
+            node_path: Full path to node, e.g. '/subnode@1/subsubnode'
+
+        Returns:
+            List of subnode names for that node, e.g. ['subsubnode', 'ss1']
+        """
+        subnode_list = []
+        node = self.fdt.path_offset(node_path)
+        offset = self.fdt.first_subnode(node, QUIET_NOTFOUND)
+        while offset > 0:
+            name = self.fdt.get_name(offset)
+            subnode_list.append(name)
+            offset = self.fdt.next_subnode(offset, QUIET_NOTFOUND)
+        return subnode_list
+
     def testImport(self):
         """Check that we can import the library correctly"""
         self.assertEquals(type(libfdt), types.ModuleType)
@@ -494,6 +512,19 @@ class PyLibfdtBasicTests(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             self.fdt.set_name(node, 'name\0')
         self.assertIn('embedded nul', str(e.exception))
+
+    def testAddDeleteNodes(self):
+        """Test that we can add and delete nodes"""
+        node_name = '/subnode@1'
+        self.assertEquals(self.GetSubnodes(node_name), ['subsubnode', 'ss1'])
+        node = self.fdt.path_offset('%s/subsubnode' % node_name)
+        self.assertEquals(self.fdt.del_node(node, 'subsubnode'), 0)
+        self.assertEquals(self.GetSubnodes(node_name), ['ss1'])
+
+        node = self.fdt.path_offset(node_name)
+        offset = self.fdt.add_subnode(node, 'more')
+        self.assertTrue(offset > 0)
+        self.assertEquals(self.GetSubnodes(node_name), ['more', 'ss1'])
 
 
 class PyLibfdtSwTests(unittest.TestCase):
