@@ -673,17 +673,21 @@ class Fdt(FdtRo):
         return check_err(fdt_setprop(self._fdt, nodeoffset, prop_name,
                                      val, len(val)), quiet)
 
-    def delprop(self, nodeoffset, prop_name):
+    def delprop(self, nodeoffset, prop_name, quiet=()):
         """Delete a property from a node
 
         Args:
             nodeoffset: Node offset containing property to delete
             prop_name: Name of property to delete
+            quiet: Errors to ignore (empty to raise on all errors)
+
+        Returns:
+            Error code, or 0 if OK
 
         Raises:
             FdtError if the property does not exist, or another error occurs
         """
-        return check_err(fdt_delprop(self._fdt, nodeoffset, prop_name))
+        return check_err(fdt_delprop(self._fdt, nodeoffset, prop_name), quiet)
 
 
 class Property(bytearray):
