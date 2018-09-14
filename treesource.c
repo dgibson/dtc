@@ -118,18 +118,20 @@ static void write_propval_int(FILE *f, const char *p, size_t len, size_t width)
 	for (; p < end; p += width) {
 		switch (width) {
 		case 1:
-			fprintf(f, " %02"PRIx8, *(const uint8_t*)p);
+			fprintf(f, "%02"PRIx8, *(const uint8_t*)p);
 			break;
 		case 2:
-			fprintf(f, " 0x%02"PRIx16, fdt16_to_cpu(*(const fdt16_t*)p));
+			fprintf(f, "0x%02"PRIx16, fdt16_to_cpu(*(const fdt16_t*)p));
 			break;
 		case 4:
-			fprintf(f, " 0x%02"PRIx32, fdt32_to_cpu(*(const fdt32_t*)p));
+			fprintf(f, "0x%02"PRIx32, fdt32_to_cpu(*(const fdt32_t*)p));
 			break;
 		case 8:
-			fprintf(f, " 0x%02"PRIx64, fdt64_to_cpu(*(const fdt64_t*)p));
+			fprintf(f, "0x%02"PRIx64, fdt64_to_cpu(*(const fdt64_t*)p));
 			break;
 		}
+		if (p + width < end)
+			fputc(' ', f);
 	}
 }
 
@@ -162,10 +164,10 @@ static const char *delim_start[] = {
 	[TYPE_STRING] = "",
 };
 static const char *delim_end[] = {
-	[TYPE_UINT8] = " ]",
-	[TYPE_UINT16] = " >",
-	[TYPE_UINT32] = " >",
-	[TYPE_UINT64] = " >",
+	[TYPE_UINT8] = "]",
+	[TYPE_UINT16] = ">",
+	[TYPE_UINT32] = ">",
+	[TYPE_UINT64] = ">",
 	[TYPE_STRING] = "",
 };
 
