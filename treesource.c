@@ -216,7 +216,7 @@ static void write_propval(FILE *f, struct property *prop)
 		return;
 	}
 
-	fprintf(f, " = ");
+	fprintf(f, " =");
 
 	if (!next_type_marker(m)) {
 		/* data type information missing, need to guess */
@@ -227,32 +227,23 @@ static void write_propval(FILE *f, struct property *prop)
 		m = &dummy_marker;
 	}
 
-	struct marker *m_label = prop->val.markers;
 	for_each_marker(m) {
-		size_t chunk_len;
+		size_t chunk_len = (m->next ? m->next->offset : len) - m->offset;
+		size_t data_len = type_marker_length(m) ? : len - m->offset;
 		const char *p = &prop->val.val[m->offset];
 
-		if (!has_data_type_information(m))
-			continue;
-
-		chunk_len = type_marker_length(m);
-		if (!chunk_len)
-			chunk_len = len - m->offset;
-
-		if (emit_type != TYPE_NONE)
-			fprintf(f, "%s, ", delim_end[emit_type]);
-		emit_type = m->type;
-
-		for_each_marker_of_type(m_label, LABEL) {
-			if (m_label->offset > m->offset)
-				break;
-			fprintf(f, "%s: ", m_label->ref);
+		if (has_data_type_information(m)) {
+			emit_type = m->type;
+			fprintf(f, " %s", delim_start[emit_type]);
 		}
 
-		fprintf(f, "%s", delim_start[emit_type]);
+		if (m->type == LABEL)
+			fprintf(f, " %s:", m->ref);
 
-		if (chunk_len <= 0)
+		if (emit_type == TYPE_NONE) {
+			assert(chunk_len == 0);
 			continue;
+		}
 
 		switch(emit_type) {
 		case TYPE_UINT16:
@@ -270,15 +261,15 @@ static void write_propval(FILE *f, struct property *prop)
 		default:
 			write_propval_int(f, p, chunk_len, 1);
 		}
-	}
 
-	/* Wrap up any labels at the end of the value */
-	for_each_marker_of_type(m_label, LABEL) {
-		assert (m_label->offset == len);
-		fprintf(f, " %s:", m_label->ref);
+		if (chunk_len == data_len) {
+			size_t pos = m->offset + chunk_len;
+			fprintf(f, pos == len ? "%s" : "%s,",
+			        delim_end[emit_type] ? : "");
+			emit_type = TYPE_NONE;
+		}
 	}
-
-	fprintf(f, "%s;\n", delim_end[emit_type] ? : "");
+	fprintf(f, ";\n");
 }
 
 static void write_tree_source_node(FILE *f, struct node *tree, int level)
