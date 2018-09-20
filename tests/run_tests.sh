@@ -668,6 +668,10 @@ dtc_tests () {
     check_tests pci-bridge-bad1.dts pci_bridge
     check_tests pci-bridge-bad2.dts pci_bridge
 
+    check_tests unit-addr-simple-bus-reg-mismatch.dts simple_bus_reg
+    check_tests unit-addr-simple-bus-compatible.dts simple_bus_reg
+
+
     # Check warning options
     run_sh_test dtc-checkfails.sh address_cells_is_cell interrupt_cells_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb bad-ncells.dts
     run_sh_test dtc-fails.sh -n test-warn-output.test.dtb -I dts -O dtb bad-ncells.dts

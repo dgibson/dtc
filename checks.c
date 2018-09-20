@@ -910,7 +910,7 @@ static bool node_is_compatible(struct node *node, const char *compat)
 
 	for (str = prop->val.val, end = str + prop->val.len; str < end;
 	     str += strnlen(str, end - str) + 1) {
-		if (strprefixeq(str, end - str, compat))
+		if (streq(str, compat))
 			return true;
 	}
 	return false;
@@ -921,7 +921,8 @@ static void check_simple_bus_bridge(struct check *c, struct dt_info *dti, struct
 	if (node_is_compatible(node, "simple-bus"))
 		node->bus = &simple_bus;
 }
-WARNING(simple_bus_bridge, check_simple_bus_bridge, NULL, &addr_size_cells);
+WARNING(simple_bus_bridge, check_simple_bus_bridge, NULL,
+	&addr_size_cells, &compatible_is_string_list);
 
 static void check_simple_bus_reg(struct check *c, struct dt_info *dti, struct node *node)
 {
