@@ -70,7 +70,8 @@ extern bool treesource_error;
 %token <byte> DT_BYTE
 %token <data> DT_STRING
 %token <labelref> DT_LABEL
-%token <labelref> DT_REF
+%token <labelref> DT_LABEL_REF
+%token <labelref> DT_PATH_REF
 %token DT_INCBIN
 
 %type <data> propdata
@@ -83,6 +84,7 @@ extern bool treesource_error;
 %type <data> bytestring
 %type <prop> propdef
 %type <proplist> proplist
+%type <labelref> dt_ref
 
 %type <node> devicetree
 %type <node> nodedef
@@ -158,6 +160,8 @@ memreserve:
 		}
 	;
 
+dt_ref: DT_LABEL_REF | DT_PATH_REF;
+
 devicetree:
 	  '/' nodedef
 		{
@@ -167,7 +171,7 @@ devicetree:
 		{
 			$$ = merge_nodes($1, $3);
 		}
-	| DT_REF nodedef
+	| dt_ref nodedef
 		{
 			/*
 			 * We rely on the rule being always:
@@ -178,7 +182,7 @@ devicetree:
 				ERROR(&@2, "Label or path %s not found", $1);
 			$$ = add_orphan_node(name_node(build_node(NULL, NULL), ""), $2, $1);
 		}
-	| devicetree DT_LABEL DT_REF nodedef
+	| devicetree DT_LABEL dt_ref nodedef
 		{
 			struct node *target = get_node_by_ref($1, $3);
 
@@ -189,7 +193,7 @@ devicetree:
 				ERROR(&@3, "Label or path %s not found", $3);
 			$$ = $1;
 		}
-	| devicetree DT_REF nodedef
+	| devicetree DT_PATH_REF nodedef
 		{
 			/*
 			 * We rely on the rule being always:
@@ -208,7 +212,26 @@ devicetree:
 			}
 			$$ = $1;
 		}
-	| devicetree DT_DEL_NODE DT_REF ';'
+	| devicetree DT_LABEL_REF nodedef
+		{
+			struct node *target = get_node_by_ref($1, $2);
+
+			if (target) {
+				merge_nodes(target, $3);
+			} else {
+				/*
+				 * We rely on the rule being always:
+				 *   versioninfo plugindecl memreserves devicetree
+				 * so $-1 is what we want (plugindecl)
+				 */
+				if ($<flags>-1 & DTSF_PLUGIN)
+					add_orphan_node($1, $3, $2);
+				else
+					ERROR(&@2, "Label or path %s not found", $2);
+			}
+			$$ = $1;
+		}
+	| devicetree DT_DEL_NODE dt_ref ';'
 		{
 			struct node *target = get_node_by_ref($1, $3);
 
@@ -220,7 +243,7 @@ devicetree:
 
 			$$ = $1;
 		}
-	| devicetree DT_OMIT_NO_REF DT_REF ';'
+	| devicetree DT_OMIT_NO_REF dt_ref ';'
 		{
 			struct node *target = get_node_by_ref($1, $3);
 
@@ -285,7 +308,7 @@ propdata:
 		{
 			$$ = data_merge($1, $3);
 		}
-	| propdataprefix DT_REF
+	| propdataprefix dt_ref
 		{
 			$1 = data_add_marker($1, TYPE_STRING, $2);
 			$$ = data_add_marker($1, REF_PATH, $2);
@@ -383,7 +406,7 @@ arrayprefix:
 
 			$$.data = data_append_integer($1.data, $2, $1.bits);
 		}
-	| arrayprefix DT_REF
+	| arrayprefix dt_ref
 		{
 			uint64_t val = ~0ULL >> (64 - $1.bits);
 
