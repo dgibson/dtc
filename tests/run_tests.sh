@@ -257,6 +257,11 @@ dtc_overlay_tests () {
     run_test check_path overlay_overlay_bypath.test.dtb not-exists "/__fixups__"
     run_test check_path overlay_overlay_bypath.test.dtb exists "/__local_fixups__"
 
+    # Make sure local target references are resolved and nodes are merged and that path references are not
+    run_dtc_test -I dts -O dtb -o overlay_overlay_local_merge.test.dtb overlay_overlay_local_merge.dts
+    run_test check_path overlay_overlay_local_merge.test.dtb exists "/fragment@0/__overlay__/new-node/new-merged-node"
+    run_test check_path overlay_overlay_local_merge.test.dtb exists "/fragment@1/__overlay__/new-root-node"
+
     # Check building works the same as manual constructions
     run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_nosugar.test.dtb
 
