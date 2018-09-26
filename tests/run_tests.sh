@@ -572,6 +572,12 @@ dtc_tests () {
         run_dtc_test -I dts -O dts $tree.test.dts
         run_wrap_test cmp $tree $tree.test.dts
     done
+    for tree in path-references; do
+        run_dtc_test -I dts -O dtb -o $tree.test.dtb $tree.dts
+        run_dtc_test -I dts -O dts -o $tree.test.dts $tree.dts
+        run_dtc_test -I dts -O dtb -o $tree.test.dts.test.dtb $tree.test.dts
+        run_test dtbs_equal_ordered $tree.test.dtb $tree.test.dts.test.dtb
+    done
 
     # Check -Oyaml output
     if pkg-config --exists yaml-0.1; then

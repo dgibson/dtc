@@ -64,6 +64,10 @@ static bool isstring(char c)
 static void write_propval_string(FILE *f, const char *s, size_t len)
 {
 	const char *end = s + len - 1;
+
+	if (!len)
+		return;
+
 	assert(*end == '\0');
 
 	fprintf(f, "\"");
