@@ -730,10 +730,10 @@ dtc_tests () {
     for align in 2 4 8 16 32 64; do
 	# -p -a
 	run_dtc_test -O dtb -p 1000 -a $align -o align0.dtb subnode_iterate.dts
-	check_align align0.dtb $align
+	base_run_test check_align align0.dtb $align
 	# -S -a
 	run_dtc_test -O dtb -S 1999 -a $align -o align1.dtb subnode_iterate.dts
-	check_align align1.dtb $align
+	base_run_test check_align align1.dtb $align
     done
 
     # Tests for overlay/plugin generation
