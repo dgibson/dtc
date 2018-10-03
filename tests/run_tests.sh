@@ -941,6 +941,14 @@ fdtoverlay_tests() {
 
     # test that baz correctly inserted the property
     run_fdtoverlay_test baz "/foonode/barnode/baznode" "baz-property" "-ts" ${stacked_basedtb} ${stacked_targetdtb} ${stacked_bardtb} ${stacked_bazdtb}
+
+    overlay_long_path=overlay_overlay_long_path.dts
+    overlay_long_pathdtb=overlay_overlay_long_path.fdoverlay.test.dtb
+    target_long_pathdtb=overlay_overlay_long_path_target.fdoverlay.test.dtb
+    run_dtc_test -@ -I dts -O dtb -o $overlay_long_pathdtb $overlay_long_path
+
+    # test that fdtoverlay manages to apply overlays with long target path
+    run_fdtoverlay_test lpath "/test-node/sub-test-node/sub-test-node-with-very-long-target-path/test-0" "prop" "-ts" ${basedtb} ${target_long_pathdtb} ${overlay_long_pathdtb}
 }
 
 pylibfdt_tests () {
