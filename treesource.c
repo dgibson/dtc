@@ -239,10 +239,10 @@ static void write_propval(FILE *f, struct property *prop)
 		if (has_data_type_information(m)) {
 			emit_type = m->type;
 			fprintf(f, " %s", delim_start[emit_type]);
-		}
-
-		if (m->type == LABEL)
+		} else if (m->type == LABEL)
 			fprintf(f, " %s:", m->ref);
+		else if (m->offset)
+			fputc(' ', f);
 
 		if (emit_type == TYPE_NONE) {
 			assert(chunk_len == 0);
