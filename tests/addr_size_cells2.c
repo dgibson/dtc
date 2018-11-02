@@ -57,6 +57,6 @@ int main(int argc, char *argv[])
 	test_init(argc, argv);
 	fdt = load_blob(argv[1]);
 
-	check_node(fdt, "/", 2, 2);
+	check_node(fdt, "/", 2, 1);
 	PASS();
 }
