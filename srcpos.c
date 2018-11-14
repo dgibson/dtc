@@ -197,18 +197,6 @@ void srcfile_add_search_path(const char *dirname)
 	search_path_tail = &node->next;
 }
 
-/*
- * The empty source position.
- */
-
-struct srcpos srcpos_empty = {
-	.first_line = 0,
-	.first_column = 0,
-	.last_line = 0,
-	.last_column = 0,
-	.file = NULL,
-};
-
 void srcpos_update(struct srcpos *pos, const char *text, int len)
 {
 	int i;

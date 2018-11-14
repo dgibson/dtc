@@ -96,13 +96,6 @@ struct srcpos {
 	} while (0)
 
 
-/*
- * Fictional source position used for IR nodes that are
- * created without otherwise knowing a true source position.
- * For example,constant definitions from the command line.
- */
-extern struct srcpos srcpos_empty;
-
 extern void srcpos_update(struct srcpos *pos, const char *text, int len);
 extern struct srcpos *srcpos_copy(struct srcpos *pos);
 extern char *srcpos_string(struct srcpos *pos);
