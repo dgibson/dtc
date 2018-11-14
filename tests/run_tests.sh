@@ -88,6 +88,9 @@ wrap_test () {
 	    if [ "$ret" -gt 127 ]; then
 		signame=$(kill -l $((ret - 128)))
 		FAIL "Killed by SIG$signame"
+	    elif [ "$ret" -eq $VGCODE ]; then
+		echo "VALGRIND ERROR"
+		exit $VGCODE
 	    else
 		FAIL "Returned error code $ret"
 	    fi
