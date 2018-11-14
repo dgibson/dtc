@@ -88,7 +88,7 @@ checkm:
 	@echo "make checkm requires valgrind, but NO_VALGRIND=1"
 else
 checkm: tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
-	cd $(TESTS_PREFIX); ./run_tests.sh -m 2>&1 | tee vglog.$$$$
+	cd $(TESTS_PREFIX); ./run_tests.sh -m
 endif
 
 checkv:	tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
