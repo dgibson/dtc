@@ -19,7 +19,6 @@
  */
 
 #include "dtc.h"
-#include "srcpos.h"
 
 /*
  * Tree building functions
@@ -51,8 +50,7 @@ void delete_labels(struct label **labels)
 		label->deleted = 1;
 }
 
-struct property *build_property(char *name, struct data val,
-				struct srcpos *srcpos)
+struct property *build_property(char *name, struct data val)
 {
 	struct property *new = xmalloc(sizeof(*new));
 
@@ -60,7 +58,6 @@ struct property *build_property(char *name, struct data val,
 
 	new->name = name;
 	new->val = val;
-	new->srcpos = srcpos_copy(srcpos);
 
 	return new;
 }
@@ -100,8 +97,7 @@ struct property *reverse_properties(struct property *first)
 	return head;
 }
 
-struct node *build_node(struct property *proplist, struct node *children,
-			struct srcpos *srcpos)
+struct node *build_node(struct property *proplist, struct node *children)
 {
 	struct node *new = xmalloc(sizeof(*new));
 	struct node *child;
@@ -110,7 +106,6 @@ struct node *build_node(struct property *proplist, struct node *children,
 
 	new->proplist = reverse_properties(proplist);
 	new->children = children;
-	new->srcpos = srcpos_copy(srcpos);
 
 	for_each_child(new, child) {
 		child->parent = new;
@@ -119,14 +114,13 @@ struct node *build_node(struct property *proplist, struct node *children,
 	return new;
 }
 
-struct node *build_node_delete(struct srcpos *srcpos)
+struct node *build_node_delete(void)
 {
 	struct node *new = xmalloc(sizeof(*new));
 
 	memset(new, 0, sizeof(*new));
 
 	new->deleted = 1;
-	new->srcpos = srcpos_copy(srcpos);
 
 	return new;
 }
@@ -189,8 +183,6 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 
 				old_prop->val = new_prop->val;
 				old_prop->deleted = 0;
-				free(old_prop->srcpos);
-				old_prop->srcpos = new_prop->srcpos;
 				free(new_prop);
 				new_prop = NULL;
 				break;
@@ -231,8 +223,6 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 			add_child(old_node, new_child);
 	}
 
-	old_node->srcpos = srcpos_extend(old_node->srcpos, new_node->srcpos);
-
 	/* The new node contents are now merged into the old node.  Free
 	 * the new node. */
 	free(new_node);
@@ -251,18 +241,18 @@ struct node * add_orphan_node(struct node *dt, struct node *new_node, char *ref)
 	if (ref[0] == '/') {
 		d = data_append_data(d, ref, strlen(ref) + 1);
 
-		p = build_property("target-path", d, NULL);
+		p = build_property("target-path", d);
 	} else {
 		d = data_add_marker(d, REF_PHANDLE, ref);
 		d = data_append_integer(d, 0xffffffff, 32);
 
-		p = build_property("target", d, NULL);
+		p = build_property("target", d);
 	}
 
 	xasprintf(&name, "fragment@%u",
 			next_orphan_fragment++);
 	name_node(new_node, "__overlay__");
-	node = build_node(p, new_node, NULL);
+	node = build_node(p, new_node);
 	name_node(node, name);
 
 	add_child(dt, node);
@@ -361,7 +351,7 @@ void append_to_property(struct node *node,
 		p->val = d;
 	} else {
 		d = data_append_data(empty_data, data, len);
-		p = build_property(name, d, NULL);
+		p = build_property(name, d);
 		add_property(node, p);
 	}
 }
@@ -619,11 +609,11 @@ cell_t get_node_phandle(struct node *root, struct node *node)
 
 	if (!get_property(node, "linux,phandle")
 	    && (phandle_format & PHANDLE_LEGACY))
-		add_property(node, build_property("linux,phandle", d, NULL));
+		add_property(node, build_property("linux,phandle", d));
 
 	if (!get_property(node, "phandle")
 	    && (phandle_format & PHANDLE_EPAPR))
-		add_property(node, build_property("phandle", d, NULL));
+		add_property(node, build_property("phandle", d));
 
 	/* If the node *does* have a phandle property, we must
 	 * be dealing with a self-referencing phandle, which will be
@@ -797,7 +787,7 @@ static struct node *build_and_name_child_node(struct node *parent, char *name)
 {
 	struct node *node;
 
-	node = build_node(NULL, NULL, NULL);
+	node = build_node(NULL, NULL);
 	name_node(node, xstrdup(name));
 	add_child(parent, node);
 
@@ -859,8 +849,7 @@ static void generate_label_tree_internal(struct dt_info *dti,
 			/* insert it */
 			p = build_property(l->label,
 				data_copy_mem(node->fullpath,
-						strlen(node->fullpath) + 1),
-				NULL);
+						strlen(node->fullpath) + 1));
 			add_property(an, p);
 		}
 

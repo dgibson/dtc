@@ -34,7 +34,7 @@ static struct node *read_fstree(const char *dirname)
 	if (!d)
 		die("Couldn't opendir() \"%s\": %s\n", dirname, strerror(errno));
 
-	tree = build_node(NULL, NULL, NULL);
+	tree = build_node(NULL, NULL);
 
 	while ((de = readdir(d)) != NULL) {
 		char *tmpname;
@@ -60,8 +60,7 @@ static struct node *read_fstree(const char *dirname)
 			} else {
 				prop = build_property(xstrdup(de->d_name),
 						      data_copy_file(pfile,
-								     st.st_size),
-						      NULL);
+								     st.st_size));
 				add_property(tree, prop);
 				fclose(pfile);
 			}

@@ -180,10 +180,7 @@ devicetree:
 			 */
 			if (!($<flags>-1 & DTSF_PLUGIN))
 				ERROR(&@2, "Label or path %s not found", $1);
-			$$ = add_orphan_node(
-					name_node(build_node(NULL, NULL, NULL),
-						  ""),
-					$2, $1);
+			$$ = add_orphan_node(name_node(build_node(NULL, NULL), ""), $2, $1);
 		}
 	| devicetree DT_LABEL dt_ref nodedef
 		{
@@ -263,7 +260,7 @@ devicetree:
 nodedef:
 	  '{' proplist subnodes '}' ';'
 		{
-			$$ = build_node($2, $3, &@$);
+			$$ = build_node($2, $3);
 		}
 	;
 
@@ -281,11 +278,11 @@ proplist:
 propdef:
 	  DT_PROPNODENAME '=' propdata ';'
 		{
-			$$ = build_property($1, $3, &@$);
+			$$ = build_property($1, $3);
 		}
 	| DT_PROPNODENAME ';'
 		{
-			$$ = build_property($1, empty_data, &@$);
+			$$ = build_property($1, empty_data);
 		}
 	| DT_DEL_PROP DT_PROPNODENAME ';'
 		{
@@ -566,7 +563,7 @@ subnode:
 		}
 	| DT_DEL_NODE DT_PROPNODENAME ';'
 		{
-			$$ = name_node(build_node_delete(&@$), $2);
+			$$ = name_node(build_node_delete(), $2);
 		}
 	| DT_OMIT_NO_REF subnode
 		{
