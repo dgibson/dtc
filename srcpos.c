@@ -222,11 +222,33 @@ struct srcpos *
 srcpos_copy(struct srcpos *pos)
 {
 	struct srcpos *pos_new;
+	struct srcfile_state *srcfile_state;
+
+	if (!pos)
+		return NULL;
 
 	pos_new = xmalloc(sizeof(struct srcpos));
+	assert(pos->next == NULL);
 	memcpy(pos_new, pos, sizeof(struct srcpos));
 
+	/* allocate without free */
+	srcfile_state = xmalloc(sizeof(struct srcfile_state));
+	memcpy(srcfile_state, pos->file, sizeof(struct srcfile_state));
+	pos_new->file = srcfile_state;
+
 	return pos_new;
+}
+
+struct srcpos *srcpos_extend(struct srcpos *pos, struct srcpos *newtail)
+{
+	struct srcpos *p;
+
+	if (!pos)
+		return newtail;
+
+	for (p = pos; p->next != NULL; p = p->next);
+	p->next = newtail;
+	return pos;
 }
 
 char *
