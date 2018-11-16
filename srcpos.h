@@ -103,6 +103,9 @@ extern struct srcpos *srcpos_copy(struct srcpos *pos);
 extern struct srcpos *srcpos_extend(struct srcpos *new_srcpos,
 				    struct srcpos *old_srcpos);
 extern char *srcpos_string(struct srcpos *pos);
+extern char *srcpos_string_first(struct srcpos *pos, int level);
+extern char *srcpos_string_last(struct srcpos *pos, int level);
+
 
 extern void PRINTF(3, 0) srcpos_verror(struct srcpos *pos, const char *prefix,
 					const char *fmt, va_list va);

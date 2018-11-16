@@ -214,9 +214,18 @@ static void write_propval(FILE *f, struct property *prop)
 	struct marker *m = prop->val.markers;
 	struct marker dummy_marker;
 	enum markertype emit_type = TYPE_NONE;
+	char *srcstr;
 
 	if (len == 0) {
-		fprintf(f, ";\n");
+		fprintf(f, ";");
+		if (annotate) {
+			srcstr = srcpos_string_first(prop->srcpos, annotate);
+			if (srcstr) {
+				fprintf(f, " /* %s */", srcstr);
+				free(srcstr);
+			}
+		}
+		fprintf(f, "\n");
 		return;
 	}
 
@@ -273,7 +282,15 @@ static void write_propval(FILE *f, struct property *prop)
 			emit_type = TYPE_NONE;
 		}
 	}
-	fprintf(f, ";\n");
+	fprintf(f, ";");
+	if (annotate) {
+		srcstr = srcpos_string_first(prop->srcpos, annotate);
+		if (srcstr) {
+			fprintf(f, " /* %s */", srcstr);
+			free(srcstr);
+		}
+	}
+	fprintf(f, "\n");
 }
 
 static void write_tree_source_node(FILE *f, struct node *tree, int level)
@@ -281,14 +298,24 @@ static void write_tree_source_node(FILE *f, struct node *tree, int level)
 	struct property *prop;
 	struct node *child;
 	struct label *l;
+	char *srcstr;
 
 	write_prefix(f, level);
 	for_each_label(tree->labels, l)
 		fprintf(f, "%s: ", l->label);
 	if (tree->name && (*tree->name))
-		fprintf(f, "%s {\n", tree->name);
+		fprintf(f, "%s {", tree->name);
 	else
-		fprintf(f, "/ {\n");
+		fprintf(f, "/ {");
+
+	if (annotate) {
+		srcstr = srcpos_string_first(tree->srcpos, annotate);
+		if (srcstr) {
+			fprintf(f, " /* %s */", srcstr);
+			free(srcstr);
+		}
+	}
+	fprintf(f, "\n");
 
 	for_each_property(tree, prop) {
 		write_prefix(f, level+1);
@@ -302,9 +329,16 @@ static void write_tree_source_node(FILE *f, struct node *tree, int level)
 		write_tree_source_node(f, child, level+1);
 	}
 	write_prefix(f, level);
-	fprintf(f, "};\n");
+	fprintf(f, "};");
+	if (annotate) {
+		srcstr = srcpos_string_last(tree->srcpos, annotate);
+		if (srcstr) {
+			fprintf(f, " /* %s */", srcstr);
+			free(srcstr);
+		}
+	}
+	fprintf(f, "\n");
 }
-
 
 void dt_to_source(FILE *f, struct dt_info *dti)
 {
