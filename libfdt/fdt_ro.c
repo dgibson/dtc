@@ -65,7 +65,7 @@ static int fdt_nodename_eq_(const void *fdt, int offset,
 		/* short match */
 		return 0;
 
-	if (memcmp(p, s, len) != 0)
+	if (strncmp(p, s, len) != 0)
 		return 0;
 
 	if (p[len] == '\0')
@@ -141,7 +141,7 @@ static int fdt_string_eq_(const void *fdt, int stroffset,
 	int slen;
 	const char *p = fdt_get_string(fdt, stroffset, &slen);
 
-	return p && (slen == len) && (memcmp(p, s, len) == 0);
+	return p && (slen == len) && (strncmp(p, s, len) == 0);
 }
 
 uint32_t fdt_get_max_phandle(const void *fdt)
@@ -671,7 +671,7 @@ int fdt_node_offset_by_prop_value(const void *fdt, int startoffset,
 	     offset = fdt_next_node(fdt, offset, NULL)) {
 		val = fdt_getprop(fdt, offset, propname, &len);
 		if (val && (len == proplen)
-		    && (memcmp(val, propval, len) == 0))
+		    && (strncmp(val, propval, len) == 0))
 			return offset;
 	}
 
@@ -709,7 +709,7 @@ int fdt_stringlist_contains(const char *strlist, int listlen, const char *str)
 	const char *p;
 
 	while (listlen >= len) {
-		if (memcmp(str, strlist, len+1) == 0)
+		if (strncmp(str, strlist, len+1) == 0)
 			return 1;
 		p = memchr(strlist, '\0', listlen);
 		if (!p)
@@ -765,7 +765,7 @@ int fdt_stringlist_search(const void *fdt, int nodeoffset, const char *property,
 		if (list + length > end)
 			return -FDT_ERR_BADVALUE;
 
-		if (length == len && memcmp(list, string, length) == 0)
+		if (length == len && strncmp(list, string, length) == 0)
 			return idx;
 
 		list += length;

@@ -314,7 +314,7 @@ const char *fdt_find_string_(const char *strtab, int tabsize, const char *s)
 	const char *p;
 
 	for (p = strtab; p <= last; p++)
-		if (memcmp(p, s, len) == 0)
+		if (strncmp(p, s, len) == 0)
 			return p;
 	return NULL;
 }

@@ -793,7 +793,7 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 
 		/* verify format; safe since "s" lies in \0 terminated prop */
 		len = sizeof("/__overlay__/") - 1;
-		if ((e - s) < len || memcmp(s, "/__overlay__/", len))
+		if ((e - s) < len || strncmp(s, "/__overlay__/", len))
 			return -FDT_ERR_BADOVERLAY;
 
 		rel_path = s + len;
