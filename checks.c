@@ -78,23 +78,23 @@ static inline void  PRINTF(5, 6) check_msg(struct check *c, struct dt_info *dti,
 					   const char *fmt, ...)
 {
 	va_list ap;
-	va_start(ap, fmt);
 
-	if ((c->warn && (quiet < 1))
-	    || (c->error && (quiet < 2))) {
-		fprintf(stderr, "%s: %s (%s): ",
-			strcmp(dti->outname, "-") ? dti->outname : "<stdout>",
-			(c->error) ? "ERROR" : "Warning", c->name);
-		if (node) {
-			fprintf(stderr, "%s", node->fullpath);
-			if (prop)
-				fprintf(stderr, ":%s", prop->name);
-			fputs(": ", stderr);
-		}
-		vfprintf(stderr, fmt, ap);
-		fprintf(stderr, "\n");
+	if (!(c->warn && (quiet < 1)) && !(c->error && (quiet < 2)))
+		return;
+
+	fprintf(stderr, "%s: %s (%s): ",
+		strcmp(dti->outname, "-") ? dti->outname : "<stdout>",
+		(c->error) ? "ERROR" : "Warning", c->name);
+	if (node) {
+		fprintf(stderr, "%s", node->fullpath);
+		if (prop)
+			fprintf(stderr, ":%s", prop->name);
+		fputs(": ", stderr);
 	}
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
 	va_end(ap);
+	fprintf(stderr, "\n");
 }
 
 #define FAIL(c, dti, node, ...)						\
