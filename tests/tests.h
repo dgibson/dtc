@@ -118,6 +118,16 @@ const void *check_getprop(void *fdt, int nodeoffset, const char *name,
 	})
 #define check_getprop_string(fdt, nodeoffset, name, s) \
 	check_getprop((fdt), (nodeoffset), (name), strlen(s)+1, (s))
+
+/* Returns non-NULL if the property at poffset has the name in_name */
+const void *check_get_prop_offset(void *fdt, int poffset, const char *in_name,
+				  int in_len, const void *in_val);
+#define check_get_prop_offset_cell(fdt, poffset, name, val) \
+	({ \
+		fdt32_t x = cpu_to_fdt32(val);			     \
+		check_get_prop_offset(fdt, poffset, name, sizeof(x), &x); \
+	})
+
 int nodename_eq(const char *s1, const char *s2);
 void vg_prepare_blob(void *fdt, size_t bufsize);
 void *load_blob(const char *filename);

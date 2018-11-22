@@ -28,6 +28,7 @@ tmp.*
 /get_path
 /get_phandle
 /getprop
+/get_prop_offset
 /incbin
 /integer-expressions
 /fs_tree1
