@@ -1,6 +1,7 @@
 *.dtb
 *.dts.test.s
 *.test.dts
+*.test.dt.yaml
 tmp.*
 /fs/
 /add_subnode_with_nops

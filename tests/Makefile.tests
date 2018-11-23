@@ -47,8 +47,9 @@ TESTS_TARGETS = $(TESTS) $(TESTS_TREES)
 TESTS_DEPFILES = $(TESTS:%=%.d) \
 	$(addprefix $(TESTS_PREFIX),testutils.d trees.d dumptrees.d)
 
-TESTS_CLEANFILES_L =  *.output vglog.* vgcore.* *.dtb *.test.dts *.dtsv1 tmp.*
-TESTS_CLEANFILES_L += dumptrees
+TESTS_CLEANFILES_L = $(STD_CLEANFILES) \
+	*.dtb *.test.dts *.test.dt.yaml *.dtsv1 tmp.* \
+	dumptrees
 TESTS_CLEANFILES = $(TESTS) $(TESTS_CLEANFILES_L:%=$(TESTS_PREFIX)%)
 TESTS_CLEANDIRS_L = fs
 TESTS_CLEANDIRS = $(TESTS_CLEANDIRS_L:%=$(TESTS_PREFIX)%)
@@ -76,7 +77,6 @@ $(TESTS_TREES): $(TESTS_PREFIX)dumptrees
 
 tests_clean:
 	@$(VECHO) CLEAN "(tests)"
-	rm -f $(STD_CLEANFILES:%=$(TESTS_PREFIX)%)
 	rm -f $(TESTS_CLEANFILES)
 	rm -rf $(TESTS_CLEANDIRS)
 
@@ -97,4 +97,3 @@ checkv:	tests ${TESTS_BIN} $(TESTS_PYLIBFDT)
 ifneq ($(DEPTARGETS),)
 -include $(TESTS_DEPFILES)
 endif
-
