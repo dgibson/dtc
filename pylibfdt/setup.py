@@ -21,21 +21,22 @@ def get_version():
     m = re.match(VERSION_PATTERN, f.readline())
     return m.group(1)
 
+
 setupdir = os.path.dirname(os.path.abspath(sys.argv[0]))
 os.chdir(setupdir)
 
 libfdt_module = Extension(
     '_libfdt',
-    sources = ['libfdt.i'],
-    include_dirs = ['../libfdt'],
-    libraries = ['fdt'],
-    library_dirs = ['../libfdt'],
-    swig_opts = ['-I../libfdt'],
+    sources=['libfdt.i'],
+    include_dirs=['../libfdt'],
+    libraries=['fdt'],
+    library_dirs=['../libfdt'],
+    swig_opts=['-I../libfdt'],
 )
 
 setup(
     name='libfdt',
-    version= get_version(),
+    version=get_version(),
     author='Simon Glass <sjg@chromium.org>',
     description='Python binding for libfdt',
     ext_modules=[libfdt_module],
