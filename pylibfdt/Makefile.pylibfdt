@@ -3,6 +3,10 @@
 
 PYLIBFDT_srcs = $(PYLIBFDT_srcdir)/libfdt.i
 PYMODULE = $(PYLIBFDT_objdir)/_libfdt.so
+PYLIBFDT_CLEANFILES_L = libfdt_wrap.c libfdt.py *.pyc *.so
+PYLIBFDT_CLEANFILES = $(PYLIBFDT_CLEANFILES_L:%=$(PYLIBFDT_objdir)/%)
+PYLIBFDT_CLEANDIRS_L = build __pycache__
+PYLIBFDT_CLEANDIRS = $(PYLIBFDT_CLEANDIRS_L:%=$(PYLIBFDT_objdir)/%)
 
 SETUP = $(PYLIBFDT_srcdir)/setup.py
 SETUPFLAGS =
@@ -19,4 +23,7 @@ install_pylibfdt: $(PYMODULE)
 	@$(VECHO) INSTALL-PYLIB
 	$(PYTHON) $(SETUP) $(SETUPFLAGS) install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
 
-PYLIBFDT_cleanfiles = libfdt_wrap.c libfdt.py libfdt.pyc _libfdt.so
+pylibfdt_clean:
+	@$(VECHO) CLEAN "(pylibfdt)"
+	rm -f $(PYLIBFDT_CLEANFILES)
+	rm -rf $(PYLIBFDT_CLEANDIRS)

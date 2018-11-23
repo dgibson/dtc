@@ -271,10 +271,6 @@ include $(PYLIBFDT_srcdir)/Makefile.pylibfdt
 .PHONY: pylibfdt
 pylibfdt: $(PYLIBFDT_objdir)/_libfdt.so
 
-pylibfdt_clean:
-	@$(VECHO) CLEAN "(pylibfdt)"
-	rm -f $(addprefix $(PYLIBFDT_objdir)/,$(PYLIBFDT_cleanfiles))
-
 #
 # Release signing and uploading
 # This is for maintainer convenience, don't try this at home.
