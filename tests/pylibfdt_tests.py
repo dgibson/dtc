@@ -69,7 +69,7 @@ TEST_ADDR_2H = 0
 TEST_ADDR_2L = 123456789
 TEST_ADDR_2 = (TEST_ADDR_2H << 32) | TEST_ADDR_2L
 TEST_SIZE_2H = 0
-TEST_SIZE_2L = 010000
+TEST_SIZE_2L = 0o10000
 TEST_SIZE_2 = (TEST_SIZE_2H << 32) | TEST_SIZE_2L
 
 TEST_VALUE_1 = 0xdeadbeef
@@ -422,7 +422,7 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEquals(2, self.fdt.num_mem_rsv())
         self.assertEquals([ 0xdeadbeef00000000, 0x100000],
                           self.fdt.get_mem_rsv(0))
-        self.assertEquals([123456789, 010000], self.fdt.get_mem_rsv(1))
+        self.assertEquals([123456789, 0o10000], self.fdt.get_mem_rsv(1))
 
     def testEmpty(self):
         """Test that we can create an empty tree"""
