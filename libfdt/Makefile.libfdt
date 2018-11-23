@@ -12,4 +12,4 @@ LIBFDT_OBJS = $(LIBFDT_SRCS:%.c=%.o)
 
 libfdt_clean:
 	@$(VECHO) CLEAN "(libfdt)"
-	rm -f $(STD_CLEANFILES:%=$(LIBFDT_objdir)/%)
+	rm -f $(STD_CLEANFILES:%=$(LIBFDT_dir)/%)

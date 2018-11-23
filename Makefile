@@ -182,23 +182,22 @@ endif
 #
 # Rules for libfdt
 #
-LIBFDT_objdir = libfdt
-LIBFDT_srcdir = libfdt
-LIBFDT_archive = $(LIBFDT_objdir)/libfdt.a
-LIBFDT_lib = $(LIBFDT_objdir)/libfdt-$(DTC_VERSION).$(SHAREDLIB_EXT)
-LIBFDT_include = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_INCLUDES))
-LIBFDT_version = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_VERSION))
+LIBFDT_dir = libfdt
+LIBFDT_archive = $(LIBFDT_dir)/libfdt.a
+LIBFDT_lib = $(LIBFDT_dir)/libfdt-$(DTC_VERSION).$(SHAREDLIB_EXT)
+LIBFDT_include = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_INCLUDES))
+LIBFDT_version = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_VERSION))
 
-include $(LIBFDT_srcdir)/Makefile.libfdt
+include $(LIBFDT_dir)/Makefile.libfdt
 
 .PHONY: libfdt
 libfdt: $(LIBFDT_archive) $(LIBFDT_lib)
 
-$(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
-$(LIBFDT_lib): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
+$(LIBFDT_archive): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
+$(LIBFDT_lib): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
 
 ifneq ($(DEPTARGETS),)
--include $(LIBFDT_OBJS:%.o=$(LIBFDT_objdir)/%.d)
+-include $(LIBFDT_OBJS:%.o=$(LIBFDT_dir)/%.d)
 endif
 
 # This stops make from generating the lex and bison output during
@@ -263,13 +262,12 @@ dist:
 #
 # Rules for pylibfdt
 #
-PYLIBFDT_srcdir = pylibfdt
-PYLIBFDT_objdir = pylibfdt
+PYLIBFDT_dir = pylibfdt
 
-include $(PYLIBFDT_srcdir)/Makefile.pylibfdt
+include $(PYLIBFDT_dir)/Makefile.pylibfdt
 
 .PHONY: pylibfdt
-pylibfdt: $(PYLIBFDT_objdir)/_libfdt.so
+pylibfdt: $(PYLIBFDT_dir)/_libfdt.so
 
 #
 # Release signing and uploading
