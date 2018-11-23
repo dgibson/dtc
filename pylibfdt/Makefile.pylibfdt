@@ -21,7 +21,7 @@ $(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP) $(VERSION_FILE)
 
 install_pylibfdt: $(PYMODULE)
 	@$(VECHO) INSTALL-PYLIB
-	$(PYTHON) $(SETUP) $(SETUPFLAGS) install $(if $(SETUP_PREFIX),--prefix=$(SETUP_PREFIX))
+	$(PYTHON) $(SETUP) $(SETUPFLAGS) install --prefix=$(PREFIX)
 
 pylibfdt_clean:
 	@$(VECHO) CLEAN "(pylibfdt)"
