@@ -197,11 +197,6 @@ libfdt: $(LIBFDT_archive) $(LIBFDT_lib)
 $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
 $(LIBFDT_lib): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
 
-libfdt_clean:
-	@$(VECHO) CLEAN "(libfdt)"
-	rm -f $(addprefix $(LIBFDT_objdir)/,$(STD_CLEANFILES))
-	rm -f $(LIBFDT_objdir)/*.so
-
 ifneq ($(DEPTARGETS),)
 -include $(LIBFDT_OBJS:%.o=$(LIBFDT_objdir)/%.d)
 endif
