@@ -19,6 +19,7 @@
  */
 
 #include "dtc.h"
+#include "srcpos.h"
 
 #ifdef TRACE_CHECKS
 #define TRACE(c, ...) \
@@ -79,13 +80,30 @@ static inline void  PRINTF(5, 6) check_msg(struct check *c, struct dt_info *dti,
 {
 	va_list ap;
 	char *str = NULL;
+	struct srcpos *pos = NULL;
+	char *file_str;
 
 	if (!(c->warn && (quiet < 1)) && !(c->error && (quiet < 2)))
 		return;
 
-	xasprintf(&str, "%s: %s (%s): ",
-		strcmp(dti->outname, "-") ? dti->outname : "<stdout>",
-		(c->error) ? "ERROR" : "Warning", c->name);
+	if (prop && prop->srcpos)
+		pos = prop->srcpos;
+	else if (node && node->srcpos)
+		pos = node->srcpos;
+
+	if (pos) {
+		file_str = srcpos_string(pos);
+		xasprintf(&str, "%s", file_str);
+		free(file_str);
+	} else if (streq(dti->outname, "-")) {
+		xasprintf(&str, "<stdout>");
+	} else {
+		xasprintf(&str, "%s", dti->outname);
+	}
+
+	xasprintf_append(&str, ": %s (%s): ",
+			(c->error) ? "ERROR" : "Warning", c->name);
+
 	if (node) {
 		if (prop)
 			xasprintf_append(&str, "%s:%s: ", node->fullpath, prop->name);
@@ -98,6 +116,17 @@ static inline void  PRINTF(5, 6) check_msg(struct check *c, struct dt_info *dti,
 	va_end(ap);
 
 	xasprintf_append(&str, "\n");
+
+	if (!prop && pos) {
+		pos = node->srcpos;
+		while (pos->next) {
+			pos = pos->next;
+
+			file_str = srcpos_string(pos);
+			str += xasprintf_append(&str, "  also defined at %s\n", file_str);
+			free(file_str);
+		}
+	}
 
 	fputs(str, stderr);
 }
