@@ -123,7 +123,7 @@ static inline void  PRINTF(5, 6) check_msg(struct check *c, struct dt_info *dti,
 			pos = pos->next;
 
 			file_str = srcpos_string(pos);
-			str += xasprintf_append(&str, "  also defined at %s\n", file_str);
+			xasprintf_append(&str, "  also defined at %s\n", file_str);
 			free(file_str);
 		}
 	}
