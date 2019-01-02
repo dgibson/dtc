@@ -100,7 +100,7 @@ static void dump_blob(void *blob, bool debug)
 	p = p_struct;
 	while ((tag = fdt32_to_cpu(GET_CELL(p))) != FDT_END) {
 
-		dumpf("%04tx: tag: 0x%08"PRIx32" (%s)\n",
+		dumpf("%04"PRIxPTR": tag: 0x%08"PRIx32" (%s)\n",
 		        (uintptr_t)p - blob_off - 4, tag, tagname(tag));
 
 		if (tag == FDT_BEGIN_NODE) {
@@ -140,8 +140,8 @@ static void dump_blob(void *blob, bool debug)
 
 		p = PALIGN(p + sz, 4);
 
-		dumpf("%04tx: string: %s\n", (uintptr_t)s - blob_off, s);
-		dumpf("%04tx: value\n", (uintptr_t)t - blob_off);
+		dumpf("%04"PRIxPTR": string: %s\n", (uintptr_t)s - blob_off, s);
+		dumpf("%04"PRIxPTR": value\n", (uintptr_t)t - blob_off);
 		printf("%*s%s", depth * shift, "", s);
 		utilfdt_print_data(t, sz);
 		printf(";\n");
