@@ -940,7 +940,7 @@ pylibfdt_tests () {
     # and the summary line for total tests (e.g. 'Ran 17 tests in 0.002s').
     # We could add pass + fail to get total tests, but this provides a useful
     # sanity check.
-    pass_count=$(grep "\.\.\. ok$" $TMP | wc -l)
+    pass_count=$(grep "ok$" $TMP | wc -l)
     fail_count=$(grep "^ERROR: " $TMP | wc -l)
     total_tests=$(sed -n 's/^Ran \([0-9]*\) tests.*$/\1/p' $TMP)
     cat $TMP
