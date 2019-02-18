@@ -82,6 +82,8 @@ TEST_VALUE64_1 = (TEST_VALUE64_1H << 32) | TEST_VALUE64_1L
 PHANDLE_1 = 0x2000
 PHANDLE_2 = 0x2001
 
+TEST_BYTES_1 = b'hello world'
+
 TEST_STRING_1 = 'hello world'
 TEST_STRING_2 = 'hi world'
 TEST_STRING_3 = u'unicode \u01d3'
@@ -443,21 +445,21 @@ class PyLibfdtBasicTests(unittest.TestCase):
     def testSetProp(self):
         """Test that we can update and create properties"""
         node = self.fdt.path_offset('/subnode@1')
-        self.fdt.setprop(node, 'compatible', TEST_STRING_1)
-        self.assertEquals(TEST_STRING_1, self.fdt.getprop(node, 'compatible'))
+        self.fdt.setprop(node, 'compatible', TEST_BYTES_1)
+        self.assertEquals(TEST_BYTES_1, self.fdt.getprop(node, 'compatible'))
 
         # Check that this property is missing, and that we don't have space to
         # add it
         self.assertEquals(-libfdt.NOTFOUND,
                           self.fdt.getprop(node, 'missing', QUIET_NOTFOUND))
         self.assertEquals(-libfdt.NOSPACE,
-                          self.fdt.setprop(node, 'missing', TEST_STRING_1,
+                          self.fdt.setprop(node, 'missing', TEST_BYTES_1,
                                            quiet=(libfdt.NOSPACE,)))
 
         # Expand the device tree so we now have room
         self.fdt.resize(self.fdt.totalsize() + 50)
-        self.fdt.setprop(node, 'missing', TEST_STRING_1)
-        self.assertEquals(TEST_STRING_1, self.fdt.getprop(node, 'missing'))
+        self.fdt.setprop(node, 'missing', TEST_BYTES_1)
+        self.assertEquals(TEST_BYTES_1, self.fdt.getprop(node, 'missing'))
 
     def testSetPropU32(self):
         """Test that we can update and create integer properties"""

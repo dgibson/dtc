@@ -1084,6 +1084,10 @@ typedef uint32_t fdt32_t;
 /* typemap used for fdt_setprop() */
 %typemap(in) (const void *val) {
     %#if PY_VERSION_HEX >= 0x03000000
+        if (!PyBytes_Check($input)) {
+            SWIG_exception_fail(SWIG_TypeError, "bytes expected in method '" "$symname"
+                "', argument " "$argnum"" of type '" "$type""'");
+        }
         $1 = PyBytes_AsString($input);
     %#else
         $1 = PyString_AsString($input);   /* char *str */
