@@ -137,7 +137,7 @@ def check_err(val, quiet=()):
     Raises
         FdtException if val < 0
     """
-    if val < 0:
+    if isinstance(val, int) and val < 0:
         if -val not in quiet:
             raise FdtException(val)
     return val
