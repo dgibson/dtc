@@ -973,7 +973,7 @@ if [ -z "$TESTSETS" ]; then
     TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump fdtoverlay"
 
     # Test pylibfdt if the libfdt Python module is available.
-    if [ -f ../pylibfdt/_libfdt.so ]; then
+    if [ -f ../pylibfdt/_libfdt.so ] || [ -f ../pylibfdt/_libfdt.cpython-3*.so ]; then
         TESTSETS="$TESTSETS pylibfdt"
     fi
 fi
