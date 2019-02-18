@@ -669,7 +669,7 @@ class Fdt(FdtRo):
         Raises:
             FdtException if no parent found or other error occurs
         """
-        val = val.encode('utf-8') + '\0'
+        val = val.encode('utf-8') + b'\0'
         return check_err(fdt_setprop(self._fdt, nodeoffset, prop_name,
                                      val, len(val)), quiet)
 
@@ -1074,12 +1074,20 @@ typedef uint32_t fdt32_t;
 	if (!$1)
 		$result = Py_None;
 	else
-		$result = Py_BuildValue("s#", $1, *arg4);
+        %#if PY_VERSION_HEX >= 0x03000000
+            $result = Py_BuildValue("y#", $1, *arg4);
+        %#else
+            $result = Py_BuildValue("s#", $1, *arg4);
+        %#endif
 }
 
 /* typemap used for fdt_setprop() */
 %typemap(in) (const void *val) {
-    $1 = PyString_AsString($input);   /* char *str */
+    %#if PY_VERSION_HEX >= 0x03000000
+        $1 = PyBytes_AsString($input);
+    %#else
+        $1 = PyString_AsString($input);   /* char *str */
+    %#endif
 }
 
 /* typemaps used for fdt_next_node() */
