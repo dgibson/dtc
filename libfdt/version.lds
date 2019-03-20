@@ -66,6 +66,7 @@ LIBFDT_1.2 {
 		fdt_resize;
 		fdt_overlay_apply;
 		fdt_get_string;
+		fdt_generate_phandle;
 	local:
 		*;
 };
