@@ -76,8 +76,8 @@ static void check_rref(const void *fdt)
 int main(int argc, char *argv[])
 {
 	void *fdt;
-	int n1, n2, n3, n4, n5, n6, err;
-	uint32_t h1, h2, h4, h5, h6, hn;
+	int n1, n2, n3, n4, n5;
+	uint32_t h1, h2, h4, h5;
 
 	test_init(argc, argv);
 	fdt = load_blob_arg(argc, argv);
@@ -97,15 +97,11 @@ int main(int argc, char *argv[])
 	n5 = fdt_path_offset(fdt, "/node5");
 	if (n5 < 0)
 		FAIL("fdt_path_offset(/node5): %s", fdt_strerror(n5));
-	n6 = fdt_path_offset(fdt, "/node6");
-	if (n6 < 0)
-		FAIL("fdt_path_offset(/node6): %s", fdt_strerror(n6));
 
 	h1 = fdt_get_phandle(fdt, n1);
 	h2 = fdt_get_phandle(fdt, n2);
 	h4 = fdt_get_phandle(fdt, n4);
 	h5 = fdt_get_phandle(fdt, n5);
-	h6 = fdt_get_phandle(fdt, n6);
 
 	if (h1 != 0x2000)
 		FAIL("/node1 has wrong phandle, 0x%x instead of 0x%x",
@@ -113,9 +109,6 @@ int main(int argc, char *argv[])
 	if (h2 != 0x1)
 		FAIL("/node2 has wrong phandle, 0x%x instead of 0x%x",
 		     h2, 0x1);
-	if (h6 != FDT_MAX_PHANDLE)
-		FAIL("/node6 has wrong phandle, 0x%x instead of 0x%x",
-		     h6, FDT_MAX_PHANDLE);
 	if ((h4 == 0x2000) || (h4 == 0x1) || (h4 == 0))
 		FAIL("/node4 has bad phandle, 0x%x", h4);
 
@@ -123,14 +116,6 @@ int main(int argc, char *argv[])
 		FAIL("/node5 has bad phandle, 0x%x", h5);
 	if ((h5 == h4) || (h5 == h2) || (h5 == h1))
 		FAIL("/node5 has duplicate phandle, 0x%x", h5);
-
-	/*
-	 * /node6 has phandle FDT_MAX_PHANDLE, so fdt_generate_phandle() is
-	 * expected to fail.
-	 */
-	err = fdt_generate_phandle(fdt, &hn);
-	if (err != -FDT_ERR_NOPHANDLES)
-		FAIL("generated invalid phandle 0x%x\n", hn);
 
 	check_ref(fdt, n1, h2);
 	check_ref(fdt, n2, h1);
