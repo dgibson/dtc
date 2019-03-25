@@ -66,6 +66,10 @@ LIBFDT_1.2 {
 		fdt_resize;
 		fdt_overlay_apply;
 		fdt_get_string;
+		fdt_get_max_phandle;
+		fdt_check_full;
+		fdt_setprop_placeholder;
+		fdt_property_placeholder;
 	local:
 		*;
 };
