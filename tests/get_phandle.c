@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 {
 	uint32_t max;
 	void *fdt;
+	int err;
 
 	test_init(argc, argv);
 	fdt = load_blob_arg(argc, argv);
@@ -53,6 +54,14 @@ int main(int argc, char *argv[])
 	check_phandle(fdt, "/", 0);
 	check_phandle(fdt, "/subnode@2", PHANDLE_1);
 	check_phandle(fdt, "/subnode@2/subsubnode@0", PHANDLE_2);
+
+	err = fdt_find_max_phandle(fdt, &max);
+	if (err < 0)
+		FAIL("fdt_find_max_phandle returned %d instead of 0\n", err);
+
+	if (max != PHANDLE_2)
+		FAIL("fdt_find_max_phandle found 0x%x instead of 0x%x", max,
+		     PHANDLE_2);
 
 	max = fdt_get_max_phandle(fdt);
 	if (max != PHANDLE_2)
