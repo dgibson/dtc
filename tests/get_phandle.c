@@ -17,6 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,9 +43,30 @@ static void check_phandle(void *fdt, const char *path, uint32_t checkhandle)
 		     path, phandle, checkhandle);
 }
 
+static void check_phandle_unique(const void *fdt, uint32_t checkhandle)
+{
+	uint32_t phandle;
+	int offset = -1;
+
+	while (true) {
+		offset = fdt_next_node(fdt, offset, NULL);
+		if (offset < 0) {
+			if (offset == -FDT_ERR_NOTFOUND)
+				break;
+
+			FAIL("error looking for phandle %#x", checkhandle);
+		}
+
+		phandle = fdt_get_phandle(fdt, offset);
+
+		if (phandle == checkhandle)
+			FAIL("generated phandle already exists");
+	}
+}
+
 int main(int argc, char *argv[])
 {
-	uint32_t max;
+	uint32_t max, phandle;
 	void *fdt;
 	int err;
 
@@ -67,6 +89,12 @@ int main(int argc, char *argv[])
 	if (max != PHANDLE_2)
 		FAIL("fdt_get_max_phandle returned 0x%x instead of 0x%x\n",
 		     max, PHANDLE_2);
+
+	err = fdt_generate_phandle(fdt, &phandle);
+	if (err < 0)
+		FAIL("failed to generate phandle: %d", err);
+
+	check_phandle_unique(fdt, phandle);
 
 	PASS();
 }
