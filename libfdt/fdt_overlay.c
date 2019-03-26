@@ -863,11 +863,15 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 
 int fdt_overlay_apply(void *fdt, void *fdto)
 {
-	uint32_t delta = fdt_get_max_phandle(fdt);
+	uint32_t delta;
 	int ret;
 
 	FDT_RO_PROBE(fdt);
 	FDT_RO_PROBE(fdto);
+
+	ret = fdt_find_max_phandle(fdt, &delta);
+	if (ret)
+		goto err;
 
 	ret = overlay_adjust_local_phandles(fdto, delta);
 	if (ret)
