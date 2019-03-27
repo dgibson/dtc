@@ -10,6 +10,7 @@ LIB_TESTS_L = get_mem_rsv \
 	notfound \
 	addr_size_cells \
 	addr_size_cells2 \
+	appendprop_addrrange \
 	stringlist \
 	setprop_inplace nop_property nop_node \
 	sw_tree1 sw_states \

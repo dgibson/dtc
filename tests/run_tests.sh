@@ -424,6 +424,11 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb -o property_iterate.dtb property_iterate.dts
     run_test property_iterate property_iterate.dtb
 
+    run_dtc_test -I dts -O dtb -o unit-addr-without-reg.dtb unit-addr-without-reg.dts
+    run_test appendprop_addrrange unit-addr-without-reg.dtb 1 1 1
+    run_test appendprop_addrrange unit-addr-without-reg.dtb 2 2 2
+    run_test appendprop_addrrange unit-addr-without-reg.dtb 2 1 3
+
     # Tests for behaviour on various sorts of corrupted trees
     run_test truncated_property
     run_test truncated_string

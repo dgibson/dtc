@@ -128,6 +128,9 @@ const void *check_get_prop_offset(void *fdt, int poffset, const char *in_name,
 		check_get_prop_offset(fdt, poffset, name, sizeof(x), &x); \
 	})
 
+const void *check_getprop_addrrange(void *fdt, int parent, int nodeoffset,
+				    const char *name, int num);
+
 int nodename_eq(const char *s1, const char *s2);
 void vg_prepare_blob(void *fdt, size_t bufsize);
 void *load_blob(const char *filename);

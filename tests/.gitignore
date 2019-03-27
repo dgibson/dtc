@@ -8,6 +8,7 @@ tmp.*
 /addr_size_cells
 /addr_size_cells2
 /appendprop[12]
+/appendprop_addrrange
 /asm_tree_dump
 /boot-cpuid
 /char_literal
