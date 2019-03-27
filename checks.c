@@ -660,6 +660,8 @@ ERROR(path_references, fixup_path_references, NULL, &duplicate_node_names);
 static void fixup_omit_unused_nodes(struct check *c, struct dt_info *dti,
 				    struct node *node)
 {
+	if (generate_symbols && node->labels)
+		return;
 	if (node->omit_if_unused && !node->is_referenced)
 		delete_node(node);
 }
