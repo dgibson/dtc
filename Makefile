@@ -24,7 +24,7 @@ BISON = bison
 LEX = flex
 SWIG = swig
 PKG_CONFIG ?= pkg-config
-PYTHON ?= python2
+PYTHON ?= python3
 
 INSTALL = /usr/bin/install
 INSTALL_PROGRAM = $(INSTALL)
