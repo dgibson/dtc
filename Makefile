@@ -184,7 +184,7 @@ endif
 #
 LIBFDT_dir = libfdt
 LIBFDT_archive = $(LIBFDT_dir)/libfdt.a
-LIBFDT_lib = $(LIBFDT_dir)/libfdt-$(DTC_VERSION).$(SHAREDLIB_EXT)
+LIBFDT_lib = $(LIBFDT_dir)/$(LIBFDT_LIB)
 LIBFDT_include = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_INCLUDES))
 LIBFDT_version = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_VERSION))
 
@@ -199,6 +199,7 @@ $(LIBFDT_lib): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS)) $(LIBFDT_version)
 	@$(VECHO) LD $@
 	$(CC) $(LDFLAGS) $(SHAREDLIB_LDFLAGS)$(LIBFDT_soname) -o $(LIBFDT_lib) \
 		$(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
+	ln -s $(LIBFDT_LIB) $(LIBFDT_dir)/$(LIBFDT_soname)
 
 ifneq ($(DEPTARGETS),)
 -include $(LIBFDT_OBJS:%.o=$(LIBFDT_dir)/%.d)
@@ -250,11 +251,11 @@ convert-dtsv0: $(CONVERT_OBJS)
 
 fdtdump:	$(FDTDUMP_OBJS)
 
-fdtget:	$(FDTGET_OBJS) $(LIBFDT_archive)
+fdtget:	$(FDTGET_OBJS) $(LIBFDT_lib)
 
-fdtput:	$(FDTPUT_OBJS) $(LIBFDT_archive)
+fdtput:	$(FDTPUT_OBJS) $(LIBFDT_lib)
 
-fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_archive)
+fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_lib)
 
 dist:
 	git archive --format=tar --prefix=dtc-$(dtc_version)/ HEAD \

@@ -18,6 +18,9 @@ if [ -z "$STATSZ" ]; then
 	fi
 fi
 
+# Help things find the libfdt shared object
+export LD_LIBRARY_PATH=../libfdt
+
 export QUIET_TEST=1
 STOP_ON_FAIL=0
 
