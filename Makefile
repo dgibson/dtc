@@ -194,7 +194,11 @@ include $(LIBFDT_dir)/Makefile.libfdt
 libfdt: $(LIBFDT_archive) $(LIBFDT_lib)
 
 $(LIBFDT_archive): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
-$(LIBFDT_lib): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
+
+$(LIBFDT_lib): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS)) $(LIBFDT_version)
+	@$(VECHO) LD $@
+	$(CC) $(LDFLAGS) $(SHAREDLIB_LDFLAGS)$(LIBFDT_soname) -o $(LIBFDT_lib) \
+		$(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
 
 ifneq ($(DEPTARGETS),)
 -include $(LIBFDT_OBJS:%.o=$(LIBFDT_dir)/%.d)
@@ -355,10 +359,6 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 %.a:
 	@$(VECHO) AR $@
 	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBFDT_lib):
-	@$(VECHO) LD $@
-	$(CC) $(LDFLAGS) $(SHAREDLIB_LDFLAGS)$(LIBFDT_soname) -o $(LIBFDT_lib) $^
 
 %.lex.c: %.l
 	@$(VECHO) LEX $@
