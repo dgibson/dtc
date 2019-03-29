@@ -67,7 +67,6 @@ LIBFDT_1.2 {
 		fdt_overlay_apply;
 		fdt_get_string;
 		fdt_find_max_phandle;
-		fdt_get_max_phandle;
 		fdt_generate_phandle;
 		fdt_check_full;
 		fdt_setprop_placeholder;
