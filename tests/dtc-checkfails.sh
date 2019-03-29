@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. ./tests.sh
+. ./testutils.sh
 
 for x; do
     shift

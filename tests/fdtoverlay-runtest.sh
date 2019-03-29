@@ -6,7 +6,7 @@
 # Usage
 #    fdtoverlay-runtest.sh name expected_output dtb_file node property flags value
 
-. ./tests.sh
+. ./testutils.sh
 
 LOG=tmp.log.$$
 EXPECT=tmp.expect.$$

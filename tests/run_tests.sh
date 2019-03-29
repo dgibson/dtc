@@ -1,6 +1,6 @@
 #! /bin/sh
 
-. ./tests.sh
+. ./testutils.sh
 
 if [ -z "$CC" ]; then
     CC=gcc
