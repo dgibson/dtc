@@ -421,6 +421,8 @@ libfdt_tests () {
 	tree1_tests_rw noppy.$basetree
     done
 
+    run_test rw_oom
+
     run_dtc_test -I dts -O dtb -o subnode_iterate.dtb subnode_iterate.dts
     run_test subnode_iterate subnode_iterate.dtb
 

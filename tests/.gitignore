@@ -56,6 +56,7 @@ tmp.*
 /references
 /root_node
 /rw_tree1
+/rw_oom
 /set_name
 /setprop
 /setprop_inplace

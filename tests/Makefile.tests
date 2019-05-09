@@ -15,7 +15,7 @@ LIB_TESTS_L = get_mem_rsv \
 	setprop_inplace nop_property nop_node \
 	sw_tree1 sw_states \
 	move_and_save mangle-layout nopulate \
-	open_pack rw_tree1 set_name setprop del_property del_node \
+	open_pack rw_tree1 rw_oom set_name setprop del_property del_node \
 	appendprop1 appendprop2 propname_escapes \
 	string_escapes references path-references phandle_format \
 	boot-cpuid incbin \
