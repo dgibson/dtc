@@ -74,6 +74,7 @@ LIBFDT_1.2 {
 		fdt_header_size_;
 		fdt_appendprop_addrrange;
 		fdt_setprop_inplace_namelen_partial;
+		fdt_create_with_flags;
 	local:
 		*;
 };
