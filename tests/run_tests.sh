@@ -354,19 +354,21 @@ libfdt_tests () {
     run_dtc_test -I dts -O dtb -o stringlist.test.dtb stringlist.dts
     run_test stringlist stringlist.test.dtb
 
-    # Sequential write tests
-    run_test sw_tree1
-    tree1_tests sw_tree1.test.dtb
-    tree1_tests unfinished_tree1.test.dtb
-    run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
-    run_test sw_states
+    for flags in default no_name_dedup; do
+        # Sequential write tests
+        run_test sw_tree1 fixed $flags
+        tree1_tests sw_tree1.test.dtb
+        tree1_tests unfinished_tree1.test.dtb
+        run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
+        run_test sw_states
 
-    # Resizing tests
-    for mode in resize realloc newalloc; do
-	run_test sw_tree1 $mode
-	tree1_tests sw_tree1.test.dtb
-	tree1_tests unfinished_tree1.test.dtb
-	run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
+        # Resizing tests
+        for mode in resize realloc newalloc; do
+            run_test sw_tree1 $mode $flags
+            tree1_tests sw_tree1.test.dtb
+            tree1_tests unfinished_tree1.test.dtb
+            run_test dtbs_equal_ordered test_tree1.dtb sw_tree1.test.dtb
+        done
     done
 
     # fdt_move tests
