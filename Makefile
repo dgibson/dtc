@@ -199,7 +199,7 @@ $(LIBFDT_lib): $(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS)) $(LIBFDT_version)
 	@$(VECHO) LD $@
 	$(CC) $(LDFLAGS) $(SHAREDLIB_LDFLAGS)$(LIBFDT_soname) -o $(LIBFDT_lib) \
 		$(addprefix $(LIBFDT_dir)/,$(LIBFDT_OBJS))
-	ln -s $(LIBFDT_LIB) $(LIBFDT_dir)/$(LIBFDT_soname)
+	ln -sf $(LIBFDT_LIB) $(LIBFDT_dir)/$(LIBFDT_soname)
 
 ifneq ($(DEPTARGETS),)
 -include $(LIBFDT_OBJS:%.o=$(LIBFDT_dir)/%.d)
