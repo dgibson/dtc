@@ -29,7 +29,7 @@
 #include "tests.h"
 #include "testdata.h"
 
-/* This is not derived programatically. May require adjustment to changes. */
+/* This is not derived programmatically. May require adjustment to changes. */
 #define SPACE	285
 
 #define CHECK(code) \

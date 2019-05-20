@@ -970,7 +970,7 @@ static void add_local_fixup_entry(struct dt_info *dti,
 	char **compp;
 	int i, depth;
 
-	/* walk back retreiving depth */
+	/* walk back retrieving depth */
 	depth = 0;
 	for (wn = node; wn; wn = wn->parent)
 		depth++;

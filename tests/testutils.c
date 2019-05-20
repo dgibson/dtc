@@ -112,7 +112,7 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 	prop = fdt_get_property(fdt, nodeoffset, name, &retlen);
 	verbose_printf("pointer %p\n", prop);
 	if (! prop)
-		FAIL("Error retreiving \"%s\" pointer: %s", name,
+		FAIL("Error retrieving \"%s\" pointer: %s", name,
 		     fdt_strerror(retlen));
 
 	tag = fdt32_to_cpu(prop->tag);

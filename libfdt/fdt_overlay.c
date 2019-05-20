@@ -93,11 +93,11 @@ static uint32_t overlay_get_target_phandle(const void *fdto, int fragment)
  * @pathp: pointer which receives the path of the target (or NULL)
  *
  * overlay_get_target() retrieves the target offset in the base
- * device tree of a fragment, no matter how the actual targetting is
+ * device tree of a fragment, no matter how the actual targeting is
  * done (through a phandle or a path)
  *
  * returns:
- *      the targetted node offset in the base device tree
+ *      the targeted node offset in the base device tree
  *      Negative error code on error
  */
 static int overlay_get_target(const void *fdt, const void *fdto,

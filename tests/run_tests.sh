@@ -287,7 +287,7 @@ dtc_overlay_tests () {
     run_dtc_test -I dts -O dtb -o overlay_overlay_decompile.test.dtb overlay_overlay_decompile.test.dts
     run_test dtbs_equal_ordered overlay_overlay.test.dtb overlay_overlay_decompile.test.dtb
 
-    # Test generation of aliases insted of symbols
+    # Test generation of aliases instead of symbols
     run_dtc_test -A -I dts -O dtb -o overlay_base_with_aliases.dtb overlay_base.dts
     run_test check_path overlay_base_with_aliases.dtb exists "/aliases"
     run_test check_path overlay_base_with_aliases.dtb not-exists "/__symbols__"
@@ -874,7 +874,7 @@ fdtput_tests () {
 	"-ts" "fine wine"
     run_wrap_test $DTPUT $dtb -p /you/are/drunk/sir/winston slurp -ts twice
 
-    # Test expansion of the blob when insufficent room for a new node
+    # Test expansion of the blob when insufficient room for a new node
     run_wrap_test $DTPUT $dtb -cp "$(cat $text $text)/longish"
 
     # Allowed to create an existing node with -p

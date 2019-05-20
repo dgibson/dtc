@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Run script for fdtput tests
-# We run fdtput to update the device tree, thn fdtget to check it
+# We run fdtput to update the device tree, then fdtget to check it
 
 # Usage
 #    fdtput-runtest.sh name expected_output dtb_file node property flags value

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Run script for fdtoverlay tests
-# We run fdtoverlay to generate a target device tree, thn fdtget to check it
+# We run fdtoverlay to generate a target device tree, then fdtget to check it
 
 # Usage
 #    fdtoverlay-runtest.sh name expected_output dtb_file node property flags value

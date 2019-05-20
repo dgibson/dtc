@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 		res = fdt_getprop(fdt, 0, "expressions", &reslen);
 
 		if (!res)
-			FAIL("Error retreiving expression results: %s\n",
+			FAIL("Error retrieving expression results: %s\n",
 		     fdt_strerror(reslen));
 
 		if (reslen != (ARRAY_SIZE(expr_table) * sizeof(uint32_t)))
