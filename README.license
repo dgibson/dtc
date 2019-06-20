@@ -8,7 +8,7 @@ dtc does not incorporate or rely on libfdt for its operation, nor vice
 versa.  It is important that these two pieces of software have
 different license conditions.
 
-As the copyright banners in each source file attest, dtc is licensed
+As SPDX license tags in each source file attest, dtc is licensed
 under the GNU GPL.  The full text of the GPL can be found in the file
 entitled 'GPL' which should be included in this package.  dtc code,
 therefore, may not be incorporated into works which do not have a GPL
@@ -16,10 +16,10 @@ compatible license.
 
 libfdt, however, is GPL/BSD dual-licensed.  That is, it may be used
 either under the terms of the GPL, or under the terms of the 2-clause
-BSD license (aka the ISC license).  The full terms of that license are
-given in the copyright banners of each of the libfdt source files.
-This is, in practice, equivalent to being BSD licensed, since the
-terms of the BSD license are strictly more permissive than the GPL.
+BSD license (aka the ISC license).  The full terms of that license can
+be found are in the file entitled 'BSD-2-Clause'. This is, in
+practice, equivalent to being BSD licensed, since the terms of the BSD
+license are strictly more permissive than the GPL.
 
 I made the decision to license libfdt in this way because I want to
 encourage widespread and correct usage of flattened device trees,
