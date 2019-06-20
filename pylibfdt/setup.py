@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
 
 """
 setup.py file for SWIG libfdt
