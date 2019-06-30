@@ -46,7 +46,7 @@ static int do_fdtoverlay(const char *input_filename,
 {
 	char *blob = NULL;
 	char **ovblob = NULL;
-	size_t blob_len, ov_len, total_len;
+	size_t blob_len, total_len;
 	int i, ret = -1;
 
 	blob = utilfdt_read(input_filename, &blob_len);
@@ -70,10 +70,18 @@ static int do_fdtoverlay(const char *input_filename,
 	/* read and keep track of the overlay blobs */
 	total_len = 0;
 	for (i = 0; i < argc; i++) {
+		size_t ov_len;
 		ovblob[i] = utilfdt_read(argv[i], &ov_len);
 		if (!ovblob[i]) {
 			fprintf(stderr, "\nFailed to read overlay %s\n",
 					argv[i]);
+			goto out_err;
+		}
+		if (fdt_totalsize(ovblob[i]) > ov_len) {
+			fprintf(stderr,
+"\nOverlay '%s' is incomplete (%lu / %" PRIu32 " bytes read)\n",
+				argv[i], (unsigned long)ov_len,
+				fdt_totalsize(ovblob[i]));
 			goto out_err;
 		}
 		total_len += ov_len;
