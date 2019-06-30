@@ -51,8 +51,7 @@ static int do_fdtoverlay(const char *input_filename,
 
 	blob = utilfdt_read(input_filename, &blob_len);
 	if (!blob) {
-		fprintf(stderr, "\nFailed to read base blob %s\n",
-				input_filename);
+		fprintf(stderr, "\nFailed to read '%s'\n", input_filename);
 		goto out_err;
 	}
 	if (fdt_totalsize(blob) > blob_len) {
@@ -73,8 +72,7 @@ static int do_fdtoverlay(const char *input_filename,
 		size_t ov_len;
 		ovblob[i] = utilfdt_read(argv[i], &ov_len);
 		if (!ovblob[i]) {
-			fprintf(stderr, "\nFailed to read overlay %s\n",
-					argv[i]);
+			fprintf(stderr, "\nFailed to read '%s'\n", argv[i]);
 			goto out_err;
 		}
 		if (fdt_totalsize(ovblob[i]) > ov_len) {
@@ -96,8 +94,8 @@ static int do_fdtoverlay(const char *input_filename,
 	for (i = 0; i < argc; i++) {
 		ret = fdt_overlay_apply(blob, ovblob[i]);
 		if (ret) {
-			fprintf(stderr, "\nFailed to apply %s (%d)\n",
-					argv[i], ret);
+			fprintf(stderr, "\nFailed to apply '%s': %s\n",
+				argv[i], fdt_strerror(ret));
 			goto out_err;
 		}
 	}
@@ -105,8 +103,8 @@ static int do_fdtoverlay(const char *input_filename,
 	fdt_pack(blob);
 	ret = utilfdt_write(output_filename, blob);
 	if (ret)
-		fprintf(stderr, "\nFailed to write output blob %s\n",
-				output_filename);
+		fprintf(stderr, "\nFailed to write '%s'\n",
+			output_filename);
 
 out_err:
 	if (ovblob) {
