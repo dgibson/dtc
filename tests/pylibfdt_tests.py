@@ -77,6 +77,7 @@ class PyLibfdtBasicTests(unittest.TestCase):
         """Read in the device tree we use for testing"""
         self.fdt = _ReadFdt('test_tree1.dtb')
         self.fdt2 = _ReadFdt('test_props.dtb')
+        self.fdt3 = _ReadFdt('aliases.dtb')
 
     def GetPropList(self, node_path):
         """Read a list of properties from a node
@@ -339,6 +340,12 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEquals(0, self.fdt.get_phandle(0))
         node2 = self.fdt.path_offset('/subnode@2')
         self.assertEquals(0x2000, self.fdt.get_phandle(node2))
+
+    def testGetAlias(self):
+        """Test for the get_alias() method"""
+        self.assertEquals("/subnode@1", self.fdt3.get_alias('s1'))
+        self.assertEquals("/subnode@1/subsubnode", self.fdt3.get_alias('ss1'))
+        self.assertEquals("/subnode@1/subsubnode/subsubsubnode", self.fdt3.get_alias('sss1'))
 
     def testParentOffset(self):
         """Test for the parent_offset() method"""

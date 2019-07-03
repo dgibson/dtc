@@ -431,6 +431,18 @@ class FdtRo(object):
         """
         return fdt_get_phandle(self._fdt, nodeoffset)
 
+    def get_alias(self, name):
+        """Get the full path referenced by a given alias
+
+        Args:
+            name: name of the alias to lookup
+
+        Returns:
+            Full path to the node for the alias named 'name', if it exists
+            None, if the given alias or the /aliases node does not exist
+        """
+        return fdt_get_alias(self._fdt, name)
+
     def parent_offset(self, nodeoffset, quiet=()):
         """Get the offset of a node's parent
 
