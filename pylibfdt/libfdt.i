@@ -727,8 +727,10 @@ class FdtSw(FdtRo):
 
     # First create the device tree with a node and property:
     sw = FdtSw()
-    with sw.add_node('node'):
-        sw.property_u32('reg', 2)
+    sw.finish_reservemap()
+    with sw.add_node(''):
+        with sw.add_node('node'):
+            sw.property_u32('reg', 2)
     fdt = sw.as_fdt()
 
     # Now we can use it as a real device tree
