@@ -738,8 +738,11 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 
 		/* get fragment name first */
 		s = strchr(path + 1, '/');
-		if (!s)
-			return -FDT_ERR_BADOVERLAY;
+		if (!s) {
+			/* Symbol refers to something that won't end
+			 * up in the target tree */
+			continue;
+		}
 
 		frag_name = path + 1;
 		frag_name_len = s - path - 1;
@@ -756,7 +759,9 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 			rel_path = "";
 			rel_path_len = 0;
 		} else {
-			return -FDT_ERR_BADOVERLAY;
+			/* Symbol refers to something that won't end
+			 * up in the target tree */
+			continue;
 		}
 
 		/* find the fragment index in which the symbol lies */
