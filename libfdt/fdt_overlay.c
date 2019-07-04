@@ -733,8 +733,6 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 		/* keep end marker to avoid strlen() */
 		e = path + path_len;
 
-		/* format: /<fragment-name>/__overlay__/<relative-subnode-path> */
-
 		if (*path != '/')
 			return -FDT_ERR_BADVALUE;
 
@@ -748,11 +746,18 @@ static int overlay_symbol_update(void *fdt, void *fdto)
 
 		/* verify format; safe since "s" lies in \0 terminated prop */
 		len = sizeof("/__overlay__/") - 1;
-		if ((e - s) < len || memcmp(s, "/__overlay__/", len))
+		if ((e - s) > len && (memcmp(s, "/__overlay__/", len) == 0)) {
+			/* /<fragment-name>/__overlay__/<relative-subnode-path> */
+			rel_path = s + len;
+			rel_path_len = e - rel_path;
+		} else if ((e - s) == len
+			   && (memcmp(s, "/__overlay__", len - 1) == 0)) {
+			/* /<fragment-name>/__overlay__ */
+			rel_path = "";
+			rel_path_len = 0;
+		} else {
 			return -FDT_ERR_BADOVERLAY;
-
-		rel_path = s + len;
-		rel_path_len = e - rel_path;
+		}
 
 		/* find the fragment index in which the symbol lies */
 		ret = fdt_subnode_offset_namelen(fdto, 0, frag_name,

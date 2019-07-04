@@ -949,6 +949,18 @@ fdtoverlay_tests() {
 
     # test that fdtoverlay manages to apply overlays with long target path
     run_fdtoverlay_test lpath "/test-node/sub-test-node/sub-test-node-with-very-long-target-path/test-0" "prop" "-ts" ${basedtb} ${target_long_pathdtb} ${overlay_long_pathdtb}
+
+    # test adding a label to the root of a fragment
+    stacked_base_nolabel=stacked_overlay_base_nolabel.dts
+    stacked_base_nolabeldtb=stacked_overlay_base_nolabel.test.dtb
+    stacked_addlabel=stacked_overlay_addlabel.dts
+    stacked_addlabeldtb=stacked_overlay_addlabel.test.dtb
+    stacked_addlabel_targetdtb=stacked_overlay_target_nolabel.fdtoverlay.test.dtb
+
+    run_dtc_test -@ -I dts -O dtb -o $stacked_base_nolabeldtb $stacked_base_nolabel
+    run_dtc_test -@ -I dts -O dtb -o $stacked_addlabeldtb $stacked_addlabel
+
+    run_fdtoverlay_test baz "/foonode/barnode/baznode" "baz-property" "-ts" ${stacked_base_nolabeldtb} ${stacked_addlabel_targetdtb} ${stacked_addlabeldtb} ${stacked_bardtb} ${stacked_bazdtb}
 }
 
 pylibfdt_tests () {
