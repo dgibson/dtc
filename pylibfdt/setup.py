@@ -1,5 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
+
+# While Python 3 is the default, it's also possible to invoke
+# this setup.py script with Python 2.
 
 """
 setup.py file for SWIG libfdt
