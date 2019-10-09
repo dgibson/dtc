@@ -64,7 +64,8 @@ def _ReadFdt(fname):
     Returns:
         Fdt bytearray suitable for passing to libfdt functions
     """
-    return libfdt.Fdt(open(fname, mode='rb').read())
+    with open(fname, mode='rb') as f:
+        return libfdt.Fdt(f.read())
 
 class PyLibfdtBasicTests(unittest.TestCase):
     """Test class for basic pylibfdt access functions
@@ -573,7 +574,8 @@ class PyLibfdtRoTests(unittest.TestCase):
 
     def setUp(self):
         """Read in the device tree we use for testing"""
-        self.fdt = libfdt.FdtRo(open('test_tree1.dtb', mode='rb').read())
+        with open('test_tree1.dtb', mode='rb') as f:
+            self.fdt = libfdt.FdtRo(f.read())
 
     def testAccess(self):
         """Basic sanity check for the FdtRo class"""
