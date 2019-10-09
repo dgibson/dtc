@@ -12,7 +12,7 @@
  */
 
 #ifdef __GNUC__
-#define PRINTF(i, j)	__attribute__((format (printf, i, j)))
+#define PRINTF(i, j)	__attribute__((format (gnu_printf, i, j)))
 #define NORETURN	__attribute__((noreturn))
 #else
 #define PRINTF(i, j)
