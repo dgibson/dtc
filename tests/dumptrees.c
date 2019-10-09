@@ -32,6 +32,16 @@ int main(int argc, char *argv[])
 {
 	int i;
 
+	if (argc != 2) {
+	    fprintf(stderr, "Missing output directory argument\n");
+	    return 1;
+	}
+
+	if (chdir(argv[1]) != 0) {
+	    perror("chdir()");
+	    return 1;
+	}
+
 	for (i = 0; i < NUM_TREES; i++) {
 		void *blob = trees[i].blob;
 		const char *filename = trees[i].filename;

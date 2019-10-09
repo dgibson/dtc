@@ -74,7 +74,7 @@ $(TESTS_PREFIX)dumptrees: $(TESTS_PREFIX)trees.o
 
 $(TESTS_TREES): $(TESTS_PREFIX)dumptrees
 	@$(VECHO) DUMPTREES
-	cd $(TESTS_PREFIX); ./dumptrees >/dev/null
+	cd $(TESTS_PREFIX); ./dumptrees . >/dev/null
 
 tests_clean:
 	@$(VECHO) CLEAN "(tests)"
