@@ -6,7 +6,8 @@
 # Usage
 #    fdtput-runtest.sh name expected_output dtb_file node property flags value
 
-. ./testutils.sh
+SRCDIR=`dirname "$0"`
+. "$SRCDIR/testutils.sh"
 
 LOG=tmp.log.$$
 EXPECT=tmp.expect.$$

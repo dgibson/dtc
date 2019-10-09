@@ -52,8 +52,11 @@ int main(int argc, char *argv[])
 
 	test_init(argc, argv);
 
-	incbin = load_file("incbin.bin", &len);
-	fdt = load_blob_arg(argc, argv);
+	if (argc != 3)
+		CONFIG("Usage: %s <incbin file> <dtb file>", argv[0]);
+
+	incbin = load_file(argv[1], &len);
+	fdt = load_blob(argv[2]);
 
 	check_getprop(fdt, 0, "incbin", len, incbin);
 	check_getprop(fdt, 0, "incbin-partial", 17, incbin + 13);
