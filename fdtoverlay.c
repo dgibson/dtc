@@ -110,7 +110,6 @@ static int do_fdtoverlay(const char *input_filename,
 			(unsigned long)buf_len, fdt_totalsize(blob));
 		goto out_err;
 	}
-	ret = 0;
 
 	/* allocate blob pointer array */
 	ovblob = xmalloc(sizeof(*ovblob) * argc);
