@@ -522,8 +522,9 @@ class PyLibfdtSwTests(unittest.TestCase):
         sw.property_string('compatible', 'subnode1')
         sw.property_u32('reg', 1)
         sw.property_cell('prop-int', TEST_VALUE_1)
+        sw.property('data', b'\x00data\x01')
         sw.begin_node('subsubnode')
-        sw.property('compatible', 'subsubnode1\0subsubnode')
+        sw.property('compatible', b'subsubnode1\0subsubnode')
         sw.property_cell('prop-int', TEST_VALUE_1)
         sw.end_node()
         sw.begin_node('ss1')
@@ -540,7 +541,7 @@ class PyLibfdtSwTests(unittest.TestCase):
                 with sw.add_node('subsubnode@0'):
                     sw.property_u32('reg', 0)
                     sw.property_cell('phandle', PHANDLE_2)
-                    sw.property('compatible', 'subsubnode2\0subsubnode')
+                    sw.property('compatible', b'subsubnode2\0subsubnode')
                     sw.property_cell('prop-int', TEST_VALUE_2)
                 with sw.add_node('ss2'):
                     pass
