@@ -368,6 +368,6 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 
 %.tab.c %.tab.h %.output: %.y
 	@$(VECHO) BISON $@
-	$(BISON) -d $<
+	$(BISON) -b $(basename $(basename $@)) -d $<
 
 FORCE:
