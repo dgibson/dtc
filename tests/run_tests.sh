@@ -944,6 +944,10 @@ fdtoverlay_tests() {
     # test that baz correctly inserted the property
     run_fdtoverlay_test baz "/foonode/barnode/baznode" "baz-property" "-ts" ${stacked_basedtb} ${stacked_targetdtb} ${stacked_bardtb} ${stacked_bazdtb}
 
+    # test that bar and baz are correctly appended to __symbols__
+    run_fdtoverlay_test "/foonode/barnode" "/__symbols__"  "bar" "-ts" ${stacked_basedtb} ${stacked_targetdtb} ${stacked_bardtb}
+    run_fdtoverlay_test "/foonode/barnode/baznode" "/__symbols__"  "baz" "-ts" ${stacked_basedtb} ${stacked_targetdtb} ${stacked_bardtb} ${stacked_bazdtb}
+
     overlay_long_path="$SRCDIR/overlay_overlay_long_path.dts"
     overlay_long_pathdtb=overlay_overlay_long_path.fdoverlay.test.dtb
     target_long_pathdtb=overlay_overlay_long_path_target.fdoverlay.test.dtb
