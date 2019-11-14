@@ -730,7 +730,7 @@ dtc_tests () {
 
     # Dependencies
     run_dtc_test -I dts -O dtb -o dependencies.test.dtb -d dependencies.test.d "$SRCDIR/dependencies.dts"
-    sed -i "s,$SRCDIR/,,g" dependencies.test.d
+    sed -i.bak "s,$SRCDIR/,,g" dependencies.test.d
     run_wrap_test cmp dependencies.test.d "$SRCDIR/dependencies.cmp"
 
     # Search paths
