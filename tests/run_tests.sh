@@ -4,7 +4,7 @@ SRCDIR=`dirname "$0"`
 . "$SRCDIR/testutils.sh"
 
 if [ -z "$CC" ]; then
-    CC=gcc
+    CC=cc
 fi
 
 # stat differs between platforms
