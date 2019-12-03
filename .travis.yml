@@ -31,3 +31,35 @@ matrix:
     - script:
         - make
         - make check
+
+    - arch: arm64
+      addons:
+        apt_packages:
+          - swig
+          - python-dev
+          - valgrind
+          - libyaml-0-2
+      script:
+        - make
+        - make check checkm
+
+    - arch: ppc64le
+      addons:
+        apt_packages:
+          - swig
+          - python-dev
+          - libyaml-0-2
+      script:
+        - make
+        - make check
+
+    - arch: s390x
+      addons:
+        apt_packages:
+          - swig
+          - python-dev
+          - valgrind
+          - libyaml-0-2
+      script:
+        - make
+        - make check checkm
