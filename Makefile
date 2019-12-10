@@ -344,7 +344,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 
 %.d: %.c
 	@$(VECHO) DEP $<
-	$(CC) $(CPPFLAGS) -MM -MG -MT "$*.o $@" $< > $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG -MT "$*.o $@" $< > $@
 
 %.d: %.S
 	@$(VECHO) DEP $<
