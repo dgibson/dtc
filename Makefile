@@ -43,7 +43,7 @@ HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 
 NO_VALGRIND := $(shell $(PKG_CONFIG) --exists valgrind; echo $$?)
 ifeq ($(NO_VALGRIND),1)
-	CFLAGS += -DNO_VALGRIND
+	CPPFLAGS += -DNO_VALGRIND
 else
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags valgrind)
 endif
