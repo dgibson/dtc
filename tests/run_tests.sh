@@ -664,6 +664,7 @@ dtc_tests () {
     check_tests "$SRCDIR/bad-reg-ranges.dts" reg_format ranges_format
     check_tests "$SRCDIR/bad-empty-ranges.dts" ranges_format
     check_tests "$SRCDIR/reg-ranges-root.dts" reg_format ranges_format
+    check_tests "$SRCDIR/bad-dma-ranges.dts" dma_ranges_format
     check_tests "$SRCDIR/default-addr-size.dts" avoid_default_addr_size
     check_tests "$SRCDIR/obsolete-chosen-interrupt-controller.dts" obsolete_chosen_interrupt_controller
     check_tests "$SRCDIR/reg-without-unit-addr.dts" unit_address_vs_reg
