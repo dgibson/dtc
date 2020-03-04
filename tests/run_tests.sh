@@ -7,6 +7,10 @@ if [ -z "$CC" ]; then
     CC=cc
 fi
 
+if [ -z "$PYTHON" ]; then
+    PYTHON=python3
+fi
+
 # stat differs between platforms
 if [ -z "$STATSZ" ]; then
 	stat --version 2>/dev/null | grep -q 'GNU'
