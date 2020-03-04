@@ -45,6 +45,8 @@ INCLUDEDIR = $(PREFIX)/include
 HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 	    sed -e 's/\(cygwin\|msys\).*/\1/')
 
+NO_PYTHON ?= 0
+
 NO_VALGRIND := $(shell $(PKG_CONFIG) --exists valgrind; echo $$?)
 ifeq ($(NO_VALGRIND),1)
 	CPPFLAGS += -DNO_VALGRIND
@@ -168,7 +170,7 @@ check_python_deps = \
 maybe_pylibfdt: FORCE
 	target=pylibfdt; $(check_python_deps)
 
-ifeq ($(NO_PYTHON),)
+ifeq ($(NO_PYTHON),0)
 all: maybe_pylibfdt
 endif
 
@@ -240,7 +242,7 @@ install: install-bin install-lib install-includes
 maybe_install_pylibfdt: FORCE
 	target=install_pylibfdt; $(check_python_deps)
 
-ifeq ($(NO_PYTHON),)
+ifeq ($(NO_PYTHON),0)
 install: maybe_install_pylibfdt
 endif
 
@@ -312,7 +314,7 @@ TESTS_BIN += fdtput
 TESTS_BIN += fdtget
 TESTS_BIN += fdtdump
 TESTS_BIN += fdtoverlay
-ifeq ($(NO_PYTHON),)
+ifeq ($(NO_PYTHON),0)
 TESTS_PYLIBFDT += maybe_pylibfdt
 endif
 
