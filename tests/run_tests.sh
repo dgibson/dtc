@@ -25,6 +25,20 @@ else
     fi
 fi
 
+if [ -n "$NO_YAML" ]; then
+    if [ "$NO_YAML" != "0" ]; then
+        no_yaml=true
+    else
+        no_yaml=false
+    fi
+else
+    if pkg-config --exists yaml-0.1; then
+        no_yaml=false
+    else
+        no_yaml=true
+    fi
+fi
+
 # stat differs between platforms
 if [ -z "$STATSZ" ]; then
 	stat --version 2>/dev/null | grep -q 'GNU'
@@ -615,7 +629,7 @@ dtc_tests () {
     done
 
     # Check -Oyaml output
-    if pkg-config --exists yaml-0.1; then
+    if ! $no_yaml; then
             for tree in type-preservation; do
                 run_dtc_test -I dts -O yaml -o $tree.test.dt.yaml "$SRCDIR/$tree.dts"
                 run_wrap_test cmp "$SRCDIR/$tree.dt.yaml" $tree.test.dt.yaml
