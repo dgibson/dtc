@@ -8,6 +8,8 @@ freebsd_12_task:
     pkg install -y bison gmake pkgconf
   build_script:
     gmake
+  test_script:
+    gmake check
 
 linux_gcc_task:
   container:
