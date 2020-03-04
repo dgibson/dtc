@@ -52,7 +52,10 @@ if [ -z "$STATSZ" ]; then
 fi
 
 # Help things find the libfdt shared object
-export LD_LIBRARY_PATH=../libfdt
+if [ -z "$TEST_LIBDIR" ]; then
+    TEST_LIBDIR=../libfdt
+fi
+export LD_LIBRARY_PATH="$TEST_LIBDIR"
 
 export QUIET_TEST=1
 STOP_ON_FAIL=0

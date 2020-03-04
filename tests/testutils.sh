@@ -18,11 +18,15 @@ FAIL_IF_SIGNAL () {
     fi
 }
 
-DTC=../dtc
-DTGET=../fdtget
-DTPUT=../fdtput
-FDTDUMP=../fdtdump
-FDTOVERLAY=../fdtoverlay
+if [ -z "$TEST_BINDIR" ]; then
+    TEST_BINDIR=..
+fi
+
+DTC=${TEST_BINDIR}/dtc
+DTGET=${TEST_BINDIR}/fdtget
+DTPUT=${TEST_BINDIR}/fdtput
+FDTDUMP=${TEST_BINDIR}/fdtdump
+FDTOVERLAY=${TEST_BINDIR}/fdtoverlay
 
 verbose_run () {
     if [ -z "$QUIET_TEST" ]; then
