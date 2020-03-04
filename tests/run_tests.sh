@@ -11,6 +11,20 @@ if [ -z "$PYTHON" ]; then
     PYTHON=python3
 fi
 
+if [ -n "$NO_PYTHON" ]; then
+    if [ "$NO_PYTHON" != "0" ]; then
+        no_python=true
+    else
+        no_python=false
+    fi
+else
+    if [ -f ../pylibfdt/_libfdt.so ] || [ -f ../pylibfdt/_libfdt.cpython-3*.so ]; then
+        no_python=false
+    else
+        no_python=true
+    fi
+fi
+
 # stat differs between platforms
 if [ -z "$STATSZ" ]; then
 	stat --version 2>/dev/null | grep -q 'GNU'
@@ -1016,7 +1030,7 @@ if [ -z "$TESTSETS" ]; then
     TESTSETS="libfdt utilfdt dtc dtbs_equal fdtget fdtput fdtdump fdtoverlay"
 
     # Test pylibfdt if the libfdt Python module is available.
-    if [ -f ../pylibfdt/_libfdt.so ] || [ -f ../pylibfdt/_libfdt.cpython-3*.so ]; then
+    if ! $no_python; then
         TESTSETS="$TESTSETS pylibfdt"
     fi
 fi
