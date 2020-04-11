@@ -1193,6 +1193,27 @@ int fdt_address_cells(const void *fdt, int nodeoffset);
  */
 int fdt_size_cells(const void *fdt, int nodeoffset);
 
+/**
+ * fdt_cells - retrive size of cells specified by parameter name.
+ * @fdt: pointer to the device tree blob
+ * @nodeoffset: offset of the node to find the address range size for
+ * @name: name of the property which size we want to read
+ *
+ * When the node has a valid property define in name, returns its value.
+ *
+ * returns:
+ *	0 <= n < FDT_MAX_NCELLS, on success
+ *      -FDT_ERR_NOTFOUND, if the node has no property specified in paramter
+		name
+ *      -FDT_ERR_BADNCELLS, if the node has a badly formatted or invalid
+ *		#size-cells property
+ *	-FDT_ERR_BADMAGIC,
+ *	-FDT_ERR_BADVERSION,
+ *	-FDT_ERR_BADSTATE,
+ *	-FDT_ERR_BADSTRUCTURE,
+ *	-FDT_ERR_TRUNCATED, standard meanings
+ */
+int fdt_cells(const void *fdt, int nodeoffset, const char *name);
 
 /**********************************************************************/
 /* Write-in-place functions                                           */
