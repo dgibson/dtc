@@ -176,12 +176,14 @@ endif
 
 
 ifneq ($(DEPTARGETS),)
+ifneq ($(MAKECMDGOALS),libfdt)
 -include $(DTC_OBJS:%.o=%.d)
 -include $(CONVERT_OBJS:%.o=%.d)
 -include $(FDTDUMP_OBJS:%.o=%.d)
 -include $(FDTGET_OBJS:%.o=%.d)
 -include $(FDTPUT_OBJS:%.o=%.d)
 -include $(FDTOVERLAY_OBJS:%.o=%.d)
+endif
 endif
 
 
@@ -318,7 +320,9 @@ ifeq ($(NO_PYTHON),0)
 TESTS_PYLIBFDT += maybe_pylibfdt
 endif
 
+ifneq ($(MAKECMDGOALS),libfdt)
 include tests/Makefile.tests
+endif
 
 #
 # Clean rules
