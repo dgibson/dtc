@@ -1547,6 +1547,28 @@ static bool node_is_interrupt_provider(struct node *node)
 
 	return false;
 }
+
+static void check_interrupt_provider(struct check *c,
+				     struct dt_info *dti,
+				     struct node *node)
+{
+	struct property *prop;
+
+	if (!node_is_interrupt_provider(node))
+		return;
+
+	prop = get_property(node, "#interrupt-cells");
+	if (!prop)
+		FAIL(c, dti, node,
+		     "Missing #interrupt-cells in interrupt provider");
+
+	prop = get_property(node, "#address-cells");
+	if (!prop)
+		FAIL(c, dti, node,
+		     "Missing #address-cells in interrupt provider");
+}
+WARNING(interrupt_provider, check_interrupt_provider, NULL);
+
 static void check_interrupts_property(struct check *c,
 				      struct dt_info *dti,
 				      struct node *node)
@@ -1604,7 +1626,7 @@ static void check_interrupts_property(struct check *c,
 
 	prop = get_property(irq_node, "#interrupt-cells");
 	if (!prop) {
-		FAIL(c, dti, irq_node, "Missing #interrupt-cells in interrupt-parent");
+		/* We warn about that already in another test. */
 		return;
 	}
 
@@ -1828,6 +1850,7 @@ static struct check *check_table[] = {
 	&deprecated_gpio_property,
 	&gpios_property,
 	&interrupts_property,
+	&interrupt_provider,
 
 	&alias_paths,
 

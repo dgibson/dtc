@@ -714,6 +714,7 @@ dtc_tests () {
     check_tests "$SRCDIR/bad-graph.dts" graph_endpoint
     run_sh_test "$SRCDIR/dtc-checkfails.sh" deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb "$SRCDIR/bad-gpio.dts"
     check_tests "$SRCDIR/bad-interrupt-cells.dts" interrupts_property
+    check_tests "$SRCDIR/bad-interrupt-controller.dts" interrupt_provider
     run_sh_test "$SRCDIR/dtc-checkfails.sh" node_name_chars -- -I dtb -O dtb bad_node_char.dtb
     run_sh_test "$SRCDIR/dtc-checkfails.sh" node_name_format -- -I dtb -O dtb bad_node_format.dtb
     run_sh_test "$SRCDIR/dtc-checkfails.sh" property_name_chars -- -I dtb -O dtb bad_prop_char.dtb
