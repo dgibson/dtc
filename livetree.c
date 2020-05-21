@@ -116,6 +116,17 @@ struct node *build_node_delete(struct srcpos *srcpos)
 	return new;
 }
 
+struct node *build_node_rename(struct srcpos *srcpos)
+{
+	struct node *new = xmalloc(sizeof(*new));
+
+	memset(new, 0, sizeof(*new));
+
+	new->srcpos = srcpos_copy(srcpos);
+
+	return new;
+}
+
 struct node *name_node(struct node *node, char *name)
 {
 	assert(node->name == NULL);
@@ -333,6 +344,11 @@ void delete_node(struct node *node)
 	for_each_property(node, prop)
 		delete_property(prop);
 	delete_labels(&node->labels);
+}
+
+void rename_node(struct node *node, char *name)
+{
+	node->name = name;
 }
 
 void append_to_property(struct node *node,

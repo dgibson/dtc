@@ -52,6 +52,7 @@ extern bool treesource_error;
 %token DT_BITS
 %token DT_DEL_PROP
 %token DT_DEL_NODE
+%token DT_RENAME_NODE
 %token DT_OMIT_NO_REF
 %token <propnodename> DT_PROPNODENAME
 %token <integer> DT_LITERAL
@@ -229,6 +230,18 @@ devicetree:
 
 			if (target)
 				delete_node(target);
+			else
+				ERROR(&@3, "Label or path %s not found", $3);
+
+
+			$$ = $1;
+		}
+	| devicetree DT_RENAME_NODE dt_ref DT_PROPNODENAME ';'
+		{
+			struct node *target = get_node_by_ref($1, $3);
+
+			if (target)
+				rename_node(target, $4);
 			else
 				ERROR(&@3, "Label or path %s not found", $3);
 
@@ -556,6 +569,10 @@ subnode:
 	| DT_DEL_NODE DT_PROPNODENAME ';'
 		{
 			$$ = name_node(build_node_delete(&@$), $2);
+		}
+	| DT_RENAME_NODE DT_PROPNODENAME DT_PROPNODENAME ';'
+		{
+			$$ = name_node(build_node_rename(&@$), $2);
 		}
 	| DT_OMIT_NO_REF subnode
 		{

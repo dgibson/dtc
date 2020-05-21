@@ -137,6 +137,13 @@ static void PRINTF(1, 2) lexical_error(const char *fmt, ...);
 			return DT_DEL_NODE;
 		}
 
+<*>"/rename-node/"	{
+			DPRINT("Keyword: /rename-node/\n");
+			DPRINT("<PROPNODENAME>\n");
+			BEGIN(PROPNODENAME);
+			return DT_RENAME_NODE;
+		}
+
 <*>"/omit-if-no-ref/"	{
 			DPRINT("Keyword: /omit-if-no-ref/\n");
 			DPRINT("<PROPNODENAME>\n");

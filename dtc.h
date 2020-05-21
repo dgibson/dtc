@@ -233,6 +233,7 @@ struct property *reverse_properties(struct property *first);
 struct node *build_node(struct property *proplist, struct node *children,
 			struct srcpos *srcpos);
 struct node *build_node_delete(struct srcpos *srcpos);
+struct node *build_node_rename(struct srcpos *srcpos);
 struct node *name_node(struct node *node, char *name);
 struct node *omit_node_if_unused(struct node *node);
 struct node *reference_node(struct node *node);
@@ -246,6 +247,7 @@ void delete_property(struct property *prop);
 void add_child(struct node *parent, struct node *child);
 void delete_node_by_name(struct node *parent, char *name);
 void delete_node(struct node *node);
+void rename_node(struct node *node, char *name);
 void append_to_property(struct node *node,
 			char *name, const void *data, int len,
 			enum markertype type);

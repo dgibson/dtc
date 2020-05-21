@@ -1,0 +1,27 @@
+/dts-v1/;
+
+/include/ "test_tree1.dts"
+
+/rename-node/ &ssn0 kumar;
+
+/ {
+	nonexistant-property = <0xdeadbeef>;
+
+	nonexistant-subnode {
+		prop-int = <1>;
+	};
+
+	dellabel: deleted-by-label {
+		prop-int = <1>;
+	};
+
+	subnode@1 {
+		delete-this-str = "deadbeef";
+	};
+
+};
+
+/ {
+	/rename-node/ nonexistant-subnode foo;
+};
+
