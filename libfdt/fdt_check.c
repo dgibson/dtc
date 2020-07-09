@@ -22,6 +22,8 @@ int fdt_check_full(const void *fdt, size_t bufsize)
 
 	if (bufsize < FDT_V1_SIZE)
 		return -FDT_ERR_TRUNCATED;
+	if (bufsize < fdt_header_size(fdt))
+		return -FDT_ERR_TRUNCATED;
 	err = fdt_check_header(fdt);
 	if (err != 0)
 		return err;
