@@ -137,13 +137,13 @@ const void *fdt_offset_ptr(const void *fdt, int offset, unsigned int len)
 	unsigned absoffset = offset + fdt_off_dt_struct(fdt);
 
 	if (!can_assume(VALID_INPUT))
-		if ((absoffset < offset)
+		if ((absoffset < (unsigned)offset)
 		    || ((absoffset + len) < absoffset)
 		    || (absoffset + len) > fdt_totalsize(fdt))
 			return NULL;
 
 	if (can_assume(LATEST) || fdt_version(fdt) >= 0x11)
-		if (((offset + len) < offset)
+		if (((offset + len) < (unsigned)offset)
 		    || ((offset + len) > fdt_size_dt_struct(fdt)))
 			return NULL;
 
@@ -308,7 +308,7 @@ int fdt_move(const void *fdt, void *buf, int bufsize)
 {
 	FDT_RO_PROBE(fdt);
 
-	if (fdt_totalsize(fdt) > bufsize)
+	if (fdt_totalsize(fdt) > (unsigned)bufsize)
 		return -FDT_ERR_NOSPACE;
 
 	memmove(buf, fdt, fdt_totalsize(fdt));
