@@ -59,6 +59,7 @@ ifeq ($(NO_YAML),1)
 	CFLAGS += -DNO_YAML
 else
 	LDLIBS_dtc += $(shell $(PKG_CONFIG) --libs yaml-0.1)
+	CFLAGS += $(shell $(PKG_CONFIG) --cflags yaml-0.1)
 endif
 
 ifeq ($(HOSTOS),darwin)
