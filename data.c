@@ -84,7 +84,7 @@ struct data data_copy_file(FILE *f, size_t maxlen)
 	while (!feof(f) && (d.len < maxlen)) {
 		size_t chunksize, ret;
 
-		if (maxlen == -1)
+		if (maxlen == (size_t)-1)
 			chunksize = 4096;
 		else
 			chunksize = maxlen - d.len;
