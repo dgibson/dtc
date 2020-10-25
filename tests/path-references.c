@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	void *fdt;
 	const char *p;
 	int len, multilen;
-	int n1, n2, n3, n4;
+	int n1, n2, n3, n4, n5;
 
 	test_init(argc, argv);
 	fdt = load_blob_arg(argc, argv);
@@ -88,6 +88,12 @@ int main(int argc, char *argv[])
 		FAIL("fdt_path_offset(/foobar/baz): %s", fdt_strerror(n4));
 	check_ref(fdt, n3, "/foobar/baz");
 	check_ref(fdt, n4, "/foo/baz");
+
+	n5 = fdt_path_offset(fdt, "/bar/baz");
+	if (n5 < 0)
+		FAIL("fdt_path_offset(/bar/baz): %s", fdt_strerror(n5));
+
+	check_ref(fdt, n5, "/bar/baz");
 
 	check_rref(fdt);
 

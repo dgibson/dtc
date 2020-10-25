@@ -669,6 +669,9 @@ dtc_tests () {
     tree1_tests dtc_tree1_merge_path.test.dtb test_tree1.dtb
     run_wrap_error_test $DTC -I dts -O dtb -o /dev/null "$SRCDIR/test_label_ref.dts"
 
+    run_dtc_test -I dts -O dtb -o dtc_relref_merge.test.dtb "$SRCDIR/relref_merge.dts"
+    run_test relref_merge dtc_relref_merge.test.dtb
+
     # Check prop/node delete functionality
     run_dtc_test -I dts -O dtb -o dtc_tree1_delete.test.dtb "$SRCDIR/test_tree1_delete.dts"
     tree1_tests dtc_tree1_delete.test.dtb
