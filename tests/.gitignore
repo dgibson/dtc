@@ -54,6 +54,7 @@ tmp.*
 /property_iterate
 /propname_escapes
 /references
+/relref_merge
 /root_node
 /rw_tree1
 /rw_oom

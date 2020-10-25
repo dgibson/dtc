@@ -25,4 +25,13 @@
 			lref = &n3;
 		};
 	};
+	n5: bar {
+		baz {
+		};
+	};
+};
+
+n6: &{n5/baz} {
+	ref = &{n6/};
+	lref = &{n5/baz};
 };
