@@ -33,6 +33,17 @@ char *xstrdup(const char *s)
 	return d;
 }
 
+char *xstrndup(const char *s, size_t n)
+{
+	size_t len = strnlen(s, n) + 1;
+	char *d = xmalloc(len);
+
+	memcpy(d, s, len - 1);
+	d[len - 1] = '\0';
+
+	return d;
+}
+
 int xavsprintf_append(char **strp, const char *fmt, va_list ap)
 {
 	int n, size = 0;	/* start with 128 bytes */
