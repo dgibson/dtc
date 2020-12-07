@@ -6,16 +6,18 @@ project('dtc', 'c',
 
 cc = meson.get_compiler('c')
 
-add_project_arguments(cc.get_supported_arguments([
-  '-Wall',
-  '-Wpointer-arith',
-  '-Wcast-qual',
-  '-Wnested-externs',
-  '-Wstrict-prototypes',
-  '-Wmissing-prototypes',
-  '-Wredundant-decls',
-  '-Wshadow'
-]),language: 'c')
+add_project_arguments(
+  cc.get_supported_arguments([
+    '-Wpointer-arith',
+    '-Wcast-qual',
+    '-Wnested-externs',
+    '-Wstrict-prototypes',
+    '-Wmissing-prototypes',
+    '-Wredundant-decls',
+    '-Wshadow'
+  ]),
+  language: 'c'
+)
 
 if host_machine.system() == 'windows'
   add_project_arguments(
