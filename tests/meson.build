@@ -127,4 +127,5 @@ test(
   workdir: meson.current_build_dir(),
   depends: dumptrees_dtb,
   env: env,
+  timeout: 1800, # mostly for valgrind
 )
