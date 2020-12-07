@@ -108,14 +108,14 @@ endforeach
 
 run_tests = find_program('run_tests.sh')
 
-
-env = [
-  'PYTHON=' + py.path(),
-  'PYTHONPATH=' + meson.source_root() / 'pylibfdt',
-]
-
+env = []
 if not py.found()
   env += 'NO_PYTHON=1'
+else
+  env += [
+    'PYTHON=' + py.path(),
+    'PYTHONPATH=' + meson.source_root() / 'pylibfdt',
+  ]
 endif
 if not yaml.found()
   env += 'NO_YAML=1'
