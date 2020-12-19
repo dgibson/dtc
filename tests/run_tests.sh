@@ -288,7 +288,7 @@ dtc_overlay_tests () {
     run_test check_path overlay_overlay.test.dtb exists "/__local_fixups__"
 
     # Without syntactic sugar
-    run_dtc_test -I dts -O dtb -o overlay_overlay_nosugar.test.dtb "$SRCDIR/overlay_overlay.dts"
+    run_dtc_test -I dts -O dtb -o overlay_overlay_nosugar.test.dtb "$SRCDIR/overlay_overlay_nosugar.dts"
     run_test check_path overlay_overlay_nosugar.test.dtb not-exists "/__symbols__"
     run_test check_path overlay_overlay_nosugar.test.dtb exists "/__fixups__"
     run_test check_path overlay_overlay_nosugar.test.dtb exists "/__local_fixups__"
