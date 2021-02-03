@@ -17,3 +17,7 @@ lex.yy.c
 /fdtoverlay
 /patches
 /.pc
+
+# cscope files
+cscope.*
+ncscope.*
