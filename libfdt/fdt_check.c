@@ -59,6 +59,16 @@ int fdt_check_full(const void *fdt, size_t bufsize)
 			depth++;
 			if (depth > INT_MAX)
 				return -FDT_ERR_BADSTRUCTURE;
+
+			/* The root node must have an empty name */
+			if (depth == 1) {
+				const char *name;
+				int len;
+
+				name = fdt_get_name(fdt, offset, &len);
+				if (*name || len)
+					return -FDT_ERR_BADSTRUCTURE;
+			}
 			break;
 
 		case FDT_END_NODE:

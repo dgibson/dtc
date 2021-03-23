@@ -298,3 +298,18 @@ two_roots_strings_end:
 
 two_roots_end:
 
+
+        /* root node with a non-empty name */
+        TREE_HDR(named_root)
+	EMPTY_RSVMAP(named_root)
+
+named_root_struct:
+	BEGIN_NODE("fake")
+	END_NODE
+	FDTLONG(FDT_END)
+named_root_struct_end:
+
+named_root_strings:
+named_root_strings_end:
+
+named_root_end:

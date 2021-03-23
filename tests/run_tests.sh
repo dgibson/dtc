@@ -518,7 +518,7 @@ libfdt_tests () {
 	run_test check_full $good
     done
     for bad in truncated_property.dtb truncated_string.dtb \
-		truncated_memrsv.dtb two_roots.dtb; do
+		truncated_memrsv.dtb two_roots.dtb named_root.dtb; do
 	run_test check_full -n $bad
     done
 }

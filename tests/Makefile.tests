@@ -33,7 +33,7 @@ LIB_TESTS_L = get_mem_rsv \
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
 LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv \
-	two_roots
+	two_roots named_root
 
 LIBTREE_TESTS = $(LIBTREE_TESTS_L:%=$(TESTS_PREFIX)%)
 
