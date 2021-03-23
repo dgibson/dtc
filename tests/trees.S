@@ -279,3 +279,22 @@ truncated_memrsv_rsvmap:
 truncated_memrsv_rsvmap_end:
 
 truncated_memrsv_end:
+
+
+        /* two root nodes */
+        TREE_HDR(two_roots)
+	EMPTY_RSVMAP(two_roots)
+
+two_roots_struct:
+	BEGIN_NODE("")
+	END_NODE
+	BEGIN_NODE("")
+	END_NODE
+	FDTLONG(FDT_END)
+two_roots_struct_end:
+
+two_roots_strings:
+two_roots_strings_end:
+
+two_roots_end:
+
