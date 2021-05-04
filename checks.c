@@ -1494,7 +1494,7 @@ static bool prop_is_gpio(struct property *prop)
 	 * *-gpios and *-gpio can appear in property names,
 	 * so skip over any false matches (only one known ATM)
 	 */
-	if (strstr(prop->name, "nr-gpio"))
+	if (strstr(prop->name, ",nr-gpios"))
 		return false;
 
 	str = strrchr(prop->name, '-');
