@@ -691,7 +691,7 @@ dtc_tests () {
     run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb "$SRCDIR/nonexist-node-ref2.dts"
     check_tests "$SRCDIR/bad-name-property.dts" name_properties
 
-    check_tests "$SRCDIR/bad-ncells.dts" address_cells_is_cell size_cells_is_cell interrupt_cells_is_cell
+    check_tests "$SRCDIR/bad-ncells.dts" address_cells_is_cell size_cells_is_cell interrupts_extended_is_cell
     check_tests "$SRCDIR/bad-string-props.dts" device_type_is_string model_is_string status_is_string label_is_string compatible_is_string_list names_is_string_list
     check_tests "$SRCDIR/bad-chosen.dts" chosen_node_is_root
     check_tests "$SRCDIR/bad-chosen.dts" chosen_node_bootargs
@@ -740,7 +740,7 @@ dtc_tests () {
 
 
     # Check warning options
-    run_sh_test "$SRCDIR/dtc-checkfails.sh" address_cells_is_cell interrupt_cells_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb "$SRCDIR/bad-ncells.dts"
+    run_sh_test "$SRCDIR/dtc-checkfails.sh" address_cells_is_cell interrupts_extended_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb "$SRCDIR/bad-ncells.dts"
     run_sh_test "$SRCDIR/dtc-fails.sh" -n test-warn-output.test.dtb -I dts -O dtb "$SRCDIR/bad-ncells.dts"
     run_sh_test "$SRCDIR/dtc-fails.sh" test-error-output.test.dtb -I dts -O dtb bad-ncells.dts -Esize_cells_is_cell
     run_sh_test "$SRCDIR/dtc-checkfails.sh" always_fail -- -Walways_fail -I dts -O dtb "$SRCDIR/test_tree1.dts"

@@ -672,7 +672,6 @@ ERROR(omit_unused_nodes, fixup_omit_unused_nodes, NULL, &phandle_references, &pa
  */
 WARNING_IF_NOT_CELL(address_cells_is_cell, "#address-cells");
 WARNING_IF_NOT_CELL(size_cells_is_cell, "#size-cells");
-WARNING_IF_NOT_CELL(interrupt_cells_is_cell, "#interrupt-cells");
 
 WARNING_IF_NOT_STRING(device_type_is_string, "device_type");
 WARNING_IF_NOT_STRING(model_is_string, "model");
@@ -1809,7 +1808,7 @@ static struct check *check_table[] = {
 	&phandle_references, &path_references,
 	&omit_unused_nodes,
 
-	&address_cells_is_cell, &size_cells_is_cell, &interrupt_cells_is_cell,
+	&address_cells_is_cell, &size_cells_is_cell,
 	&device_type_is_string, &model_is_string, &status_is_string,
 	&label_is_string,
 
