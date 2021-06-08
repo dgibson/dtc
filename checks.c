@@ -143,6 +143,14 @@ static void check_nodes_props(struct check *c, struct dt_info *dti, struct node 
 		check_nodes_props(c, dti, child);
 }
 
+static bool is_multiple_of(int multiple, int divisor)
+{
+	if (divisor == 0)
+		return multiple == 0;
+	else
+		return (multiple % divisor) == 0;
+}
+
 static bool run_check(struct check *c, struct dt_info *dti)
 {
 	struct node *dt = dti->dt;
@@ -766,7 +774,7 @@ static void check_reg_format(struct check *c, struct dt_info *dti,
 	size_cells = node_size_cells(node->parent);
 	entrylen = (addr_cells + size_cells) * sizeof(cell_t);
 
-	if (!entrylen || (prop->val.len % entrylen) != 0)
+	if (!is_multiple_of(prop->val.len, entrylen))
 		FAIL_PROP(c, dti, node, prop, "property has invalid length (%d bytes) "
 			  "(#address-cells == %d, #size-cells == %d)",
 			  prop->val.len, addr_cells, size_cells);
@@ -807,7 +815,7 @@ static void check_ranges_format(struct check *c, struct dt_info *dti,
 				  "#size-cells (%d) differs from %s (%d)",
 				  ranges, c_size_cells, node->parent->fullpath,
 				  p_size_cells);
-	} else if ((prop->val.len % entrylen) != 0) {
+	} else if (!is_multiple_of(prop->val.len, entrylen)) {
 		FAIL_PROP(c, dti, node, prop, "\"%s\" property has invalid length (%d bytes) "
 			  "(parent #address-cells == %d, child #address-cells == %d, "
 			  "#size-cells == %d)", ranges, prop->val.len,
@@ -1382,7 +1390,7 @@ static void check_property_phandle_args(struct check *c,
 	struct node *root = dti->dt;
 	int cell, cellsize = 0;
 
-	if (prop->val.len % sizeof(cell_t)) {
+	if (!is_multiple_of(prop->val.len, sizeof(cell_t))) {
 		FAIL_PROP(c, dti, node, prop,
 			  "property size (%d) is invalid, expected multiple of %zu",
 			  prop->val.len, sizeof(cell_t));
@@ -1594,7 +1602,7 @@ static void check_interrupts_property(struct check *c,
 	if (!irq_prop)
 		return;
 
-	if (irq_prop->val.len % sizeof(cell_t))
+	if (!is_multiple_of(irq_prop->val.len, sizeof(cell_t)))
 		FAIL_PROP(c, dti, node, irq_prop, "size (%d) is invalid, expected multiple of %zu",
 		     irq_prop->val.len, sizeof(cell_t));
 
@@ -1643,7 +1651,7 @@ static void check_interrupts_property(struct check *c,
 	}
 
 	irq_cells = propval_cell(prop);
-	if (irq_prop->val.len % (irq_cells * sizeof(cell_t))) {
+	if (!is_multiple_of(irq_prop->val.len, irq_cells * sizeof(cell_t))) {
 		FAIL_PROP(c, dti, node, prop,
 			  "size is (%d), expected multiple of %d",
 			  irq_prop->val.len, (int)(irq_cells * sizeof(cell_t)));
