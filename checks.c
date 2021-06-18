@@ -520,7 +520,7 @@ static cell_t check_phandle_prop(struct check *c, struct dt_info *dti,
 
 	phandle = propval_cell(prop);
 
-	if ((phandle == 0) || (phandle == -1)) {
+	if (!phandle_is_valid(phandle)) {
 		FAIL_PROP(c, dti, node, prop, "bad value (0x%x) in %s property",
 		     phandle, prop->name);
 		return 0;
@@ -1400,14 +1400,14 @@ static void check_property_phandle_args(struct check *c,
 	for (cell = 0; cell < prop->val.len / sizeof(cell_t); cell += cellsize + 1) {
 		struct node *provider_node;
 		struct property *cellprop;
-		int phandle;
+		cell_t phandle;
 
 		phandle = propval_cell_n(prop, cell);
 		/*
 		 * Some bindings use a cell value 0 or -1 to skip over optional
 		 * entries when each index position has a specific definition.
 		 */
-		if (phandle == 0 || phandle == -1) {
+		if (!phandle_is_valid(phandle)) {
 			/* Give up if this is an overlay with external references */
 			if (dti->dtsflags & DTSF_PLUGIN)
 				break;
@@ -1615,7 +1615,7 @@ static void check_interrupts_property(struct check *c,
 		prop = get_property(parent, "interrupt-parent");
 		if (prop) {
 			phandle = propval_cell(prop);
-			if ((phandle == 0) || (phandle == -1)) {
+			if (!phandle_is_valid(phandle)) {
 				/* Give up if this is an overlay with
 				 * external references */
 				if (dti->dtsflags & DTSF_PLUGIN)
@@ -1772,7 +1772,7 @@ static struct node *get_remote_endpoint(struct check *c, struct dt_info *dti,
 
 	phandle = propval_cell(prop);
 	/* Give up if this is an overlay with external references */
-	if (phandle == 0 || phandle == -1)
+	if (!phandle_is_valid(phandle))
 		return NULL;
 
 	node = get_node_by_phandle(dti->dt, phandle);

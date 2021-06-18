@@ -51,6 +51,11 @@ extern int annotate;		/* annotate .dts with input source location */
 
 typedef uint32_t cell_t;
 
+static inline bool phandle_is_valid(cell_t phandle)
+{
+	return phandle != 0 && phandle != ~0U;
+}
+
 static inline uint16_t dtb_ld16(const void *p)
 {
 	const uint8_t *bp = (const uint8_t *)p;

@@ -559,7 +559,7 @@ struct node *get_node_by_phandle(struct node *tree, cell_t phandle)
 {
 	struct node *child, *node;
 
-	if ((phandle == 0) || (phandle == -1)) {
+	if (!phandle_is_valid(phandle)) {
 		assert(generate_fixups);
 		return NULL;
 	}
@@ -594,7 +594,7 @@ cell_t get_node_phandle(struct node *root, struct node *node)
 	static cell_t phandle = 1; /* FIXME: ick, static local */
 	struct data d = empty_data;
 
-	if ((node->phandle != 0) && (node->phandle != -1))
+	if (phandle_is_valid(node->phandle))
 		return node->phandle;
 
 	while (get_node_by_phandle(root, phandle))
