@@ -88,7 +88,7 @@ void check_mem_rsv(void *fdt, int n, uint64_t addr, uint64_t size)
 }
 
 void check_property(void *fdt, int nodeoffset, const char *name,
-		    int len, const void *val)
+		    unsigned int len, const void *val)
 {
 	const struct fdt_property *prop;
 	int retlen, namelen;
@@ -101,6 +101,9 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 	if (! prop)
 		FAIL("Error retrieving \"%s\" pointer: %s", name,
 		     fdt_strerror(retlen));
+	if (retlen < 0)
+		FAIL("negative name length (%d) for returned property\n",
+		     retlen);
 
 	tag = fdt32_to_cpu(prop->tag);
 	nameoff = fdt32_to_cpu(prop->nameoff);
@@ -112,13 +115,16 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 	propname = fdt_get_string(fdt, nameoff, &namelen);
 	if (!propname)
 		FAIL("Couldn't get property name: %s", fdt_strerror(namelen));
-	if (namelen != strlen(propname))
+	if (namelen < 0)
+		FAIL("negative name length (%d) for returned string\n",
+		     namelen);
+	if ((unsigned)namelen != strlen(propname))
 		FAIL("Incorrect prop name length: %d instead of %zd",
 		     namelen, strlen(propname));
 	if (!streq(propname, name))
 		FAIL("Property name mismatch \"%s\" instead of \"%s\"",
 		     propname, name);
-	if (proplen != retlen)
+	if (proplen != (unsigned)retlen)
 		FAIL("Length retrieved for \"%s\" by fdt_get_property()"
 		     " differs from stored length (%d != %d)",
 		     name, retlen, proplen);

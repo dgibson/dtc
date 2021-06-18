@@ -23,7 +23,7 @@ static void test_node(void *fdt, int parent_offset)
 	uint32_t subnodes;
 	const fdt32_t *prop;
 	int offset;
-	int count;
+	unsigned int count;
 	int len;
 
 	/* This property indicates the number of subnodes to expect */

@@ -43,7 +43,8 @@ static int nopulate_struct(char *buf, const char *fdt)
 int main(int argc, char *argv[])
 {
 	char *fdt, *fdt2, *buf;
-	int newsize, struct_start, struct_end_old, struct_end_new, delta;
+	int newsize, struct_end_old, struct_end_new, delta;
+	unsigned int struct_start;
 	const char *inname;
 	char outname[PATH_MAX];
 

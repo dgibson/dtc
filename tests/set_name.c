@@ -39,7 +39,11 @@ static void check_set_name(void *fdt, const char *path, const char *newname)
 		FAIL("fdt_get_name(%s) returned \"%s\" instead of \"%s\"",
 		     path, getname, oldname);
 
-	if (len != strlen(getname))
+	if (len < 0)
+		FAIL("fdt_get_name(%s) returned negative length: %d",
+		     path, len);
+
+	if ((unsigned)len != strlen(getname))
 		FAIL("fdt_get_name(%s) returned length %d instead of %zd",
 		     path, len, strlen(getname));
 
@@ -51,12 +55,14 @@ static void check_set_name(void *fdt, const char *path, const char *newname)
 	getname = fdt_get_name(fdt, offset, &len);
 	if (!getname)
 		FAIL("fdt_get_name(%d): %s", offset, fdt_strerror(len));
+	if (len < 0)
+		FAIL("negative name length (%d) for returned node name\n", len);
 
 	if (strcmp(getname, newname) != 0)
 		FAIL("fdt_get_name(%s) returned \"%s\" instead of \"%s\"",
 		     path, getname, newname);
 
-	if (len != strlen(getname))
+	if ((unsigned)len != strlen(getname))
 		FAIL("fdt_get_name(%s) returned length %d instead of %zd",
 		     path, len, strlen(getname));
 }

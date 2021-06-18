@@ -23,7 +23,7 @@ static void test_node(void *fdt, int parent_offset)
 	uint32_t properties;
 	const fdt32_t *prop;
 	int offset, property;
-	int count;
+	unsigned int count;
 	int len;
 
 	/*

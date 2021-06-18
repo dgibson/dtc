@@ -83,7 +83,7 @@ void cleanup(void);
 void check_mem_rsv(void *fdt, int n, uint64_t addr, uint64_t size);
 
 void check_property(void *fdt, int nodeoffset, const char *name,
-		    int len, const void *val);
+		    unsigned int len, const void *val);
 #define check_property_cell(fdt, nodeoffset, name, val) \
 	({ \
 		fdt32_t x = cpu_to_fdt32(val);			      \

@@ -32,7 +32,7 @@ static struct {
 
 int main(int argc, char *argv[])
 {
-	int i;
+	unsigned int i;
 
 	if (argc != 2) {
 	    fprintf(stderr, "Missing output directory argument\n");

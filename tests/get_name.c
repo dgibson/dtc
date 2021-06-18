@@ -34,12 +34,14 @@ static void check_name(void *fdt, const char *path)
 		       offset, getname, len);
 	if (!getname)
 		FAIL("fdt_get_name(%d): %s", offset, fdt_strerror(len));
+	if (len < 0)
+		FAIL("negative name length (%d) for returned node name\n", len);
 
 	if (strcmp(getname, checkname) != 0)
 		FAIL("fdt_get_name(%s) returned \"%s\" instead of \"%s\"",
 		     path, getname, checkname);
 
-	if (len != strlen(getname))
+	if ((unsigned)len != strlen(getname))
 		FAIL("fdt_get_name(%s) returned length %d instead of %zd",
 		     path, len, strlen(getname));
 

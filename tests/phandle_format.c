@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		FAIL("fdt_path_offset(/node4): %s", fdt_strerror(n4));
 
 	h4 = fdt_get_phandle(fdt, n4);
-	if ((h4 == 0) || (h4 == -1))
+	if ((h4 == 0) || (h4 == ~0U))
 		FAIL("/node4 has bad phandle 0x%x\n", h4);
 
 	if (phandle_format & PHANDLE_LEGACY)

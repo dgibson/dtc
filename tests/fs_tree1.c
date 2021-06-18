@@ -54,7 +54,7 @@ static void mkfile(const char *name, void *data, size_t len)
 	rc = write(fd, data, len);
 	if (rc < 0)
 		FAIL("write(\"%s\"): %s", name, strerror(errno));
-	if (rc != len)
+	if ((unsigned)rc != len)
 		FAIL("write(\"%s\"): short write", name);
 	
 	rc = close(fd);
