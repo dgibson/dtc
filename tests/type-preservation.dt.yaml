@@ -13,8 +13,11 @@
     int64: [!u64 [0x200000000]]
     int64-array: [!u64 [0x100000000, 0x0]]
     a-string-with-nulls: ["foo\0bar", "baz"]
+    a-phandle: [[!phandle 0x1]]
+    a-phandle-with-args: [[!phandle 0x1, 0x0, 0x1], [!phandle 0x1, 0x2, 0x3]]
     subsubnode:
       compatible: ["subsubnode1", "subsubnode"]
+      phandle: [[0x1]]
       subsubsubnode:
         compatible: ["subsubsubnode1", [0x1234], "subsubsubnode"]
 ...
