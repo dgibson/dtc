@@ -54,13 +54,13 @@ tree##_rsvmap_end:		;
 #define PROP_STR(tree, name, str) \
 	PROPHDR(tree, name, 55f - 54f) \
 54:	\
-	.string	str		; \
+	.asciz	str		; \
 55:	\
 	.balign	4		;
 
 #define BEGIN_NODE(name) \
 	FDTLONG(FDT_BEGIN_NODE)	; \
-	.string	name		; \
+	.asciz	name		; \
 	.balign 4		;
 
 #define END_NODE \
@@ -68,7 +68,7 @@ tree##_rsvmap_end:		;
 
 #define STRING(tree, name, str) \
 tree##_##name:			; \
-	.string	str		;
+	.asciz	str		;
 
 	.data
 
@@ -253,9 +253,7 @@ truncated_string_struct_end:
 truncated_string_strings:
 	STRING(truncated_string, good_string, "good")
 truncated_string_bad_string:
-	.byte	'b'
-	.byte	'a'
-	.byte	'd'
+	.ascii	"bad"
 	/* NOTE: terminating \0 deliberately missing */
 truncated_string_strings_end:
 truncated_string_end:

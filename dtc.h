@@ -116,6 +116,12 @@ enum markertype {
 	TYPE_UINT64,
 	TYPE_STRING,
 };
+
+static inline bool is_type_marker(enum markertype type)
+{
+	return type >= TYPE_UINT8;
+}
+
 extern const char *markername(enum markertype markertype);
 
 struct  marker {
@@ -140,7 +146,22 @@ struct data {
 	for_each_marker(m) \
 		if ((m)->type == (t))
 
-size_t type_marker_length(struct marker *m);
+static inline struct marker *next_type_marker(struct marker *m)
+{
+	for_each_marker(m)
+		if (is_type_marker(m->type))
+			break;
+	return m;
+}
+
+static inline size_t type_marker_length(struct marker *m)
+{
+	struct marker *next = next_type_marker(m->next);
+
+	if (next)
+		return next->offset - m->offset;
+	return 0;
+}
 
 void data_free(struct data d);
 

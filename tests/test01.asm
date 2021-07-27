@@ -44,7 +44,7 @@ _dt_reserve_map:
 dt_struct_start:
 _dt_struct_start:
 	.long	OF_DT_BEGIN_NODE
-	.string	""
+	.asciz	""
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0xc
@@ -76,7 +76,7 @@ _dt_struct_start:
 	.long	0x2
 	.balign	4
 	.long	OF_DT_BEGIN_NODE
-	.string	"cpus"
+	.asciz	"cpus"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0x4
@@ -94,7 +94,7 @@ _dt_struct_start:
 	.long	0x0
 	.balign	4
 	.long	OF_DT_BEGIN_NODE
-	.string	"PowerPC,970@0"
+	.asciz	"PowerPC,970@0"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0xc
@@ -139,7 +139,7 @@ _dt_struct_start:
 	.balign	4
 	.long	OF_DT_END_NODE
 	.long	OF_DT_BEGIN_NODE
-	.string	"PowerPC,970@1"
+	.asciz	"PowerPC,970@1"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0xc
@@ -181,7 +181,7 @@ _dt_struct_start:
 	.long	OF_DT_END_NODE
 	.long	OF_DT_END_NODE
 	.long	OF_DT_BEGIN_NODE
-	.string	"randomnode"
+	.asciz	"randomnode"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0x13
@@ -216,7 +216,7 @@ _dt_struct_start:
 	.balign	4
 	.long	OF_DT_END_NODE
 	.long	OF_DT_BEGIN_NODE
-	.string	"memory@0"
+	.asciz	"memory@0"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0x7
@@ -242,7 +242,7 @@ memreg:
 	.balign	4
 	.long	OF_DT_END_NODE
 	.long	OF_DT_BEGIN_NODE
-	.string	"chosen"
+	.asciz	"chosen"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0xf
@@ -267,25 +267,25 @@ _dt_struct_end:
 	.globl	dt_strings_start
 dt_strings_start:
 _dt_strings_start:
-	.string "model"
-	.string "compatible"
-	.string "#address-cells"
-	.string "#size-cells"
-	.string "linux,phandle"
-	.string "name"
-	.string "device_type"
-	.string "reg"
-	.string "clock-frequency"
-	.string "timebase-frequency"
-	.string "linux,boot-cpu"
-	.string "i-cache-size"
-	.string "d-cache-size"
-	.string "string"
-	.string "blob"
-	.string "ref"
-	.string "mixed"
-	.string "bootargs"
-	.string "linux,platform"
+	.asciz	"model"
+	.asciz	"compatible"
+	.asciz	"#address-cells"
+	.asciz	"#size-cells"
+	.asciz	"linux,phandle"
+	.asciz	"name"
+	.asciz	"device_type"
+	.asciz	"reg"
+	.asciz	"clock-frequency"
+	.asciz	"timebase-frequency"
+	.asciz	"linux,boot-cpu"
+	.asciz	"i-cache-size"
+	.asciz	"d-cache-size"
+	.asciz	"string"
+	.asciz	"blob"
+	.asciz	"ref"
+	.asciz	"mixed"
+	.asciz	"bootargs"
+	.asciz	"linux,platform"
 	.globl	dt_strings_end
 dt_strings_end:
 _dt_strings_end:

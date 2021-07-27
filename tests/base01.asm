@@ -32,7 +32,7 @@ _dt_reserve_map:
 dt_struct_start:
 _dt_struct_start:
 	.long	OF_DT_BEGIN_NODE
-	.string	""
+	.asciz	""
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0xa
@@ -58,7 +58,7 @@ _dt_struct_start:
 	.long	0x2
 	.balign	4
 	.long	OF_DT_BEGIN_NODE
-	.string	"memory@0"
+	.asciz	"memory@0"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0x7
@@ -77,7 +77,7 @@ _dt_struct_start:
 	.balign	4
 	.long	OF_DT_END_NODE
 	.long	OF_DT_BEGIN_NODE
-	.string	"cpus"
+	.asciz	"cpus"
 	.balign	4
 	.long	OF_DT_PROP
 	.long	0x4
@@ -151,22 +151,22 @@ _dt_struct_end:
 	.globl	dt_strings_start
 dt_strings_start:
 _dt_strings_start:
-	.string "model"
-	.string "compatible"
-	.string "#address-cells"
-	.string "#size-cells"
-	.string "device_type"
-	.string "reg"
-	.string "d10"
-	.string "d23"
-	.string "b101"
-	.string "o17"
-	.string "hd00d"
-	.string "stuff"
-	.string "bad-d-1"
-	.string "bad-d-2"
-	.string "bad-o-1"
-	.string "bad-o-2"
+	.asciz	"model"
+	.asciz	"compatible"
+	.asciz	"#address-cells"
+	.asciz	"#size-cells"
+	.asciz	"device_type"
+	.asciz	"reg"
+	.asciz	"d10"
+	.asciz	"d23"
+	.asciz	"b101"
+	.asciz	"o17"
+	.asciz	"hd00d"
+	.asciz	"stuff"
+	.asciz	"bad-d-1"
+	.asciz	"bad-d-2"
+	.asciz	"bad-o-1"
+	.asciz	"bad-o-2"
 	.globl	dt_strings_end
 dt_strings_end:
 _dt_strings_end:
