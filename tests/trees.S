@@ -1,174 +1,187 @@
 #include <fdt.h>
 #include "testdata.h"
 
-#define FDTLONG(val) \
-	.byte	((val) >> 24) & 0xff ; \
-	.byte	((val) >> 16) & 0xff ; \
-	.byte	((val) >> 8) & 0xff ; \
-	.byte	(val) & 0xff	;
+	.macro	fdtlong	val
+	.byte	((\val) >> 24) & 0xff
+	.byte	((\val) >> 16) & 0xff
+	.byte	((\val) >> 8) & 0xff
+	.byte	(\val) & 0xff
+	.endm
 
-#define TREE_HDR(tree) \
-	.balign	8		; \
-	.globl	tree		; \
-tree:	\
-	FDTLONG(FDT_MAGIC)	; \
-	FDTLONG(tree##_end - tree) ; \
-	FDTLONG(tree##_struct - tree) ; \
-	FDTLONG(tree##_strings - tree) ; \
-	FDTLONG(tree##_rsvmap - tree) ; \
-	FDTLONG(0x11)		; \
-	FDTLONG(0x10)		; \
-	FDTLONG(0)		; \
-	FDTLONG(tree##_strings_end - tree##_strings) ; \
-	FDTLONG(tree##_struct_end - tree##_struct) ;
+	.macro	treehdr	tree
+	.balign	8
+	.globl	\tree
+\tree :
+	fdtlong	FDT_MAGIC
+	fdtlong	(\tree\()_end - \tree)
+	fdtlong	(\tree\()_struct - \tree)
+	fdtlong	(\tree\()_strings - \tree)
+	fdtlong	(\tree\()_rsvmap - \tree)
+	fdtlong	0x11
+	fdtlong	0x10
+	fdtlong	0
+	fdtlong	(\tree\()_strings_end - \tree\()_strings)
+	fdtlong	(\tree\()_struct_end - \tree\()_struct)
+	.endm
 
-#define RSVMAP_ENTRY(addrh, addrl, lenh, lenl) \
-	FDTLONG(addrh)		; \
-	FDTLONG(addrl)		; \
-	FDTLONG(lenh)		; \
-	FDTLONG(lenl)
+	.macro	rsvmape	addrh, addrl, lenh, lenl
+	fdtlong	\addrh
+	fdtlong	\addrl
+	fdtlong	\lenh
+	fdtlong	\lenl
+	.endm
 
-#define EMPTY_RSVMAP(tree) \
-	.balign	8		; \
-tree##_rsvmap:			; \
-	RSVMAP_ENTRY(0, 0, 0, 0) \
-tree##_rsvmap_end:		;
+	.macro	empty_rsvmap	tree
+	.balign	8
+\tree\()_rsvmap:
+	rsvmape	0, 0, 0, 0
+\tree\()_rsvmap_end:
+	.endm
 
-#define PROPHDR(tree, name, len) \
-	FDTLONG(FDT_PROP)	; \
-	FDTLONG(len)		; \
-	FDTLONG(tree##_##name - tree##_strings) ;
+	.macro prophdr	tree, name, len
+	fdtlong	FDT_PROP
+	fdtlong	\len
+	fdtlong	(\tree\()_\name - \tree\()_strings)
+	.endm
 
-#define PROP_EMPTY(tree, name) \
-	PROPHDR(tree, name, 0)	;
+	.macro propnil	tree, name
+	prophdr	\tree, \name, 0
+	.endm
 
-#define PROP_INT(tree, name, val) \
-	PROPHDR(tree, name, 4) \
-	FDTLONG(val)		;
+	.macro propu32	tree, name, val
+	prophdr	\tree, \name, 4
+	fdtlong	\val
+	.endm
 
-#define PROP_INT64(tree, name, valh, vall) \
-	PROPHDR(tree, name, 8) \
-	FDTLONG(valh)		; \
-	FDTLONG(vall)		;
+	.macro propu64	tree, name, valh, vall
+	prophdr	\tree, \name, 8
+	fdtlong	\valh
+	fdtlong	\vall
+	.endm
 
-#define PROP_STR(tree, name, str) \
-	PROPHDR(tree, name, 55f - 54f) \
-54:	\
-	.asciz	str		; \
-55:	\
-	.balign	4		;
+	.macro propstr	tree, name, str:vararg
+	prophdr	\tree, \name, (55f - 54f)
+54:
+	.asciz	\str
+55:
+	.balign	4
+	.endm
 
-#define BEGIN_NODE(name) \
-	FDTLONG(FDT_BEGIN_NODE)	; \
-	.asciz	name		; \
-	.balign 4		;
+	.macro	beginn	name:vararg
+	fdtlong	FDT_BEGIN_NODE
+	.asciz	\name
+	.balign 4
+	.endm
 
-#define END_NODE \
-	FDTLONG(FDT_END_NODE)	;
+	.macro	endn
+	fdtlong	FDT_END_NODE
+	.endm
 
-#define STRING(tree, name, str) \
-tree##_##name:			; \
-	.asciz	str		;
+	.macro	string	tree, name, str:vararg
+\tree\()_\name :
+	.asciz	\str
+	.endm
+
 
 	.data
 
-	TREE_HDR(test_tree1)
+	treehdr	test_tree1
 
 	.balign	8
 test_tree1_rsvmap:
-	RSVMAP_ENTRY(TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L)
-	RSVMAP_ENTRY(TEST_ADDR_2H, TEST_ADDR_2L, TEST_SIZE_2H, TEST_SIZE_2L)
-	RSVMAP_ENTRY(0, 0, 0, 0)
+	rsvmape	TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L
+	rsvmape	TEST_ADDR_2H, TEST_ADDR_2L, TEST_SIZE_2H, TEST_SIZE_2L
+	rsvmape	0, 0, 0, 0
 test_tree1_rsvmap_end:
 
 test_tree1_struct:
-	BEGIN_NODE("")
-	PROP_STR(test_tree1, compatible, "test_tree1")
-	PROP_INT(test_tree1, prop_int, TEST_VALUE_1)
-	PROP_INT64(test_tree1, prop_int64, TEST_VALUE64_1H, TEST_VALUE64_1L)
-	PROP_STR(test_tree1, prop_str, TEST_STRING_1)
-	PROP_INT(test_tree1, address_cells, 1)
-	PROP_INT(test_tree1, size_cells, 0)
+	beginn	""
+	propstr	test_tree1, compatible, "test_tree1"
+	propu32	test_tree1, prop_int, TEST_VALUE_1
+	propu64	test_tree1, prop_int64, TEST_VALUE64_1H, TEST_VALUE64_1L
+	propstr	test_tree1, prop_str, TEST_STRING_1
+	propu32 test_tree1, address_cells, 1
+	propu32	test_tree1, size_cells, 0
 
-	BEGIN_NODE("subnode@1")
-	PROP_STR(test_tree1, compatible, "subnode1")
-	PROP_INT(test_tree1, reg, 1)
-	PROP_INT(test_tree1, prop_int, TEST_VALUE_1)
+	beginn	"subnode@1"
+	propstr	test_tree1, compatible, "subnode1"
+	propu32	test_tree1, reg, 1
+	propu32	test_tree1, prop_int, TEST_VALUE_1
 
-	BEGIN_NODE("subsubnode")
-	PROP_STR(test_tree1, compatible, "subsubnode1\0subsubnode")
-	PROP_STR(test_tree1, placeholder, "this is a placeholder string\0string2")
-	PROP_INT(test_tree1, prop_int, TEST_VALUE_1)
-	END_NODE
+	beginn	"subsubnode"
+	propstr	test_tree1, compatible, "subsubnode1\0subsubnode"
+	propstr	test_tree1, placeholder, "this is a placeholder string\0string2"
+	propu32	test_tree1, prop_int, TEST_VALUE_1
+	endn
 
-	BEGIN_NODE("ss1")
-	END_NODE
+	beginn	"ss1"
+	endn
 
-	END_NODE
+	endn
 
-	BEGIN_NODE("subnode@2")
-	PROP_INT(test_tree1, reg, 2)
-	PROP_INT(test_tree1, linux_phandle, PHANDLE_1)
-	PROP_INT(test_tree1, prop_int, TEST_VALUE_2)
-	PROP_INT(test_tree1, address_cells, 1)
-	PROP_INT(test_tree1, size_cells, 0)
+	beginn	"subnode@2"
+	propu32	test_tree1, reg, 2
+	propu32	test_tree1, linux_phandle, PHANDLE_1
+	propu32	test_tree1, prop_int, TEST_VALUE_2
+	propu32	test_tree1, address_cells, 1
+	propu32	test_tree1, size_cells, 0
 
-	BEGIN_NODE("subsubnode@0")
-	PROP_INT(test_tree1, reg, 0)
-	PROP_INT(test_tree1, phandle, PHANDLE_2)
-	PROP_STR(test_tree1, compatible, "subsubnode2\0subsubnode")
-	PROP_INT(test_tree1, prop_int, TEST_VALUE_2)
-	END_NODE
+	beginn	"subsubnode@0"
+	propu32	test_tree1, reg, 0
+	propu32	test_tree1, phandle, PHANDLE_2
+	propstr	test_tree1, compatible, "subsubnode2\0subsubnode"
+	propu32	test_tree1, prop_int, TEST_VALUE_2
+	endn
 
-	BEGIN_NODE("ss2")
-	END_NODE
+	beginn	"ss2"
+	endn
 
-	END_NODE
+	endn
 
-	END_NODE
-	FDTLONG(FDT_END)
+	endn
+	fdtlong	FDT_END
 test_tree1_struct_end:
 
 test_tree1_strings:
-	STRING(test_tree1, compatible, "compatible")
-	STRING(test_tree1, prop_int, "prop-int")
-	STRING(test_tree1, prop_int64, "prop-int64")
-	STRING(test_tree1, prop_str, "prop-str")
-	STRING(test_tree1, linux_phandle, "linux,phandle")
-	STRING(test_tree1, phandle, "phandle")
-	STRING(test_tree1, reg, "reg")
-	STRING(test_tree1, placeholder, "placeholder")
-	STRING(test_tree1, address_cells, "#address-cells")
-	STRING(test_tree1, size_cells, "#size-cells")
+	string	test_tree1, compatible, "compatible"
+	string	test_tree1, prop_int, "prop-int"
+	string	test_tree1, prop_int64, "prop-int64"
+	string	test_tree1, prop_str, "prop-str"
+	string	test_tree1, linux_phandle, "linux,phandle"
+	string	test_tree1, phandle, "phandle"
+	string	test_tree1, reg, "reg"
+	string	test_tree1, placeholder, "placeholder"
+	string	test_tree1, address_cells, "#address-cells"
+	string	test_tree1, size_cells, "#size-cells"
 test_tree1_strings_end:
 test_tree1_end:
 
 
-	TREE_HDR(truncated_property)
-	EMPTY_RSVMAP(truncated_property)
+	treehdr	truncated_property
+	empty_rsvmap	truncated_property
 
 truncated_property_struct:
-	BEGIN_NODE("")
-	PROPHDR(truncated_property, prop_truncated, 4)
+	beginn	""
+	prophdr	truncated_property, prop_truncated, 4
 	/* Oops, no actual property data here */
 truncated_property_struct_end:
 
 truncated_property_strings:
-	STRING(truncated_property, prop_truncated, "truncated")
+	string	truncated_property, prop_truncated, "truncated"
 truncated_property_strings_end:
 
 truncated_property_end:
 
 
-	TREE_HDR(bad_node_char)
-	EMPTY_RSVMAP(bad_node_char)
+	treehdr	bad_node_char
+	empty_rsvmap	bad_node_char
 
 bad_node_char_struct:
-	BEGIN_NODE("")
-	BEGIN_NODE("sub$node")
-	END_NODE
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	beginn	"sub$node"
+	endn
+	endn
+	fdtlong	FDT_END
 bad_node_char_struct_end:
 
 bad_node_char_strings:
@@ -176,15 +189,15 @@ bad_node_char_strings_end:
 bad_node_char_end:
 
 
-	TREE_HDR(bad_node_format)
-	EMPTY_RSVMAP(bad_node_format)
+	treehdr	bad_node_format
+	empty_rsvmap	bad_node_format
 
 bad_node_format_struct:
-	BEGIN_NODE("")
-	BEGIN_NODE("subnode@1@2")
-	END_NODE
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	beginn	"subnode@1@2"
+	endn
+	endn
+	fdtlong	FDT_END
 bad_node_format_struct_end:
 
 bad_node_format_strings:
@@ -192,18 +205,18 @@ bad_node_format_strings_end:
 bad_node_format_end:
 
 
-	TREE_HDR(bad_prop_char)
-	EMPTY_RSVMAP(bad_prop_char)
+	treehdr	bad_prop_char
+	empty_rsvmap	bad_prop_char
 
 bad_prop_char_struct:
-	BEGIN_NODE("")
-	PROP_INT(bad_prop_char, prop, TEST_VALUE_1)
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	propu32	bad_prop_char, prop, TEST_VALUE_1
+	endn
+	fdtlong	FDT_END
 bad_prop_char_struct_end:
 
 bad_prop_char_strings:
-	STRING(bad_prop_char, prop, "prop$erty")
+	string	bad_prop_char, prop, "prop$erty"
 bad_prop_char_strings_end:
 bad_prop_char_end:
 
@@ -212,46 +225,46 @@ bad_prop_char_end:
 	.balign	8
 	.globl	ovf_size_strings
 ovf_size_strings:
-	FDTLONG(FDT_MAGIC)
-	FDTLONG(ovf_size_strings_end - ovf_size_strings)
-	FDTLONG(ovf_size_strings_struct - ovf_size_strings) 
-	FDTLONG(ovf_size_strings_strings - ovf_size_strings)
-	FDTLONG(ovf_size_strings_rsvmap - ovf_size_strings)
-	FDTLONG(0x11)
-	FDTLONG(0x10)
-	FDTLONG(0)
-	FDTLONG(0xffffffff)
-	FDTLONG(ovf_size_strings_struct_end - ovf_size_strings_struct)
-	EMPTY_RSVMAP(ovf_size_strings)
+	fdtlong	FDT_MAGIC
+	fdtlong	(ovf_size_strings_end - ovf_size_strings)
+	fdtlong	(ovf_size_strings_struct - ovf_size_strings)
+	fdtlong	(ovf_size_strings_strings - ovf_size_strings)
+	fdtlong	(ovf_size_strings_rsvmap - ovf_size_strings)
+	fdtlong	0x11
+	fdtlong	0x10
+	fdtlong	0
+	fdtlong	0xffffffff
+	fdtlong	(ovf_size_strings_struct_end - ovf_size_strings_struct)
+	empty_rsvmap	ovf_size_strings
 
 ovf_size_strings_struct:
-	BEGIN_NODE("")
-	PROP_INT(ovf_size_strings, bad_string, 0)
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	propu32	ovf_size_strings, bad_string, 0
+	endn
+	fdtlong	FDT_END
 ovf_size_strings_struct_end:
 
 ovf_size_strings_strings:
-	STRING(ovf_size_strings, x, "x")
+	string	ovf_size_strings, x, "x"
 	ovf_size_strings_bad_string = ovf_size_strings_strings + 0x10000000
 ovf_size_strings_strings_end:
 ovf_size_strings_end:
 
 
 	/* truncated_string */
-	TREE_HDR(truncated_string)
-	EMPTY_RSVMAP(truncated_string)
+	treehdr	truncated_string
+	empty_rsvmap	truncated_string
 
 truncated_string_struct:
-	BEGIN_NODE("")
-	PROP_EMPTY(truncated_string, good_string)
-	PROP_EMPTY(truncated_string, bad_string)
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	propnil	truncated_string, good_string
+	propnil	truncated_string, bad_string
+	endn
+	fdtlong	FDT_END
 truncated_string_struct_end:
 
 truncated_string_strings:
-	STRING(truncated_string, good_string, "good")
+	string	truncated_string, good_string, "good"
 truncated_string_bad_string:
 	.ascii	"bad"
 	/* NOTE: terminating \0 deliberately missing */
@@ -260,12 +273,12 @@ truncated_string_end:
 
 
 	/* truncated_memrsv */
-	TREE_HDR(truncated_memrsv)
+	treehdr	truncated_memrsv
 
 truncated_memrsv_struct:
-	BEGIN_NODE("")
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	endn
+	fdtlong	FDT_END
 truncated_memrsv_struct_end:
 
 truncated_memrsv_strings:
@@ -273,22 +286,22 @@ truncated_memrsv_strings_end:
 
 	.balign	8
 truncated_memrsv_rsvmap:
-	RSVMAP_ENTRY(TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L)
+	rsvmape	TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L
 truncated_memrsv_rsvmap_end:
 
 truncated_memrsv_end:
 
 
         /* two root nodes */
-        TREE_HDR(two_roots)
-	EMPTY_RSVMAP(two_roots)
+	treehdr	two_roots
+	empty_rsvmap	two_roots
 
 two_roots_struct:
-	BEGIN_NODE("")
-	END_NODE
-	BEGIN_NODE("")
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	""
+	endn
+	beginn	""
+	endn
+	fdtlong	FDT_END
 two_roots_struct_end:
 
 two_roots_strings:
@@ -298,13 +311,13 @@ two_roots_end:
 
 
         /* root node with a non-empty name */
-        TREE_HDR(named_root)
-	EMPTY_RSVMAP(named_root)
+	treehdr	named_root
+	empty_rsvmap	named_root
 
 named_root_struct:
-	BEGIN_NODE("fake")
-	END_NODE
-	FDTLONG(FDT_END)
+	beginn	"fake"
+	endn
+	fdtlong	FDT_END
 named_root_struct_end:
 
 named_root_strings:
