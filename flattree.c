@@ -124,7 +124,8 @@ static void asm_emit_cell(void *e, cell_t val)
 {
 	FILE *f = e;
 
-	fprintf(f, "\t.byte 0x%02x; .byte 0x%02x; .byte 0x%02x; .byte 0x%02x\n",
+	fprintf(f, "\t.byte\t0x%02x\n" "\t.byte\t0x%02x\n"
+		"\t.byte\t0x%02x\n" "\t.byte\t0x%02x\n",
 		(val >> 24) & 0xff, (val >> 16) & 0xff,
 		(val >> 8) & 0xff, val & 0xff);
 }
