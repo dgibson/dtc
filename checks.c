@@ -1587,7 +1587,7 @@ static void check_interrupt_provider(struct check *c,
 		FAIL(c, dti, node,
 		     "Missing #address-cells in interrupt provider");
 }
-WARNING(interrupt_provider, check_interrupt_provider, NULL);
+WARNING(interrupt_provider, check_interrupt_provider, NULL, &interrupts_extended_is_cell);
 
 static void check_interrupts_property(struct check *c,
 				      struct dt_info *dti,
