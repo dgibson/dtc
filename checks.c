@@ -1573,14 +1573,20 @@ static void check_interrupt_provider(struct check *c,
 				     struct node *node)
 {
 	struct property *prop;
-
-	if (!node_is_interrupt_provider(node))
-		return;
+	bool irq_provider = node_is_interrupt_provider(node);
 
 	prop = get_property(node, "#interrupt-cells");
-	if (!prop)
+	if (irq_provider && !prop) {
 		FAIL(c, dti, node,
-		     "Missing #interrupt-cells in interrupt provider");
+		     "Missing '#interrupt-cells' in interrupt provider");
+		return;
+	}
+
+	if (!irq_provider && prop) {
+		FAIL(c, dti, node,
+		     "'#interrupt-cells' found, but node is not an interrupt provider");
+		return;
+	}
 }
 WARNING(interrupt_provider, check_interrupt_provider, NULL, &interrupts_extended_is_cell);
 
