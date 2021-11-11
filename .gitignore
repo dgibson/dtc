@@ -22,3 +22,7 @@ lex.yy.c
 # cscope files
 cscope.*
 ncscope.*
+
+.eggs/
+build/
+dist/
