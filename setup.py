@@ -30,6 +30,7 @@ top_builddir = get_top_builddir()
 libfdt_module = Extension(
     '_libfdt',
     sources=[os.path.join(srcdir, 'pylibfdt/libfdt.i')],
+    define_macros=[('PY_SSIZE_T_CLEAN', None)],
     include_dirs=[os.path.join(srcdir, 'libfdt')],
     libraries=['fdt'],
     library_dirs=[os.path.join(top_builddir, 'libfdt')],
