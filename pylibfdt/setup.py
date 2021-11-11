@@ -15,10 +15,6 @@ import os
 import re
 import sys
 
-
-VERSION_PATTERN = '^#define DTC_VERSION "DTC ([^"]*)"$'
-
-
 def get_top_builddir():
     if '--top-builddir' in sys.argv:
         index = sys.argv.index('--top-builddir')
@@ -27,17 +23,8 @@ def get_top_builddir():
     else:
         return os.getcwd()
 
-
 srcdir = os.path.dirname(os.path.abspath(sys.argv[0]))
 top_builddir = get_top_builddir()
-
-
-def get_version():
-    version_file = os.path.join(top_builddir, 'version_gen.h')
-    f = open(version_file, 'rt')
-    m = re.match(VERSION_PATTERN, f.readline())
-    return m.group(1)
-
 
 libfdt_module = Extension(
     '_libfdt',
@@ -50,7 +37,10 @@ libfdt_module = Extension(
 
 setup(
     name='libfdt',
-    version=get_version(),
+    use_scm_version={
+        "root": os.path.join(srcdir, '..'),
+    },
+    setup_requires = ['setuptools_scm'],
     author='Simon Glass <sjg@chromium.org>',
     description='Python binding for libfdt',
     ext_modules=[libfdt_module],
