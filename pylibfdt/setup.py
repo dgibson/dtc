@@ -10,7 +10,7 @@ Copyright (C) 2017 Google, Inc.
 Written by Simon Glass <sjg@chromium.org>
 """
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import os
 import re
 import sys
