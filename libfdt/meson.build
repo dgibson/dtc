@@ -24,6 +24,11 @@ libfdt = library(
   install: true,
 )
 
+libfdt_a = static_library(
+  'fdt', sources,
+  install: true,
+)
+
 libfdt_inc = include_directories('.')
 
 libfdt_dep = declare_dependency(
