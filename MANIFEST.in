@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
 
 global-exclude *
+include README
+include GPL
+include BSD-2-Clause
 include setup.py
 include pylibfdt/libfdt.i
 include pylibfdt/*.py

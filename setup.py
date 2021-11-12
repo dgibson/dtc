@@ -17,6 +17,9 @@ import sys
 
 srcdir = os.path.dirname(__file__)
 
+with open("README", "r") as fh:
+    long_description = fh.read()
+
 def get_top_builddir():
     if '--top-builddir' in sys.argv:
         index = sys.argv.index('--top-builddir')
@@ -49,4 +52,18 @@ setup(
     ext_modules=[libfdt_module],
     package_dir={'': os.path.join(srcdir, 'pylibfdt')},
     py_modules=['libfdt'],
+
+    long_description=long_description,
+    long_description_content_type="text/plain",
+    url="https://git.kernel.org/pub/scm/utils/dtc/dtc.git",
+    license="BSD",
+    license_files=["GPL", "BSD-2-Clause"],
+
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+        "Operating System :: OS Independent",
+    ],
+
 )
