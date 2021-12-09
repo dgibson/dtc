@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 			     TEST_STRING_1);
 
 	verbose_printf("Old string value was \"%s\"\n", strp);
-	xstr = strdup(strp);
+	xstr = xstrdup(strp);
 	xlen = strlen(xstr);
 	for (i = 0; i < xlen; i++)
 		xstr[i] = toupper(xstr[i]);
