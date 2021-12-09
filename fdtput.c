@@ -433,6 +433,8 @@ int main(int argc, char *argv[])
 			if (utilfdt_decode_type(optarg, &disp.type,
 					&disp.size))
 				usage("Invalid type string");
+			if (disp.type == 'r')
+				usage("Unsupported raw data type");
 			break;
 
 		case 'v':

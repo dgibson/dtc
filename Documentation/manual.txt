@@ -712,7 +712,7 @@ The syntax of the fdtget command is:
 
 where options are:
 
-    <type>    s=string, i=int, u=unsigned, x=hex
+    <type>    s=string, i=int, u=unsigned, x=hex, r=raw
         Optional modifier prefix:
             hh or b=byte, h=2 byte, l=4 byte (default)
 

@@ -73,6 +73,9 @@ static void check_sizes(char *modifier, int expected_size)
 
 	*ptr = 's';
 	check(fmt, 's', -1);
+
+	*ptr = 'r';
+	check(fmt, 'r', -1);
 }
 
 static void test_utilfdt_decode_type(void)
@@ -90,7 +93,7 @@ static void test_utilfdt_decode_type(void)
 	/* try every other character */
 	checkfail("");
 	for (ch = ' '; ch < 127; ch++) {
-		if (!strchr("iuxs", ch)) {
+		if (!strchr("iuxsr", ch)) {
 			*fmt = ch;
 			fmt[1] = '\0';
 			checkfail(fmt);
