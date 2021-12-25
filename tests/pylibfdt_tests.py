@@ -382,6 +382,14 @@ class PyLibfdtBasicTests(unittest.TestCase):
                           self.get_prop("prop-uint64").as_uint64())
         self.assertEqual(-2, self.get_prop("prop-int64").as_int64())
 
+    def testGetStringlistProperties(self):
+        """Test that we can access properties as string list"""
+        node = self.fdt.path_offset('/subnode@1/subsubnode')
+        self.assertEqual(["subsubnode1", "subsubnode"],
+                         self.fdt.getprop(node, "compatible").as_stringlist())
+        self.assertEqual(["this is a placeholder string", "string2"],
+                         self.fdt.getprop(node, "placeholder").as_stringlist())
+
     def testReserveMap(self):
         """Test that we can access the memory reserve map"""
         self.assertEqual(2, self.fdt.num_mem_rsv())
