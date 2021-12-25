@@ -382,6 +382,17 @@ class PyLibfdtBasicTests(unittest.TestCase):
                           self.get_prop("prop-uint64").as_uint64())
         self.assertEqual(-2, self.get_prop("prop-int64").as_int64())
 
+    def testGetIntListProperties(self):
+        """Test that we can access properties as integer lists"""
+        self.assertEqual([128, -16, -2],
+                         self.get_prop("prop-int32-array").as_int32_list())
+        self.assertEqual([0x1, 0x98765432, 0xdeadbeef],
+                         self.get_prop("prop-uint32-array").as_uint32_list())
+        self.assertEqual([0x100000000, -2],
+                         self.get_prop("prop-int64-array").as_int64_list())
+        self.assertEqual([0x100000000, 0x1],
+                         self.get_prop("prop-uint64-array").as_uint64_list())
+
     def testGetStringlistProperties(self):
         """Test that we can access properties as string list"""
         node = self.fdt.path_offset('/subnode@1/subsubnode')
