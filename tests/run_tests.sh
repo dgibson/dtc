@@ -513,6 +513,9 @@ libfdt_tests () {
     run_dtc_test -I fs -O dtb -o fs.test_tree1.test.dtb $FSBASE/test_tree1
     run_test dtbs_equal_unordered -m fs.test_tree1.test.dtb test_tree1.dtb
 
+    ## https://github.com/dgibson/dtc/issues/64
+    check_tests "$SRCDIR/phandle-args-overflow.dts" clocks_property
+
     # check full tests
     for good in test_tree1.dtb; do
 	run_test check_full $good
