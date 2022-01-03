@@ -17,7 +17,7 @@ import sys
 
 srcdir = os.path.dirname(__file__)
 
-with open("README", "r") as fh:
+with open(os.path.join(srcdir, "README"), "r") as fh:
     long_description = fh.read()
 
 def get_top_builddir():
