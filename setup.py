@@ -11,6 +11,8 @@ Written by Simon Glass <sjg@chromium.org>
 """
 
 from setuptools import setup, Extension
+from setuptools.command.build_py import build_py as _build_py
+
 import os
 import re
 import sys
@@ -40,11 +42,17 @@ libfdt_module = Extension(
     swig_opts=['-I' + os.path.join(srcdir, 'libfdt')],
 )
 
+class build_py(_build_py):
+    def run(self):
+        self.run_command("build_ext")
+        return super().run()
+
 setup(
     name='libfdt',
     use_scm_version={
         "root": srcdir,
     },
+    cmdclass = {'build_py' : build_py},
     setup_requires = ['setuptools_scm'],
     author='Simon Glass',
     author_email='sjg@chromium.org',
