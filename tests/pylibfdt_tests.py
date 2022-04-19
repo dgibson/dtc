@@ -348,6 +348,19 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEqual("/subnode@1/subsubnode", self.fdt3.get_alias('ss1'))
         self.assertEqual("/subnode@1/subsubnode/subsubsubnode", self.fdt3.get_alias('sss1'))
 
+    def testGetPath(self):
+        """Test for the get_path() method"""
+        node = self.fdt.path_offset('/subnode@1')
+        node2 = self.fdt.path_offset('/subnode@1/subsubnode')
+        self.assertEqual("/subnode@1", self.fdt.get_path(node))
+        self.assertEqual("/subnode@1/subsubnode", self.fdt.get_path(node2))
+
+        with self.assertRaises(FdtException) as e:
+            self.fdt.get_path(-1)
+        self.assertEqual(e.exception.err, -libfdt.BADOFFSET)
+
+        self.assertEqual(-libfdt.BADOFFSET, self.fdt.get_path(-1, quiet=(libfdt.BADOFFSET,)))
+
     def testParentOffset(self):
         """Test for the parent_offset() method"""
         self.assertEqual(-libfdt.NOTFOUND,
