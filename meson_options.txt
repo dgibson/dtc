@@ -8,3 +8,5 @@ option('valgrind', type: 'feature', value: 'auto',
        description: 'Valgrind support')
 option('python', type: 'feature', value: 'auto',
        description: 'Build pylibfdt Python library')
+option('static-build', type: 'boolean', value: false,
+       description: 'Build static binaries')

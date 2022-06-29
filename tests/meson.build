@@ -96,15 +96,20 @@ tests += [
 ]
 
 dl = cc.find_library('dl', required: false)
-if dl.found()
+if dl.found() and not static_build
   tests += [
     'asm_tree_dump',
     'value-labels',
   ]
 endif
 
+test_deps = [testutil_dep, util_dep, libfdt_dep]
+if not static_build
+  test_deps += [dl]
+endif
+
 foreach t: tests
-  executable(t, files(t + '.c'), dependencies: [testutil_dep, util_dep, libfdt_dep, dl])
+  executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args)
 endforeach
 
 run_tests = find_program('run_tests.sh')
