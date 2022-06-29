@@ -71,6 +71,7 @@ tests = [
   'property_iterate',
   'propname_escapes',
   'references',
+  'relref_merge',
   'root_node',
   'rw_oom',
   'rw_tree1',
