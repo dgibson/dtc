@@ -607,11 +607,15 @@ dtc_tests () {
 	run_dtc_test -I dts -O asm -o oasm_$tree.test.s "$SRCDIR/$tree"
 	asm_to_so_test oasm_$tree
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb "$SRCDIR/$tree"
-	run_test asm_tree_dump ./oasm_$tree.test.so oasm_$tree.test.dtb
-	run_wrap_test cmp oasm_$tree.test.dtb $tree.test.dtb
+	if [ -x ./asm_tree_dump ]; then
+	    run_test asm_tree_dump ./oasm_$tree.test.so oasm_$tree.test.dtb
+	    run_wrap_test cmp oasm_$tree.test.dtb $tree.test.dtb
+	fi
     done
 
-    run_test value-labels ./oasm_value-labels.dts.test.so
+    if [ -x ./value-labels ]; then
+	run_test value-labels ./oasm_value-labels.dts.test.so
+    fi
 
     # Check -Odts mode preserve all dtb information
     for tree in test_tree1.dtb dtc_tree1.test.dtb dtc_escapes.test.dtb \

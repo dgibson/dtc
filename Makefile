@@ -198,6 +198,13 @@ LIBFDT_lib = $(LIBFDT_dir)/$(LIBFDT_LIB)
 LIBFDT_include = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_INCLUDES))
 LIBFDT_version = $(addprefix $(LIBFDT_dir)/,$(LIBFDT_VERSION))
 
+ifeq ($(STATIC_BUILD),1)
+	CFLAGS += -static
+	LIBFDT_dep = $(LIBFDT_archive)
+else
+	LIBFDT_dep = $(LIBFDT_lib)
+endif
+
 include $(LIBFDT_dir)/Makefile.libfdt
 
 .PHONY: libfdt
@@ -261,11 +268,11 @@ convert-dtsv0: $(CONVERT_OBJS)
 
 fdtdump:	$(FDTDUMP_OBJS)
 
-fdtget:	$(FDTGET_OBJS) $(LIBFDT_lib)
+fdtget:	$(FDTGET_OBJS) $(LIBFDT_dep)
 
-fdtput:	$(FDTPUT_OBJS) $(LIBFDT_lib)
+fdtput:	$(FDTPUT_OBJS) $(LIBFDT_dep)
 
-fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_lib)
+fdtoverlay: $(FDTOVERLAY_OBJS) $(LIBFDT_dep)
 
 dist:
 	git archive --format=tar --prefix=dtc-$(dtc_version)/ HEAD \

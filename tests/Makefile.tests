@@ -37,8 +37,10 @@ LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv \
 
 LIBTREE_TESTS = $(LIBTREE_TESTS_L:%=$(TESTS_PREFIX)%)
 
-DL_LIB_TESTS_L = asm_tree_dump value-labels
-DL_LIB_TESTS = $(DL_LIB_TESTS_L:%=$(TESTS_PREFIX)%)
+ifneq ($(STATIC_BUILD),1)
+	DL_LIB_TESTS_L = asm_tree_dump value-labels
+	DL_LIB_TESTS = $(DL_LIB_TESTS_L:%=$(TESTS_PREFIX)%)
+endif
 
 TESTS = $(LIB_TESTS) $(LIBTREE_TESTS) $(DL_LIB_TESTS)
 
@@ -60,17 +62,17 @@ TESTS_CLEANDIRS = $(TESTS_CLEANDIRS_L:%=$(TESTS_PREFIX)%)
 .PHONY: tests
 tests:	$(TESTS) $(TESTS_TREES)
 
-$(LIB_TESTS): %: $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_lib)
+$(LIB_TESTS): %: $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_dep)
 
 # Not necessary on all platforms; allow -ldl to be excluded instead of forcing
 # other platforms to patch it out.
 LIBDL = -ldl
-$(DL_LIB_TESTS): %: %.o $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_lib)
+$(DL_LIB_TESTS): %: %.o $(TESTS_PREFIX)testutils.o util.o $(LIBFDT_dep)
 	@$(VECHO) LD [libdl] $@
 	$(LINK.c) -o $@ $^ $(LIBDL)
 
 $(LIBTREE_TESTS): %: $(TESTS_PREFIX)testutils.o $(TESTS_PREFIX)trees.o \
-		util.o $(LIBFDT_lib)
+		util.o $(LIBFDT_dep)
 
 $(TESTS_PREFIX)dumptrees: $(TESTS_PREFIX)trees.o
 
