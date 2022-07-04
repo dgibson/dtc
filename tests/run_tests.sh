@@ -195,7 +195,7 @@ asm_to_so_test () {
 run_fdtget_test () {
     expect="$1"
     shift
-    printf "fdtget-runtest.sh %s $*:	" "$(echo $expect)"
+    printf "fdtget-runtest.sh \"%s\" $*:	" "$expect"
     base_run_test sh "$SRCDIR/fdtget-runtest.sh" "$expect" "$@"
 }
 
@@ -862,7 +862,7 @@ fdtget_tests () {
     run_fdtget_test "61 62 63 0" -tbx $dtb /randomnode tricky1
     run_fdtget_test "a b c d de ea ad be ef" -tbx $dtb /randomnode blob
     run_fdtget_test "MyBoardName\0MyBoardFamilyName\0" -tr $dtb / compatible
-    run_fdtget_test "\x0a\x0b\x0c\x0d\xde\xea\xad\xbe\xef" -tr $dtb /randomnode blob
+    run_fdtget_test "\012\013\014\015\336\352\255\276\357" -tr $dtb /randomnode blob
 
     # Here the property size is not a multiple of 4 bytes, so it should fail
     run_wrap_error_test $DTGET -tlx $dtb /randomnode mixed
