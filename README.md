@@ -7,7 +7,6 @@ utility library for reading and manipulating the binary format.
 dtc and libfdt are maintained by:
 
 * [David Gibson `<david@gibson.dropbear.id.au>`](mailto:david@gibson.dropbear.id.au)
-* [Jon Loeliger `<loeliger@gmail.com>`](mailto:loeliger@gmail.com)
 
 ## Python library
 
