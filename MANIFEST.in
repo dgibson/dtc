@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
 
 global-exclude *
-include README
+include README.md
 include GPL
 include BSD-2-Clause
 include setup.py
