@@ -271,6 +271,7 @@ libfdt_overlay_tests () {
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb "$SRCDIR/$tree.dts"
 	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
     done
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb -o /dev/null fixup-ref-to-path.dts
 }
 
 # Tests to exercise dtc's overlay generation support
