@@ -389,3 +389,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 	$(BISON) -b $(basename $(basename $@)) -d $<
 
 FORCE:
+
+ifeq ($(MAKE_RESTARTS),10)
+$(error "Make re-executed itself $(MAKE_RESTARTS) times. Infinite recursion?")
+endif
