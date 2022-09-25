@@ -384,7 +384,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 	@$(VECHO) LEX $@
 	$(LEX) -o$@ $<
 
-%.tab.c %.tab.h %.output: %.y
+%.tab.c %.tab.h: %.y
 	@$(VECHO) BISON $@
 	$(BISON) -b $(basename $(basename $@)) -d $<
 
