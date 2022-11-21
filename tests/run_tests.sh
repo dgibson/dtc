@@ -518,6 +518,11 @@ libfdt_tests () {
     ## https://github.com/dgibson/dtc/issues/64
     check_tests "$SRCDIR/phandle-args-overflow.dts" clocks_property
 
+    ## https://github.com/dgibson/dtc/issues/74
+    run_dtc_test -I dts -O dtb -o cell-overflow-results.test.dtb cell-overflow-results.dts
+    run_dtc_test -I dts -O dtb -o cell-overflow.test.dtb cell-overflow.dts
+    run_test dtbs_equal_ordered cell-overflow.test.dtb cell-overflow-results.test.dtb
+
     # check full tests
     for good in test_tree1.dtb; do
 	run_test check_full $good
