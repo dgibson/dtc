@@ -1036,6 +1036,9 @@ class NodeAdder():
 
 %rename(fdt_property) fdt_property_func;
 
+%immutable fdt_property::data;
+%immutable fdt_node_header::name;
+
 /*
  * fdt32_t is a big-endian 32-bit value defined to uint32_t in libfdt_env.h
  * so use the same type here.
