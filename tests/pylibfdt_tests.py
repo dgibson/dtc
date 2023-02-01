@@ -354,6 +354,7 @@ class PyLibfdtBasicTests(unittest.TestCase):
         node2 = self.fdt.path_offset('/subnode@1/subsubnode')
         self.assertEqual("/subnode@1", self.fdt.get_path(node))
         self.assertEqual("/subnode@1/subsubnode", self.fdt.get_path(node2))
+        self.assertEqual("/subnode@1/subsubnode", self.fdt.get_path(node2, size_hint=1))
 
         with self.assertRaises(FdtException) as e:
             self.fdt.get_path(-1)

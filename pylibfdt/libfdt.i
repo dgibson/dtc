@@ -443,11 +443,12 @@ class FdtRo(object):
         """
         return fdt_get_alias(self._fdt, name)
 
-    def get_path(self, nodeoffset, quiet=()):
+    def get_path(self, nodeoffset, size_hint=1024, quiet=()):
         """Get the full path of a node
 
         Args:
             nodeoffset: Node offset to check
+            size_hint: Hint for size of returned string
 
         Returns:
             Full path to the node
@@ -455,11 +456,10 @@ class FdtRo(object):
         Raises:
             FdtException if an error occurs
         """
-        size = 1024
         while True:
-            ret, path = fdt_get_path(self._fdt, nodeoffset, size)
+            ret, path = fdt_get_path(self._fdt, nodeoffset, size_hint)
             if ret == -NOSPACE:
-                size = size * 2
+                size_hint *= 2
                 continue
             err = check_err(ret, quiet)
             if err:
