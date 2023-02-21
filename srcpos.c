@@ -3,7 +3,9 @@
  * Copyright 2007 Jon Loeliger, Freescale Semiconductor, Inc.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <stdio.h>
 

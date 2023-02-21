@@ -5,7 +5,9 @@
  * Copyright (C) 2006 David Gibson, IBM Corporation.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* for strsignal() in glibc.  FreeBSD has it either way */
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
