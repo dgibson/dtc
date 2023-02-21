@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#if NO_VALGRIND
+#ifdef NO_VALGRIND
 static inline void VALGRIND_MAKE_MEM_UNDEFINED(void *p, size_t len)
 {
 }
