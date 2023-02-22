@@ -1,5 +1,5 @@
 project('dtc', 'c',
-  version: '1.6.0',
+  version: '1.7.0',
   license: ['GPL2+', 'BSD-2'],
   default_options: 'werror=true',
 )
