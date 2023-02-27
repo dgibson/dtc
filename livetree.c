@@ -36,27 +36,27 @@ void delete_labels(struct label **labels)
 		label->deleted = 1;
 }
 
-struct property *build_property(char *name, struct data val,
+struct property *build_property(const char *name, struct data val,
 				struct srcpos *srcpos)
 {
 	struct property *new = xmalloc(sizeof(*new));
 
 	memset(new, 0, sizeof(*new));
 
-	new->name = name;
+	new->name = xstrdup(name);
 	new->val = val;
 	new->srcpos = srcpos_copy(srcpos);
 
 	return new;
 }
 
-struct property *build_property_delete(char *name)
+struct property *build_property_delete(const char *name)
 {
 	struct property *new = xmalloc(sizeof(*new));
 
 	memset(new, 0, sizeof(*new));
 
-	new->name = name;
+	new->name = xstrdup(name);
 	new->deleted = 1;
 
 	return new;

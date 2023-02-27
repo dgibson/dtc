@@ -260,9 +260,9 @@ struct node {
 void add_label(struct label **labels, char *label);
 void delete_labels(struct label **labels);
 
-struct property *build_property(char *name, struct data val,
+struct property *build_property(const char *name, struct data val,
 				struct srcpos *srcpos);
-struct property *build_property_delete(char *name);
+struct property *build_property_delete(const char *name);
 struct property *chain_property(struct property *first, struct property *list);
 struct property *reverse_properties(struct property *first);
 

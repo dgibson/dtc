@@ -284,14 +284,17 @@ propdef:
 	  DT_PROPNODENAME '=' propdata ';'
 		{
 			$$ = build_property($1, $3, &@$);
+			free($1);
 		}
 	| DT_PROPNODENAME ';'
 		{
 			$$ = build_property($1, empty_data, &@$);
+			free($1);
 		}
 	| DT_DEL_PROP DT_PROPNODENAME ';'
 		{
 			$$ = build_property_delete($2);
+			free($2);
 		}
 	| DT_LABEL propdef
 		{
