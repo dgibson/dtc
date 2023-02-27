@@ -65,7 +65,7 @@ extern char *xstrndup(const char *s, size_t len);
 
 extern int PRINTF(2, 3) xasprintf(char **strp, const char *fmt, ...);
 extern int PRINTF(2, 3) xasprintf_append(char **strp, const char *fmt, ...);
-extern int xavsprintf_append(char **strp, const char *fmt, va_list ap);
+extern int PRINTF(2, 0) xavsprintf_append(char **strp, const char *fmt, va_list ap);
 extern char *join_path(const char *path, const char *name);
 
 /**

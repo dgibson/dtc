@@ -22,7 +22,8 @@ ASSUME_MASK ?= 0
 
 CPPFLAGS = -I libfdt -I . -DFDT_ASSUME_MASK=$(ASSUME_MASK)
 WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs -Wsign-compare \
-	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
+	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow \
+	-Wsuggest-attribute=format
 CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS) $(EXTRA_CFLAGS)
 
 BISON = bison

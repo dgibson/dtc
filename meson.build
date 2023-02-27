@@ -14,7 +14,8 @@ add_project_arguments(
     '-Wstrict-prototypes',
     '-Wmissing-prototypes',
     '-Wredundant-decls',
-    '-Wshadow'
+    '-Wshadow',
+    '-Wsuggest-attribute=format',
   ]),
   language: 'c'
 )
