@@ -573,10 +573,12 @@ subnode:
 	  DT_PROPNODENAME nodedef
 		{
 			$$ = name_node($2, $1);
+			free($1);
 		}
 	| DT_DEL_NODE DT_PROPNODENAME ';'
 		{
 			$$ = name_node(build_node_delete(&@$), $2);
+			free($2);
 		}
 	| DT_OMIT_NO_REF subnode
 		{
