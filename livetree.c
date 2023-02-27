@@ -36,7 +36,7 @@ void delete_labels(struct label **labels)
 		label->deleted = 1;
 }
 
-struct property *build_property(char *name, struct data val,
+struct property *build_property(const char *name, struct data val,
 				struct srcpos *srcpos)
 {
 	struct property *new = xmalloc(sizeof(*new));
@@ -116,7 +116,7 @@ struct node *build_node_delete(struct srcpos *srcpos)
 	return new;
 }
 
-struct node *name_node(struct node *node, char *name)
+struct node *name_node(struct node *node, const char *name)
 {
 	assert(node->name == NULL);
 
@@ -276,7 +276,7 @@ void add_property(struct node *node, struct property *prop)
 	*p = prop;
 }
 
-void delete_property_by_name(struct node *node, char *name)
+void delete_property_by_name(struct node *node, const char *name)
 {
 	struct property *prop = node->proplist;
 
@@ -309,7 +309,7 @@ void add_child(struct node *parent, struct node *child)
 	*p = child;
 }
 
-void delete_node_by_name(struct node *parent, char *name)
+void delete_node_by_name(struct node *parent, const char *name)
 {
 	struct node *node = parent->children;
 
@@ -336,7 +336,7 @@ void delete_node(struct node *node)
 }
 
 void append_to_property(struct node *node,
-			char *name, const void *data, int len,
+			const char *name, const void *data, int len,
 			enum markertype type)
 {
 	struct data d;
@@ -808,7 +808,7 @@ void sort_tree(struct dt_info *dti)
 }
 
 /* utility helper to avoid code duplication */
-static struct node *build_and_name_child_node(struct node *parent, char *name)
+static struct node *build_and_name_child_node(struct node *parent, const char *name)
 {
 	struct node *node;
 
@@ -819,7 +819,7 @@ static struct node *build_and_name_child_node(struct node *parent, char *name)
 	return node;
 }
 
-static struct node *build_root_node(struct node *dt, char *name)
+static struct node *build_root_node(struct node *dt, const char *name)
 {
 	struct node *an;
 
@@ -988,7 +988,7 @@ static void add_local_fixup_entry(struct dt_info *dti,
 {
 	struct node *wn, *nwn;	/* local fixup node, walk node, new */
 	fdt32_t value_32;
-	char **compp;
+	const char **compp;
 	int i, depth;
 
 	/* walk back retrieving depth */
@@ -1040,7 +1040,7 @@ static void generate_local_fixups_tree_internal(struct dt_info *dti,
 		generate_local_fixups_tree_internal(dti, lfn, c);
 }
 
-void generate_label_tree(struct dt_info *dti, char *name, bool allocph)
+void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
 {
 	if (!any_label_tree(dti, dti->dt))
 		return;
@@ -1048,7 +1048,7 @@ void generate_label_tree(struct dt_info *dti, char *name, bool allocph)
 				     dti->dt, allocph);
 }
 
-void generate_fixups_tree(struct dt_info *dti, char *name)
+void generate_fixups_tree(struct dt_info *dti, const char *name)
 {
 	if (!any_fixup_tree(dti, dti->dt))
 		return;
@@ -1056,7 +1056,7 @@ void generate_fixups_tree(struct dt_info *dti, char *name)
 				      dti->dt);
 }
 
-void generate_local_fixups_tree(struct dt_info *dti, char *name)
+void generate_local_fixups_tree(struct dt_info *dti, const char *name)
 {
 	if (!any_local_fixup_tree(dti, dti->dt))
 		return;

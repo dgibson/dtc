@@ -41,7 +41,7 @@ static int check_subnode(void *fdt, int parent, const char *name)
 	return offset;
 }
 
-static void check_path_offset(void *fdt, char *path, int offset)
+static void check_path_offset(void *fdt, const char *path, int offset)
 {
 	int rc;
 
@@ -56,7 +56,7 @@ static void check_path_offset(void *fdt, char *path, int offset)
 		     " %d instead of %d", path, rc, offset);
 }
 
-static void check_path_offset_namelen(void *fdt, char *path, int namelen,
+static void check_path_offset_namelen(void *fdt, const char *path, int namelen,
 				      int offset)
 {
 	int rc;

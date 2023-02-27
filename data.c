@@ -12,7 +12,6 @@ void data_free(struct data d)
 	m = d.markers;
 	while (m) {
 		nm = m->next;
-		free(m->ref);
 		free(m);
 		m = nm;
 	}
@@ -224,7 +223,7 @@ struct data data_append_align(struct data d, int align)
 	return data_append_zeroes(d, newlen - d.len);
 }
 
-struct data data_add_marker(struct data d, enum markertype type, char *ref)
+struct data data_add_marker(struct data d, enum markertype type, const char *ref)
 {
 	struct marker *m;
 

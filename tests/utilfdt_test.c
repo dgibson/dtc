@@ -50,7 +50,7 @@ static void checkfail(const char *fmt)
  * \param expected_size	The size (in bytes) that we expect (ignored for
  *			strings)
  */
-static void check_sizes(char *modifier, int expected_size)
+static void check_sizes(const char *modifier, int expected_size)
 {
 	char fmt[10], *ptr;
 

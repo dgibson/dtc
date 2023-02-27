@@ -16,6 +16,7 @@ add_project_arguments(
     '-Wredundant-decls',
     '-Wshadow',
     '-Wsuggest-attribute=format',
+    '-Wwrite-strings',
   ]),
   language: 'c'
 )

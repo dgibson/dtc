@@ -127,7 +127,7 @@ extern const char *markername(enum markertype markertype);
 struct  marker {
 	enum markertype type;
 	unsigned int offset;
-	char *ref;
+	const char *ref;
 	struct marker *next;
 };
 
@@ -183,7 +183,7 @@ struct data data_append_byte(struct data d, uint8_t byte);
 struct data data_append_zeroes(struct data d, int len);
 struct data data_append_align(struct data d, int align);
 
-struct data data_add_marker(struct data d, enum markertype type, char *ref);
+struct data data_add_marker(struct data d, enum markertype type, const char *ref);
 
 bool data_is_one_string(struct data d);
 
@@ -205,7 +205,7 @@ struct bus_type {
 
 struct property {
 	bool deleted;
-	char *name;
+	const char *name;
 	struct data val;
 
 	struct property *next;
@@ -216,7 +216,7 @@ struct property {
 
 struct node {
 	bool deleted;
-	char *name;
+	const char *name;
 	struct property *proplist;
 	struct node *children;
 
@@ -260,7 +260,7 @@ struct node {
 void add_label(struct label **labels, char *label);
 void delete_labels(struct label **labels);
 
-struct property *build_property(char *name, struct data val,
+struct property *build_property(const char *name, struct data val,
 				struct srcpos *srcpos);
 struct property *build_property_delete(char *name);
 struct property *chain_property(struct property *first, struct property *list);
@@ -269,7 +269,7 @@ struct property *reverse_properties(struct property *first);
 struct node *build_node(struct property *proplist, struct node *children,
 			struct srcpos *srcpos);
 struct node *build_node_delete(struct srcpos *srcpos);
-struct node *name_node(struct node *node, char *name);
+struct node *name_node(struct node *node, const char *name);
 struct node *omit_node_if_unused(struct node *node);
 struct node *reference_node(struct node *node);
 struct node *chain_node(struct node *first, struct node *list);
@@ -277,13 +277,13 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node);
 struct node *add_orphan_node(struct node *old_node, struct node *new_node, char *ref);
 
 void add_property(struct node *node, struct property *prop);
-void delete_property_by_name(struct node *node, char *name);
+void delete_property_by_name(struct node *node, const char *name);
 void delete_property(struct property *prop);
 void add_child(struct node *parent, struct node *child);
-void delete_node_by_name(struct node *parent, char *name);
+void delete_node_by_name(struct node *parent, const char *name);
 void delete_node(struct node *node);
 void append_to_property(struct node *node,
-			char *name, const void *data, int len,
+			const char *name, const void *data, int len,
 			enum markertype type);
 
 const char *get_unitname(struct node *node);
@@ -336,9 +336,9 @@ struct dt_info *build_dt_info(unsigned int dtsflags,
 			      struct reserve_info *reservelist,
 			      struct node *tree, uint32_t boot_cpuid_phys);
 void sort_tree(struct dt_info *dti);
-void generate_label_tree(struct dt_info *dti, char *name, bool allocph);
-void generate_fixups_tree(struct dt_info *dti, char *name);
-void generate_local_fixups_tree(struct dt_info *dti, char *name);
+void generate_label_tree(struct dt_info *dti, const char *name, bool allocph);
+void generate_fixups_tree(struct dt_info *dti, const char *name);
+void generate_local_fixups_tree(struct dt_info *dti, const char *name);
 
 /* Checks */
 
