@@ -114,6 +114,7 @@ static inline void  PRINTF(5, 6) check_msg(struct check *c, struct dt_info *dti,
 	}
 
 	fputs(str, stderr);
+	free(str);
 }
 
 #define FAIL(c, dti, node, ...)						\
