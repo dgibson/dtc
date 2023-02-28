@@ -70,7 +70,7 @@ struct dt_info *dt_from_fs(const char *dirname)
 	struct node *tree;
 
 	tree = read_fstree(dirname);
-	tree = name_node(tree, "");
+	tree = name_node(tree, xstrdup(""));
 
 	return build_dt_info(DTSF_V1, NULL, tree, guess_boot_cpuid(tree));
 }

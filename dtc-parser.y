@@ -160,7 +160,7 @@ dt_ref: DT_LABEL_REF | DT_PATH_REF;
 devicetree:
 	  '/' nodedef
 		{
-			$$ = name_node($2, "");
+			$$ = name_node($2, xstrdup(""));
 		}
 	| devicetree '/' nodedef
 		{
@@ -179,7 +179,7 @@ devicetree:
 				ERROR(&@2, "Label-relative reference %s not supported in plugin", $1);
 			$$ = add_orphan_node(
 					name_node(build_node(NULL, NULL, NULL),
-						  ""),
+						  xstrdup("")),
 					$2, $1);
 		}
 	| devicetree DT_LABEL dt_ref nodedef

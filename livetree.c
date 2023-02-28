@@ -237,17 +237,17 @@ struct node * add_orphan_node(struct node *dt, struct node *new_node, char *ref)
 		d = data_add_marker(d, TYPE_STRING, ref);
 		d = data_append_data(d, ref, strlen(ref) + 1);
 
-		p = build_property("target-path", d, NULL);
+		p = build_property(xstrdup("target-path"), d, NULL);
 	} else {
 		d = data_add_marker(d, REF_PHANDLE, ref);
 		d = data_append_integer(d, 0xffffffff, 32);
 
-		p = build_property("target", d, NULL);
+		p = build_property(xstrdup("target"), d, NULL);
 	}
 
 	xasprintf(&name, "fragment@%u",
 			next_orphan_fragment++);
-	name_node(new_node, "__overlay__");
+	name_node(new_node, xstrdup("__overlay__"));
 	node = build_node(p, new_node, NULL);
 	name_node(node, name);
 
@@ -617,7 +617,7 @@ struct node *get_node_by_ref(struct node *tree, const char *ref)
 }
 
 static void add_phandle_property(struct node *node,
-				 char *name, int format)
+				 const char *name, int format)
 {
 	struct data d;
 
@@ -629,7 +629,7 @@ static void add_phandle_property(struct node *node,
 	d = data_add_marker(empty_data, TYPE_UINT32, NULL);
 	d = data_append_cell(d, node->phandle);
 
-	add_property(node, build_property(name, d, NULL));
+	add_property(node, build_property(xstrdup(name), d, NULL));
 }
 
 cell_t get_node_phandle(struct node *root, struct node *node)

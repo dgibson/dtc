@@ -327,14 +327,14 @@ int main(int argc, char *argv[])
 	process_checks(force, dti);
 
 	if (auto_label_aliases)
-		generate_label_tree(dti, "aliases", false);
+		generate_label_tree(dti, xstrdup("aliases"), false);
 
 	if (generate_symbols)
-		generate_label_tree(dti, "__symbols__", true);
+		generate_label_tree(dti, xstrdup("__symbols__"), true);
 
 	if (generate_fixups) {
-		generate_fixups_tree(dti, "__fixups__");
-		generate_local_fixups_tree(dti, "__local_fixups__");
+		generate_fixups_tree(dti, xstrdup("__fixups__"));
+		generate_local_fixups_tree(dti, xstrdup("__local_fixups__"));
 	}
 
 	if (sort)
