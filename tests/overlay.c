@@ -186,6 +186,7 @@ static void *open_dt(char *path)
 	 * Resize our DTs to 4k so that we have room to operate on
 	 */
 	CHECK(fdt_open_into(dt, copy, FDT_COPY_SIZE));
+	free(dt);
 
 	return copy;
 }

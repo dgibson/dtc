@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	err = fdt_open_into(fdt, buf, 0x1000);
 	if (err)
 		FAIL("fdt_open_into(): %s", fdt_strerror(err));
-
+	free(fdt);
 	fdt = buf;
 
 	/* Set up */

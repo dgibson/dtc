@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
 	buf = xmalloc(SPACE);
 	CHECK(fdt_open_into(fdt, buf, SPACE));
+	free(fdt);
 	fdt = buf;
 
 	CHECK(fdt_appendprop(fdt, 0, "prop-bytes", bytes, sizeof(bytes)));

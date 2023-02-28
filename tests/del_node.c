@@ -18,15 +18,16 @@
 
 int main(int argc, char *argv[])
 {
-	void *fdt;
+	void *fdt, *blob;
 	int subnode1_offset, subnode2_offset, subsubnode2_offset;
 	int err;
 	int oldsize, delsize, newsize;
 
 	test_init(argc, argv);
-	fdt = load_blob_arg(argc, argv);
+	blob = load_blob_arg(argc, argv);
 
-	fdt = open_blob_rw(fdt);
+	fdt = open_blob_rw(blob);
+	free(blob);
 
 	oldsize = fdt_totalsize(fdt);
 

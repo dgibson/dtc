@@ -18,16 +18,17 @@
 
 int main(int argc, char *argv[])
 {
-	void *fdt;
+	void *fdt, *blob;
 	const uint32_t *intp;
 	const char *strp;
 	int err, lenerr;
 	int oldsize, delsize, newsize;
 
 	test_init(argc, argv);
-	fdt = load_blob_arg(argc, argv);
+	blob = load_blob_arg(argc, argv);
 
-	fdt = open_blob_rw(fdt);
+	fdt = open_blob_rw(blob);
+	free(blob);
 
 	oldsize = fdt_totalsize(fdt);
 
@@ -73,5 +74,6 @@ int main(int argc, char *argv[])
 	if (newsize >= oldsize)
 		FAIL("Tree failed to shrink after deletions");
 
+	free(fdt);
 	PASS();
 }

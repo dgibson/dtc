@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 	if (err)
 		FAIL("fdt_open_into(): %s", fdt_strerror(err));
 
+	free(fdt);
 	fdt = buf;
 
 	intp = check_getprop_cell(fdt, 0, "prop-int", TEST_VALUE_1);
