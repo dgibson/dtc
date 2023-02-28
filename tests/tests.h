@@ -123,7 +123,7 @@ void vg_prepare_blob(void *fdt, size_t bufsize);
 void *load_blob(const char *filename);
 void *load_blob_arg(int argc, char *argv[]);
 void save_blob(const char *filename, void *blob);
-void *open_blob_rw(void *blob);
+void *open_blob_rw(const void *blob);
 
 #include "util.h"
 

@@ -69,15 +69,17 @@ static void check_set_name(void *fdt, const char *path, const char *newname)
 
 int main(int argc, char *argv[])
 {
-	void *fdt;
+	void *fdt, *blob;
 
 	test_init(argc, argv);
-	fdt = load_blob_arg(argc, argv);
-	fdt = open_blob_rw(fdt);
+	blob = load_blob_arg(argc, argv);
+	fdt = open_blob_rw(blob);
+	free(blob);
 
 	check_set_name(fdt, "/subnode@1", "subnode@17");
 	check_set_name(fdt, "/subnode@2/subsubnode@0", "fred@0");
 	check_set_name(fdt, "/subnode@17/subsubnode", "something@0");
 
+	free(fdt);
 	PASS();
 }

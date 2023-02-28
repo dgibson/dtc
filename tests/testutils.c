@@ -340,19 +340,14 @@ void save_blob(const char *filename, void *fdt)
 	free(tmp);
 }
 
-void *open_blob_rw(void *blob)
+void *open_blob_rw(const void *blob)
 {
 	int err;
-	void *buf = blob;
+	void *buf;
+	int newsize = fdt_totalsize(blob) + 8;
 
-	err = fdt_open_into(blob, buf, fdt_totalsize(blob));
-	if (err == -FDT_ERR_NOSPACE) {
-		/* Ran out of space converting to v17 */
-		int newsize = fdt_totalsize(blob) + 8;
-
-		buf = xmalloc(newsize);
-		err = fdt_open_into(blob, buf, newsize);
-	}
+	buf = xmalloc(newsize);
+	err = fdt_open_into(blob, buf, newsize);
 	if (err)
 		FAIL("fdt_open_into(): %s", fdt_strerror(err));
 	return buf;
