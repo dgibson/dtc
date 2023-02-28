@@ -1079,10 +1079,11 @@ static void check_i2c_bus_reg(struct check *c, struct dt_info *dti, struct node 
 		/* Ignore I2C_OWN_SLAVE_ADDRESS */
 		reg &= ~I2C_OWN_SLAVE_ADDRESS;
 
-		if ((reg & I2C_TEN_BIT_ADDRESS) && ((reg & ~I2C_TEN_BIT_ADDRESS) > 0x3ff))
-			FAIL_PROP(c, dti, node, prop, "I2C address must be less than 10-bits, got \"0x%x\"",
+		if (reg & I2C_TEN_BIT_ADDRESS) {
+			if ((reg & ~I2C_TEN_BIT_ADDRESS) > 0x3ff)
+				FAIL_PROP(c, dti, node, prop, "I2C address must be less than 10-bits, got \"0x%x\"",
 				  reg);
-		else if (reg > 0x7f)
+		} else if (reg > 0x7f)
 			FAIL_PROP(c, dti, node, prop, "I2C address must be less than 7-bits, got \"0x%x\". Set I2C_TEN_BIT_ADDRESS for 10 bit addresses or fix the property",
 				  reg);
 	}
