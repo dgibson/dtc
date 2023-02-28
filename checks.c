@@ -1108,7 +1108,7 @@ static void check_spi_bus_bridge(struct check *c, struct dt_info *dti, struct no
 		for_each_child(node, child) {
 			struct property *prop;
 			for_each_property(child, prop) {
-				if (strprefixeq(prop->name, 4, "spi-")) {
+				if (strstarts(prop->name, "spi-")) {
 					node->bus = &spi_bus;
 					break;
 				}
