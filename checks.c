@@ -31,7 +31,7 @@ typedef void (*check_fn)(struct check *c, struct dt_info *dti, struct node *node
 struct check {
 	const char *name;
 	check_fn fn;
-	void *data;
+	const void *data;
 	bool warn, error;
 	enum checkstatus status;
 	bool inprogress;
@@ -208,7 +208,7 @@ static void check_is_string(struct check *c, struct dt_info *dti,
 			    struct node *node)
 {
 	struct property *prop;
-	char *propname = c->data;
+	const char *propname = c->data;
 
 	prop = get_property(node, propname);
 	if (!prop)
@@ -227,7 +227,7 @@ static void check_is_string_list(struct check *c, struct dt_info *dti,
 {
 	int rem, l;
 	struct property *prop;
-	char *propname = c->data;
+	const char *propname = c->data;
 	char *str;
 
 	prop = get_property(node, propname);
@@ -255,7 +255,7 @@ static void check_is_cell(struct check *c, struct dt_info *dti,
 			  struct node *node)
 {
 	struct property *prop;
-	char *propname = c->data;
+	const char *propname = c->data;
 
 	prop = get_property(node, propname);
 	if (!prop)
@@ -1466,7 +1466,7 @@ static void check_provider_cells_property(struct check *c,
 					  struct dt_info *dti,
 				          struct node *node)
 {
-	struct provider *provider = c->data;
+	const struct provider *provider = c->data;
 	struct property *prop;
 
 	prop = get_property(node, provider->prop_name);
