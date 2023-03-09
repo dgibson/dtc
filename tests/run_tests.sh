@@ -885,9 +885,10 @@ dtbs_equal_tests () {
 }
 
 fdtget_tests () {
+    at="$1"
     dts=label01.dts
     dtb=$dts.fdtget.test.dtb
-    run_dtc_test -O dtb -o $dtb "$SRCDIR/$dts"
+    run_dtc_test $at -O dtb -o $dtb "$SRCDIR/$dts"
 
     # run_fdtget_test <expected-result> [<flags>] <file> <node> <property>
     run_fdtget_test "MyBoardName" $dtb / model
@@ -906,6 +907,11 @@ fdtget_tests () {
     # Here the property size is not a multiple of 4 bytes, so it should fail
     run_wrap_error_test $DTGET -tlx $dtb /randomnode mixed
     run_fdtget_test "6162 6300 1234 0 a 0 b 0 c" -thx $dtb /randomnode mixed
+    if [ -n "$at" ]; then
+        run_fdtget_test "6162 6300 1234 0 a 0 b 0 c" -thx $dtb "&node" mixed
+    else
+        run_wrap_error_test $DTGET  -thx $dtb "&node" mixed
+    fi
     run_fdtget_test "61 62 63 0 12 34 0 0 0 a 0 0 0 b 0 0 0 c" \
 	-thhx $dtb /randomnode mixed
     run_wrap_error_test $DTGET -ts $dtb /randomnode doctor-who
@@ -921,12 +927,13 @@ fdtget_tests () {
 }
 
 fdtput_tests () {
+    at="$1"
     dts=label01.dts
     dtb=$dts.fdtput.test.dtb
     text="$SRCDIR/lorem.txt"
 
     # Allow just enough space for $text
-    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
+    run_dtc_test $at -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
 
     # run_fdtput_test <expected-result> <file> <node> <property> <flags> <value>
     run_fdtput_test "a_model" $dtb / model -ts "a_model"
@@ -940,12 +947,19 @@ fdtput_tests () {
     run_fdtput_test "a0b0c0d deeaae ef000000" $dtb /randomnode blob \
 	-tx "a0b0c0d deeaae ef000000"
     run_fdtput_test "$(cat $text)" $dtb /randomnode blob -ts "$(cat $text)"
+    if [ -n "$at" ]; then
+        run_fdtput_test "y" $dtb '&node' x -ts "y"
+        run_fdtput_test "z" $dtb '&node/child' x -ts "z"
+    else
+        run_wrap_error_test $DTPUT $dtb '&node' x -ts "y"
+        run_wrap_error_test $DTPUT $dtb '&node/child' x -ts "z"
+    fi
 
     # Test expansion of the blob when insufficient room for property
     run_fdtput_test "$(cat $text $text)" $dtb /randomnode blob -ts "$(cat $text $text)"
 
     # Start again with a fresh dtb
-    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
+    run_dtc_test $at -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
 
     # Node creation
     run_wrap_error_test $DTPUT $dtb -c /baldrick sod
@@ -973,7 +987,7 @@ fdtput_tests () {
     run_wrap_test $DTPUT $dtb -cp /chosen/son
 
     # Start again with a fresh dtb
-    run_dtc_test -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
+    run_dtc_test $at -O dtb -p $($STATSZ $text) -o $dtb "$SRCDIR/$dts"
 
     # Node delete
     run_wrap_test $DTPUT $dtb -c /chosen/node1 /chosen/node2 /chosen/node3
@@ -1151,10 +1165,12 @@ for set in $TESTSETS; do
 	    dtbs_equal_tests
 	    ;;
 	"fdtget")
-	    fdtget_tests
+	    fdtget_tests ""
+	    fdtget_tests "-@"
 	    ;;
 	"fdtput")
-	    fdtput_tests
+	    fdtput_tests ""
+	    fdtput_tests "-@"
 	    ;;
 	"fdtdump")
 	    fdtdump_tests
