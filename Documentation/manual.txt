@@ -126,6 +126,11 @@ Options:
 	property for each label. The property's name is the label name and the
 	value is the path of the labeled node.
 
+    -L
+	Generates a __local_fixups__ node at the root node. For each property
+	that contains a phandle, the __local_fixups__ node contains a property
+	(at path __local_fixups__/$a if $a is the path of the node). Its value
+	is a list of offsets that are phandle values.
 
     -A
 	Generate automatically aliases for all node labels. This is similar to
