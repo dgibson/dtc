@@ -122,12 +122,10 @@ Options:
 	Relevant for dtb and asm output only.
 
     -@
-	Generates a __symbols__ node at the root node of the resulting blob
-	for any node labels used, and for any local references using phandles
-	it also generates a __local_fixups__ node that tracks them.
+	Generates a __symbols__ node at the root node. This node contains a
+	property for each label. The property's name is the label name and the
+	value is the path of the labeled node.
 
-	When using the /plugin/ tag all unresolved label references to
-	be tracked in the __fixups__ node, making dynamic resolution possible.
 
     -A
 	Generate automatically aliases for all node labels. This is similar to
