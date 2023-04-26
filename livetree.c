@@ -1056,6 +1056,25 @@ void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
 				     dti->dt, allocph);
 }
 
+void generate_labels_from_tree(struct dt_info *dti, const char *name)
+{
+	struct node *an;
+	struct property *p;
+
+	an = get_subnode(dti->dt, name);
+	if (!an)
+		return;
+
+	for_each_property(an, p) {
+		struct node *labeled_node;
+
+		labeled_node = get_node_by_path(dti->dt, p->val.val);
+		add_label(&labeled_node->labels, p->name);
+	}
+
+	delete_node(an);
+}
+
 void generate_fixups_tree(struct dt_info *dti, const char *name)
 {
 	if (!any_fixup_tree(dti, dti->dt))
@@ -1070,4 +1089,75 @@ void generate_local_fixups_tree(struct dt_info *dti, const char *name)
 		return;
 	generate_local_fixups_tree_internal(dti, build_root_node(dti->dt, name),
 					    dti->dt);
+}
+
+static void fixup_local_phandles_node(struct node *lf, struct node *n)
+{
+	struct property *lfp;
+	struct node *lfsubnode;
+
+	for_each_property(lf, lfp) {
+		struct property *p = get_property(n, lfp->name);
+		size_t i;
+
+		if (!p || p->val.len % sizeof(fdt32_t))
+			die("invalid length of property %s in node %s\n", lfp->name, lf->fullpath);
+
+		for (i = 0; i < lfp->val.len; i += sizeof(fdt32_t)) {
+			struct marker *m, **mi;
+
+			m = xmalloc(sizeof(*m));
+			m->offset = fdt32_to_cpu(*(fdt32_t *)(lfp->val.val + i));
+			m->type = REF_PHANDLE;
+			m->ref = NULL;
+
+			/* keep the list sorted in ascending ->offset order */
+			for (mi = &p->val.markers; *mi && (*mi)->offset < m->offset;)
+				mi = &(*mi)->next;
+
+			m->next = *mi;
+			*mi = m;
+		}
+	}
+
+	for_each_child(lf, lfsubnode) {
+		struct node *subnode = get_subnode(n, lfsubnode->name);
+
+		if (!subnode)
+			die("fixup for non-existent node in %s\n", lfsubnode->fullpath);
+
+		fixup_local_phandles_node(lfsubnode, subnode);
+	}
+}
+
+static void drop_phandles(struct node *n)
+{
+	struct property *p;
+	struct node *sn;
+
+	p = get_property(n, "phandle");
+	if (p)
+		delete_property(p);
+
+	p = get_property(n, "linux,phandle");
+	if (p)
+		delete_property(p);
+
+	for_each_child(n, sn)
+		drop_phandles(sn);
+}
+
+void fixup_local_phandles(struct dt_info *dti, const char *name)
+{
+	struct node *an;
+
+	an = get_subnode(dti->dt, name);
+	if (!an)
+		return;
+
+	fixup_local_phandles_node(an, dti->dt);
+
+	drop_phandles(dti->dt);
+
+	delete_node(an);
 }

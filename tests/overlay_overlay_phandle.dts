@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2023 Uwe Kleine-König
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+/dts-v1/;
+/plugin/;
+
+&{/} {
+	/* /a already has a label "node_a" in the base dts */
+	node_a2: a {
+		value = <42>;
+		c = <&node_c>;
+	};
+
+	c {
+		a = <&node_a2>;
+	};
+};
+
+&node_b {
+	value = <32>;
+};

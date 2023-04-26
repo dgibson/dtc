@@ -47,7 +47,7 @@ static void fill_fullpaths(struct node *tree, const char *prefix)
 
 /* Usage related data. */
 static const char usage_synopsis[] = "dtc [options] <input file>";
-static const char usage_short_opts[] = "qI:O:o:V:d:R:S:p:a:fb:i:H:sW:E:@AThv";
+static const char usage_short_opts[] = "qI:O:o:V:d:R:S:p:a:fb:i:H:sW:E:@LAThv";
 static struct option const usage_long_opts[] = {
 	{"quiet",            no_argument, NULL, 'q'},
 	{"in-format",         a_argument, NULL, 'I'},
@@ -67,6 +67,7 @@ static struct option const usage_long_opts[] = {
 	{"warning",           a_argument, NULL, 'W'},
 	{"error",             a_argument, NULL, 'E'},
 	{"symbols",	     no_argument, NULL, '@'},
+	{"local-fixups",     no_argument, NULL, 'L'},
 	{"auto-alias",       no_argument, NULL, 'A'},
 	{"annotate",         no_argument, NULL, 'T'},
 	{"help",             no_argument, NULL, 'h'},
@@ -252,6 +253,11 @@ int main(int argc, char *argv[])
 		case '@':
 			generate_symbols = 1;
 			break;
+
+		case 'L':
+			generate_fixups = 1;
+			break;
+
 		case 'A':
 			auto_label_aliases = 1;
 			break;
@@ -329,12 +335,20 @@ int main(int argc, char *argv[])
 	if (auto_label_aliases)
 		generate_label_tree(dti, "aliases", false);
 
-	if (generate_symbols)
-		generate_label_tree(dti, "__symbols__", true);
+	if (generate_symbols) {
+		if (streq(inform, "fs") || streq(inform, "dtb"))
+			generate_labels_from_tree(dti, "__symbols__");
+		else
+			generate_label_tree(dti, "__symbols__", true);
+	}
 
 	if (generate_fixups) {
-		generate_fixups_tree(dti, "__fixups__");
-		generate_local_fixups_tree(dti, "__local_fixups__");
+		if (streq(inform, "fs") || streq(inform, "dtb")) {
+			fixup_local_phandles(dti, "__local_fixups__");
+		} else {
+			generate_fixups_tree(dti, "__fixups__");
+			generate_local_fixups_tree(dti, "__local_fixups__");
+		}
 	}
 
 	if (sort)
