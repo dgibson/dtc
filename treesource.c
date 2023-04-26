@@ -172,7 +172,7 @@ static enum markertype guess_value_type(struct property *prop)
 	return TYPE_UINT8;
 }
 
-static void write_propval(FILE *f, struct property *prop)
+static void write_propval(FILE *f, struct node *root, struct property *prop)
 {
 	size_t len = prop->val.len;
 	struct marker *m = prop->val.markers;
@@ -219,6 +219,9 @@ static void write_propval(FILE *f, struct property *prop)
 		if (emit_type == TYPE_NONE || chunk_len == 0)
 			continue;
 
+		if (m->offset != 0)
+			fputc(' ', f);
+
 		switch(emit_type) {
 		case TYPE_UINT16:
 			write_propval_int(f, p, chunk_len, 2);
@@ -230,10 +233,26 @@ static void write_propval(FILE *f, struct property *prop)
 					break;
 
 			if (m_phandle) {
-				if (m_phandle->ref[0] == '/')
-					fprintf(f, "&{%s}", m_phandle->ref);
-				else
-					fprintf(f, "&%s", m_phandle->ref);
+				if (m_phandle->ref) {
+					if (m_phandle->ref[0] == '/')
+						fprintf(f, "&{%s}", m_phandle->ref);
+					else
+						fprintf(f, "&%s", m_phandle->ref);
+				} else {
+					cell_t phandle = fdt32_to_cpu(*(const fdt32_t *)p);
+					struct node *n = get_node_by_phandle(root, phandle);
+
+					if (!n) {
+						fprintf(f, "&??");
+					} else {
+						if (n->labels) {
+							fprintf(f, "&%s", n->labels->label);
+						} else {
+							fprintf(f, "&{%s}", n->fullpath);
+						}
+					}
+
+				}
 				if (chunk_len > 4) {
 					fputc(' ', f);
 					write_propval_int(f, p + 4, chunk_len - 4, 4);
@@ -270,7 +289,7 @@ static void write_propval(FILE *f, struct property *prop)
 	fprintf(f, "\n");
 }
 
-static void write_tree_source_node(FILE *f, struct node *tree, int level)
+static void write_tree_source_node(FILE *f, struct node *root, struct node *tree, int level)
 {
 	struct property *prop;
 	struct node *child;
@@ -299,11 +318,11 @@ static void write_tree_source_node(FILE *f, struct node *tree, int level)
 		for_each_label(prop->labels, l)
 			fprintf(f, "%s: ", l->label);
 		fprintf(f, "%s", prop->name);
-		write_propval(f, prop);
+		write_propval(f, root, prop);
 	}
 	for_each_child(tree, child) {
 		fprintf(f, "\n");
-		write_tree_source_node(f, child, level+1);
+		write_tree_source_node(f, root, child, level+1);
 	}
 	write_prefix(f, level);
 	fprintf(f, "};");
@@ -333,5 +352,5 @@ void dt_to_source(FILE *f, struct dt_info *dti)
 			(unsigned long long)re->size);
 	}
 
-	write_tree_source_node(f, dti->dt, 0);
+	write_tree_source_node(f, dti->dt, dti->dt, 0);
 }

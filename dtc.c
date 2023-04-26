@@ -335,12 +335,20 @@ int main(int argc, char *argv[])
 	if (auto_label_aliases)
 		generate_label_tree(dti, "aliases", false);
 
-	if (generate_symbols)
-		generate_label_tree(dti, "__symbols__", true);
+	if (generate_symbols) {
+		if (streq(inform, "fs") || streq(inform, "dtb"))
+			generate_labels_from_tree(dti, "__symbols__");
+		else
+			generate_label_tree(dti, "__symbols__", true);
+	}
 
 	if (generate_fixups) {
-		generate_fixups_tree(dti, "__fixups__");
-		generate_local_fixups_tree(dti, "__local_fixups__");
+		if (streq(inform, "fs") || streq(inform, "dtb")) {
+			fixup_local_phandles(dti, "__local_fixups__");
+		} else {
+			generate_fixups_tree(dti, "__fixups__");
+			generate_local_fixups_tree(dti, "__local_fixups__");
+		}
 	}
 
 	if (sort)
