@@ -87,7 +87,7 @@ static void write_propval_string(FILE *f, const char *s, size_t len)
 			fprintf(f, "\\\"");
 			break;
 		case '\0':
-			fprintf(f, "\\0");
+			fprintf(f, "\", \"");
 			break;
 		default:
 			if (isprint((unsigned char)c))
