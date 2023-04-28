@@ -42,7 +42,7 @@ else
 endif
 
 yamltree = 'yamltree.c'
-yaml = dependency('yaml-0.1', required: get_option('yaml'), static: static_build)
+yaml = dependency('yaml-0.1', version: '>=0.2.3', required: get_option('yaml'), static: static_build)
 if not yaml.found()
   add_project_arguments('-DNO_YAML', language: 'c')
   yamltree = []
