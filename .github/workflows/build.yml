@@ -1,0 +1,33 @@
+---
+name: Build test
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run:
+          sudo apt install
+          flex
+          libyaml-dev
+          pkg-config
+          python3-dev
+          swig
+          valgrind
+          bison
+
+      - name: Build
+        run: make
+
+      - name: Run check
+        run: make check
