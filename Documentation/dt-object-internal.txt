@@ -35,7 +35,7 @@ We have a number of peripherals that after probing (using some undefined method)
 should result in different Device Tree configuration.
 
 We cannot boot with this static tree because due to the configuration of the
-foo platform there exist multiple conficting peripherals DT fragments.
+foo platform there exist multiple conflicting peripherals DT fragments.
 
 So for the bar peripheral we would have this:
 
