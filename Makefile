@@ -55,7 +55,11 @@ else
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags valgrind)
 endif
 
-NO_YAML := $(shell $(PKG_CONFIG) --exists yaml-0.1; echo $$?)
+# libyaml before version 0.2.3 expects non-const string parameters. Supporting
+# both variants would require either cpp magic or passing
+# -Wno-error=discarded-qualifiers to the compiler. For the sake of simplicity
+# just support libyaml >= 0.2.3.
+NO_YAML := $(shell $(PKG_CONFIG) --atleast-version 0.2.3 yaml-0.1; echo $$?)
 ifeq ($(NO_YAML),1)
 	CFLAGS += -DNO_YAML
 else
