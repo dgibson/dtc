@@ -255,14 +255,18 @@ int fdt_path_offset_namelen(const void *fdt, const char *path, int namelen)
 
 	FDT_RO_PROBE(fdt);
 
-	/* see if we have an alias */
+	/* see if we have an alias or symbol */
 	if (*path != '/') {
 		const char *q = memchr(path, '/', end - p);
 
 		if (!q)
 			q = end;
 
-		p = fdt_get_alias_namelen(fdt, p, q - p);
+		if (*p == '&')
+			p = fdt_get_symbol_namelen(fdt, p + 1, q - p - 1);
+		else
+			p = fdt_get_alias_namelen(fdt, p, q - p);
+
 		if (!p)
 			return -FDT_ERR_BADPATH;
 		offset = fdt_path_offset(fdt, p);
@@ -522,21 +526,38 @@ uint32_t fdt_get_phandle(const void *fdt, int nodeoffset)
 	return fdt32_ld_(php);
 }
 
+static const void *fdt_path_getprop_namelen(const void *fdt, const char *path,
+					    const char *propname, int propnamelen,
+					    int *lenp)
+{
+	int offset = fdt_path_offset(fdt, path);
+
+	if (offset < 0)
+		return NULL;
+
+	return fdt_getprop_namelen(fdt, offset, propname, propnamelen, lenp);
+}
+
 const char *fdt_get_alias_namelen(const void *fdt,
 				  const char *name, int namelen)
 {
-	int aliasoffset;
-
-	aliasoffset = fdt_path_offset(fdt, "/aliases");
-	if (aliasoffset < 0)
-		return NULL;
-
-	return fdt_getprop_namelen(fdt, aliasoffset, name, namelen, NULL);
+	return fdt_path_getprop_namelen(fdt, "/aliases", name, namelen, NULL);
 }
 
 const char *fdt_get_alias(const void *fdt, const char *name)
 {
 	return fdt_get_alias_namelen(fdt, name, strlen(name));
+}
+
+const char *fdt_get_symbol_namelen(const void *fdt,
+				   const char *name, int namelen)
+{
+	return fdt_path_getprop_namelen(fdt, "/__symbols__", name, namelen, NULL);
+}
+
+const char *fdt_get_symbol(const void *fdt, const char *name)
+{
+	return fdt_get_symbol_namelen(fdt, name, strlen(name));
 }
 
 int fdt_get_path(const void *fdt, int nodeoffset, char *buf, int buflen)
