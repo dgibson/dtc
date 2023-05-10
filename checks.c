@@ -1785,31 +1785,6 @@ static void check_graph_nodes(struct check *c, struct dt_info *dti,
 }
 WARNING(graph_nodes, check_graph_nodes, NULL);
 
-static void check_graph_child_address(struct check *c, struct dt_info *dti,
-				      struct node *node)
-{
-	int cnt = 0;
-	struct node *child;
-
-	if (node->bus != &graph_ports_bus && node->bus != &graph_port_bus)
-		return;
-
-	for_each_child(node, child) {
-		struct property *prop = get_property(child, "reg");
-
-		/* No error if we have any non-zero unit address */
-		if (prop && propval_cell(prop) != 0)
-			return;
-
-		cnt++;
-	}
-
-	if (cnt == 1 && node->addr_cells != -1)
-		FAIL(c, dti, node, "graph node has single child node '%s', #address-cells/#size-cells are not necessary",
-		     node->children->name);
-}
-WARNING(graph_child_address, check_graph_child_address, NULL, &graph_nodes);
-
 static void check_graph_reg(struct check *c, struct dt_info *dti,
 			    struct node *node)
 {
@@ -1899,6 +1874,31 @@ static void check_graph_endpoint(struct check *c, struct dt_info *dti,
 		     remote_node->fullpath);
 }
 WARNING(graph_endpoint, check_graph_endpoint, NULL, &graph_nodes);
+
+static void check_graph_child_address(struct check *c, struct dt_info *dti,
+				      struct node *node)
+{
+	int cnt = 0;
+	struct node *child;
+
+	if (node->bus != &graph_ports_bus && node->bus != &graph_port_bus)
+		return;
+
+	for_each_child(node, child) {
+		struct property *prop = get_property(child, "reg");
+
+		/* No error if we have any non-zero unit address */
+                if (prop && propval_cell(prop) != 0 )
+			return;
+
+		cnt++;
+	}
+
+	if (cnt == 1 && node->addr_cells != -1)
+		FAIL(c, dti, node, "graph node has single child node '%s', #address-cells/#size-cells are not necessary",
+		     node->children->name);
+}
+WARNING(graph_child_address, check_graph_child_address, NULL, &graph_nodes, &graph_port, &graph_endpoint);
 
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
