@@ -441,7 +441,7 @@ cell_t propval_cell(struct property *prop)
 
 cell_t propval_cell_n(struct property *prop, unsigned int n)
 {
-	assert(prop->val.len / sizeof(cell_t) >= n);
+	assert(prop->val.len / sizeof(cell_t) > n);
 	return fdt32_to_cpu(*((fdt32_t *)prop->val.val + n));
 }
 
