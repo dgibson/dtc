@@ -12,22 +12,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
+
+    container:
+      image: ${{ matrix.os }}
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Install Dependencies
-        run:
-          sudo apt install
-          flex
-          libyaml-dev
-          pkg-config
-          python3-dev
-          swig
-          valgrind
-          bison
+        run: |
+          ./scripts/install-deps.sh
 
       - name: Build
-        run: make
+        run: |
+          SETUPTOOLS_SCM_PRETEND_VERSION="0" make
 
       - name: Run check
-        run: make check
+        run: |
+          SETUPTOOLS_SCM_PRETEND_VERSION="0" make check
