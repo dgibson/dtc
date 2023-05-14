@@ -15,6 +15,7 @@
     a-string-with-nulls: ["foo\0bar", "baz"]
     a-phandle: [[!phandle 0x1]]
     a-phandle-with-args: [[!phandle 0x1, 0x0, 0x1], [!phandle 0x1, 0x2, 0x3]]
+    mixed-ints-and-phandles: [[0x1, !phandle 0x1, 0x2, !phandle 0x1]]
     subsubnode:
       compatible: ["subsubnode1", "subsubnode"]
       phandle: [[0x1]]

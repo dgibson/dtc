@@ -241,6 +241,8 @@ static void write_propval(FILE *f, struct property *prop)
 			} else {
 				write_propval_int(f, p, chunk_len, 4);
 			}
+			if (data_len > chunk_len)
+				fputc(' ', f);
 			break;
 		case TYPE_UINT64:
 			write_propval_int(f, p, chunk_len, 8);

@@ -18,6 +18,7 @@
 		a-string-with-nulls = "foo\0bar", "baz";
 		a-phandle = <&subsub1>;
 		a-phandle-with-args = <&subsub1 0x00 0x01>, <&subsub1 0x02 0x03>;
+		mixed-ints-and-phandles = <0x01 &subsub1 0x02 &subsub1>;
 
 		subsub1: subsubnode {
 			compatible = "subsubnode1", "subsubnode";
