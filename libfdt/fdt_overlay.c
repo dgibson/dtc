@@ -85,42 +85,38 @@ int fdt_overlay_target_offset(const void *fdt, const void *fdto,
 }
 
 /**
- * overlay_phandle_add_offset - Increases a phandle by an offset
+ * overlay_phandle_set - Set a phandle to a specific value
  * @fdt: Base device tree blob
  * @node: Device tree overlay blob
  * @name: Name of the property to modify (phandle or linux,phandle)
- * @delta: offset to apply
+ * @phandleval: value to set the phandle to
+ * @phandlemap: List to map previous phandle values to new ones.
  *
- * overlay_phandle_add_offset() increments a node phandle by a given
- * offset.
+ * overlay_phandle_set() set a node's phandle to a given
+ * value and updates phandlemap accordingly.
  *
  * returns:
  *      0 on success.
  *      Negative error code on error
  */
-static int overlay_phandle_add_offset(void *fdt, int node,
-				      const char *name, uint32_t delta)
+static int overlay_phandle_set(void *fdt, int node,
+			       const char *name, uint32_t phandleval, uint32_t *phandlemap)
 {
-	const fdt32_t *val;
-	uint32_t adj_val;
 	int len;
+	const fdt32_t *phandle;
+	uint32_t prevval;
 
-	val = fdt_getprop(fdt, node, name, &len);
-	if (!val)
+	phandle = fdt_getprop(fdt, node, name, &len);
+	if (!phandle)
 		return len;
 
-	if (len != sizeof(*val))
+	if (len != sizeof(*phandle))
 		return -FDT_ERR_BADPHANDLE;
 
-	adj_val = fdt32_to_cpu(*val);
-	if ((adj_val + delta) < adj_val)
-		return -FDT_ERR_NOPHANDLES;
+	prevval = fdt32_ld_(phandle);
+	phandlemap[prevval - 1] = phandleval;
 
-	adj_val += delta;
-	if (adj_val == (uint32_t)-1)
-		return -FDT_ERR_NOPHANDLES;
-
-	return fdt_setprop_inplace_u32(fdt, node, name, adj_val);
+	return fdt_setprop_inplace_u32(fdt, node, name, phandleval);
 }
 
 /**
@@ -129,31 +125,82 @@ static int overlay_phandle_add_offset(void *fdt, int node,
  * @node: Offset of the node we want to adjust
  * @delta: Offset to shift the phandles of
  *
- * overlay_adjust_node_phandles() adds a constant to all the phandles
- * of a given node. This is mainly use as part of the overlay
- * application process, when we want to update all the overlay
- * phandles to not conflict with the overlays of the base device tree.
+ * overlay_adjust_node_phandles() increases the (new) phandles of a given node
+ * in an overlay to not conflict with the base device tree. This is used as part
+ * of the overlay application process, when we want to update all the overlay
+ * phandles to not conflict with the base device tree.
  *
  * returns:
  *      0 on success
  *      Negative error code on failure
  */
-static int overlay_adjust_node_phandles(void *fdto, int node,
-					uint32_t delta)
+static int overlay_adjust_node_phandles(void *fdto, int nodeo,
+					uint32_t *next_phandle, void *fdtbase,
+					int basenode, uint32_t *phandlemap)
 {
-	int child;
+	int childo;
 	int ret;
+	uint32_t phandle;
 
-	ret = overlay_phandle_add_offset(fdto, node, "phandle", delta);
-	if (ret && ret != -FDT_ERR_NOTFOUND)
-		return ret;
+	/*
+	 * If the base fdt has a phandle already reuse the value to not break
+	 * references that already exist in the base fdt.
+	 */
+	if (fdtbase)
+		phandle = fdt_get_phandle(fdtbase, basenode);
+	else
+		/*
+		 * to please the compilers that don't see that phandle is only
+		 * used when fdtbase is non-NULL and prevent them claiming that
+		 * phandle might be used uninitialized.
+		 */
+		phandle = 0;
 
-	ret = overlay_phandle_add_offset(fdto, node, "linux,phandle", delta);
-	if (ret && ret != -FDT_ERR_NOTFOUND)
-		return ret;
+	if (fdtbase && phandle) {
+		ret = overlay_phandle_set(fdto, nodeo, "phandle", phandle, phandlemap);
+		if (ret && ret != -FDT_ERR_NOTFOUND)
+			return ret;
 
-	fdt_for_each_subnode(child, fdto, node) {
-		ret = overlay_adjust_node_phandles(fdto, child, delta);
+		ret = overlay_phandle_set(fdto, nodeo, "linux,phandle", phandle, phandlemap);
+		if (ret && ret != -FDT_ERR_NOTFOUND)
+			return ret;
+	} else {
+		bool used = false;
+
+		ret = overlay_phandle_set(fdto, nodeo, "phandle", *next_phandle, phandlemap);
+		if (ret && ret != -FDT_ERR_NOTFOUND)
+			return ret;
+		else if (!ret)
+			used = true;
+
+		ret = overlay_phandle_set(fdto, nodeo, "linux,phandle", *next_phandle, phandlemap);
+		if (ret && ret != -FDT_ERR_NOTFOUND)
+			return ret;
+		else if (!ret)
+			used = true;
+
+		if (used)
+			*next_phandle += 1;
+	}
+
+	fdt_for_each_subnode(childo, fdto, nodeo) {
+		int basechild = -FDT_ERR_NOTFOUND;
+
+		if (fdtbase) {
+			int childnamelen;
+			const char *childname = fdt_get_name(fdto, childo, &childnamelen);
+
+			if (!childname)
+				return childnamelen;
+
+			basechild = fdt_subnode_offset(fdtbase, basenode, childname);
+			if (basechild < 0 && basechild != -FDT_ERR_NOTFOUND)
+				return basechild;
+		}
+
+		ret = overlay_adjust_node_phandles(fdto, childo, next_phandle,
+						   basechild >= 0 ? fdtbase : NULL,
+						   basechild, phandlemap);
 		if (ret)
 			return ret;
 	}
@@ -166,21 +213,43 @@ static int overlay_adjust_node_phandles(void *fdto, int node,
  * @fdto: Device tree overlay blob
  * @delta: Offset to shift the phandles of
  *
- * overlay_adjust_local_phandles() adds a constant to all the
- * phandles of an overlay. This is mainly use as part of the overlay
+ * overlay_adjust_local_phandles() assigns new values to all the
+ * phandles of an overlay. This is mainly used as part of the overlay
  * application process, when we want to update all the overlay
  * phandles to not conflict with the overlays of the base device tree.
+ * phandles that already exist in *fdtbase are not adapted to not overwrite
+ * existing phandles.
  *
  * returns:
  *      0 on success
  *      Negative error code on failure
  */
-static int overlay_adjust_local_phandles(void *fdto, uint32_t delta)
+static int overlay_adjust_local_phandles(void *fdto, uint32_t next_phandle, void *fdtbase, uint32_t *phandlemap)
 {
-	/*
-	 * Start adjusting the phandles from the overlay root
-	 */
-	return overlay_adjust_node_phandles(fdto, 0, delta);
+	int fragment;
+
+	fdt_for_each_subnode(fragment, fdto, 0) {
+		int overlay;
+		int target;
+		int ret;
+
+		overlay = fdt_subnode_offset(fdto, fragment, "__overlay__");
+		if (overlay == -FDT_ERR_NOTFOUND)
+			continue;
+
+		if (overlay < 0)
+			return overlay;
+
+		target = fdt_overlay_target_offset(fdtbase, fdto, fragment, NULL);
+		if (target < 0)
+			return target;
+
+		ret = overlay_adjust_node_phandles(fdto, overlay, &next_phandle,
+						   fdtbase, target, phandlemap);
+		if (ret)
+			return ret;
+	}
+	return 0;
 }
 
 /**
@@ -205,7 +274,7 @@ static int overlay_adjust_local_phandles(void *fdto, uint32_t delta)
 static int overlay_update_local_node_references(void *fdto,
 						int tree_node,
 						int fixup_node,
-						uint32_t delta)
+						uint32_t *phandlemap)
 {
 	int fixup_prop;
 	int fixup_child;
@@ -250,7 +319,7 @@ static int overlay_update_local_node_references(void *fdto,
 			 */
 			memcpy(&adj_val, tree_val + poffset, sizeof(adj_val));
 
-			adj_val = cpu_to_fdt32(fdt32_to_cpu(adj_val) + delta);
+			adj_val = cpu_to_fdt32(phandlemap[fdt32_to_cpu(adj_val) - 1]);
 
 			ret = fdt_setprop_inplace_namelen_partial(fdto,
 								  tree_node,
@@ -282,7 +351,7 @@ static int overlay_update_local_node_references(void *fdto,
 		ret = overlay_update_local_node_references(fdto,
 							   tree_child,
 							   fixup_child,
-							   delta);
+							   phandlemap);
 		if (ret)
 			return ret;
 	}
@@ -293,13 +362,12 @@ static int overlay_update_local_node_references(void *fdto,
 /**
  * overlay_update_local_references - Adjust the overlay references
  * @fdto: Device tree overlay blob
- * @delta: Offset to shift the phandles of
+ * @phandlemap: mapping of old values of the phandles to the new
  *
- * overlay_update_local_references() update all the phandles pointing
- * to a node within the device tree overlay by adding a constant
- * delta to not conflict with the base overlay.
+ * overlay_update_local_references() updates all the phandles pointing
+ * to a node within the device tree overlay according to phandlemap.
  *
- * This is mainly used as part of a device tree application process,
+ * This is used as part of a device tree overlay application process,
  * where you want the device tree overlays phandles to not conflict
  * with the ones from the base device tree before merging them.
  *
@@ -307,7 +375,7 @@ static int overlay_update_local_node_references(void *fdto,
  *      0 on success
  *      Negative error code on failure
  */
-static int overlay_update_local_references(void *fdto, uint32_t delta)
+static int overlay_update_local_references(void *fdto, uint32_t *phandlemap)
 {
 	int fixups;
 
@@ -324,7 +392,7 @@ static int overlay_update_local_references(void *fdto, uint32_t delta)
 	 * Update our local references from the root of the tree
 	 */
 	return overlay_update_local_node_references(fdto, 0, fixups,
-						    delta);
+						    phandlemap);
 }
 
 /**
@@ -816,23 +884,49 @@ int fdt_overlay_apply(void *fdt, void *fdto)
 {
 	uint32_t delta;
 	int ret;
+	uint32_t *phandlemap = NULL;
 
 	FDT_RO_PROBE(fdt);
 	FDT_RO_PROBE(fdto);
+
+	ret = fdt_find_max_phandle(fdto, &delta);
+	if (ret)
+		goto err;
+
+	phandlemap = calloc(delta, sizeof(*phandlemap));
+	if (!phandlemap) {
+		ret = -FDT_ERR_NOSPACE;
+		goto err;
+	}
 
 	ret = fdt_find_max_phandle(fdt, &delta);
 	if (ret)
 		goto err;
 
-	ret = overlay_adjust_local_phandles(fdto, delta);
-	if (ret)
-		goto err;
-
-	ret = overlay_update_local_references(fdto, delta);
-	if (ret)
-		goto err;
-
+	/*
+	 * Resolve the overlay's phandles that point into the base (in the
+	 * __fixups__ node) to the respective handles in the base.
+	 */
 	ret = overlay_fixup_phandles(fdt, fdto);
+	if (ret)
+		goto err;
+
+	/*
+	 * Adapt the phandles used in fdto to use values > delta. phandles that
+	 * already exist in fdt are not overwritten. phandlemap is updated to
+	 * maintain how the fdto's phandles change. Note this requires finding
+	 * the fragment targets in fdt and so this must be done after
+	 * overlay_fixup_phandles().
+	 */
+	ret = overlay_adjust_local_phandles(fdto, delta + 1, fdt, phandlemap);
+	if (ret)
+		goto err;
+
+	/*
+	 * Fixup the phandles in the overlay listed in __local_fixups__
+	 * according to phandlemap.
+	 */
+	ret = overlay_update_local_references(fdto, phandlemap);
 	if (ret)
 		goto err;
 
@@ -844,6 +938,8 @@ int fdt_overlay_apply(void *fdt, void *fdto)
 	if (ret)
 		goto err;
 
+	free(phandlemap);
+
 	/*
 	 * The overlay has been damaged, erase its magic.
 	 */
@@ -852,6 +948,8 @@ int fdt_overlay_apply(void *fdt, void *fdto)
 	return 0;
 
 err:
+	free(phandlemap);
+
 	/*
 	 * The overlay might have been damaged, erase its magic.
 	 */
