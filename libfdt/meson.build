@@ -18,7 +18,7 @@ sources = files(
 
 libfdt = library(
   'fdt', sources,
-  version: '1.6.0',
+  version: '1.7.0',
   link_args: ['-Wl,--no-undefined', version_script],
   link_depends: 'version.lds',
   install: true,
