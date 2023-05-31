@@ -16,10 +16,20 @@ sources = files(
   'fdt_wip.c',
 )
 
+link_args = []
+if cc.has_link_argument('-Wl,--no-undefined')
+    link_args += '-Wl,--no-undefined'
+else
+    # -undefined error is the equivalent of --no-undefined for the macOS linker,
+    # but -undefined would also be understood as a valid argument for GNU ld!
+    link_args += cc.get_supported_link_arguments('-Wl,-undefined,error')
+endif
+
+link_args += version_script
 libfdt = library(
   'fdt', sources,
   version: '1.6.0',
-  link_args: ['-Wl,--no-undefined', version_script],
+  link_args: link_args,
   link_depends: 'version.lds',
   install: true,
 )
