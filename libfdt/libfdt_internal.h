@@ -1,10 +1,12 @@
 /* SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause) */
-#ifndef LIBFDT_INTERNAL_H
-#define LIBFDT_INTERNAL_H
+
 /*
  * libfdt - Flat Device Tree manipulation
  * Copyright (C) 2006 David Gibson, IBM Corporation.
  */
+
+#pragma once
+
 #include <fdt.h>
 
 #define FDT_ALIGN(x, a)		(((x) + (a) - 1) & ~((a) - 1))
@@ -188,5 +190,3 @@ static inline bool can_assume_(int mask)
 
 /** helper macros for checking assumptions */
 #define can_assume(_assume)	can_assume_(ASSUME_ ## _assume)
-
-#endif /* LIBFDT_INTERNAL_H */
