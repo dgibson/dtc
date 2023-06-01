@@ -134,8 +134,8 @@ if not meson.is_cross_build()
   if py.found() and swig.found()
     subdir('pylibfdt')
   endif
+endif
 
-  if get_option('tools')
-    subdir('tests')
-  endif
+if get_option('tests')
+  subdir('tests')
 endif

@@ -10,3 +10,5 @@ option('python', type: 'feature', value: 'auto',
        description: 'Build pylibfdt Python library')
 option('static-build', type: 'boolean', value: false,
        description: 'Build static binaries')
+option('tests', type: 'boolean', value: true,
+       description: 'Build tests')
