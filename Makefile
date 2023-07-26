@@ -238,7 +238,7 @@ install-bin: all $(SCRIPTS)
 	$(INSTALL_PROGRAM) $(BIN) $(DESTDIR)$(BINDIR)
 	$(INSTALL_SCRIPT) $(SCRIPTS) $(DESTDIR)$(BINDIR)
 
-install-lib: all
+install-lib: libfdt
 	@$(VECHO) INSTALL-LIB
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
 	$(INSTALL_LIB) $(LIBFDT_lib) $(DESTDIR)$(LIBDIR)
