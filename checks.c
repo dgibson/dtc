@@ -1182,7 +1182,7 @@ static void check_unit_address_format(struct check *c, struct dt_info *dti,
 		/* skip over 0x for next test */
 		unitname += 2;
 	}
-	if (unitname[0] == '0' && isxdigit(unitname[1]))
+	if (unitname[0] == '0' && isxdigit((unsigned char)unitname[1]))
 		FAIL(c, dti, node, "unit name should not have leading 0s");
 }
 WARNING(unit_address_format, check_unit_address_format, NULL,
