@@ -1,33 +1,13 @@
 /* SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause) */
-LIBFDT_1.2 {
+LIBFDT_1.0 {
 	global:
-		fdt_next_node;
-		fdt_check_header;
 		fdt_move;
 		fdt_string;
-		fdt_num_mem_rsv;
-		fdt_get_mem_rsv;
 		fdt_subnode_offset_namelen;
 		fdt_subnode_offset;
-		fdt_path_offset_namelen;
 		fdt_path_offset;
-		fdt_get_name;
-		fdt_get_property_namelen;
 		fdt_get_property;
-		fdt_getprop_namelen;
 		fdt_getprop;
-		fdt_get_phandle;
-		fdt_get_alias_namelen;
-		fdt_get_alias;
-		fdt_get_path;
-                fdt_header_size;
-		fdt_supernode_atdepth_offset;
-		fdt_node_depth;
-		fdt_parent_offset;
-		fdt_node_offset_by_prop_value;
-		fdt_node_offset_by_phandle;
-		fdt_node_check_compatible;
-		fdt_node_offset_by_compatible;
 		fdt_setprop_inplace;
 		fdt_nop_property;
 		fdt_nop_node;
@@ -40,9 +20,6 @@ LIBFDT_1.2 {
 		fdt_finish;
 		fdt_open_into;
 		fdt_pack;
-		fdt_add_mem_rsv;
-		fdt_del_mem_rsv;
-		fdt_set_name;
 		fdt_setprop;
 		fdt_delprop;
 		fdt_add_subnode_namelen;
@@ -50,34 +27,92 @@ LIBFDT_1.2 {
 		fdt_del_node;
 		fdt_strerror;
 		fdt_offset_ptr;
-		fdt_next_tag;
-		fdt_appendprop;
-		fdt_create_empty_tree;
-		fdt_first_property_offset;
-		fdt_get_property_by_offset;
-		fdt_getprop_by_offset;
-		fdt_next_property_offset;
-		fdt_first_subnode;
-		fdt_next_subnode;
-		fdt_address_cells;
-		fdt_size_cells;
-		fdt_stringlist_contains;
-		fdt_stringlist_count;
-		fdt_stringlist_search;
-		fdt_stringlist_get;
-		fdt_resize;
-		fdt_overlay_apply;
-		fdt_get_string;
-		fdt_find_max_phandle;
-		fdt_generate_phandle;
-		fdt_check_full;
-		fdt_setprop_placeholder;
-		fdt_property_placeholder;
 		fdt_header_size_;
-		fdt_appendprop_addrrange;
-		fdt_setprop_inplace_namelen_partial;
-		fdt_create_with_flags;
-		fdt_overlay_target_offset;
 	local:
 		*;
 };
+
+LIBFDT_1.1 {
+	global:
+		fdt_get_name;
+		fdt_get_path;
+		fdt_supernode_atdepth_offset;
+		fdt_node_depth;
+		fdt_parent_offset;
+		fdt_node_offset_by_prop_value;
+		fdt_get_mem_rsv;
+		fdt_num_mem_rsv;
+		fdt_add_mem_rsv;
+		fdt_del_mem_rsv;
+		fdt_node_check_compatible;
+		fdt_node_offset_by_compatible;
+		fdt_check_header;
+		fdt_next_tag;
+		fdt_get_phandle;
+		fdt_node_offset_by_phandle;
+		fdt_set_name;
+} LIBFDT_1.0;
+
+LIBFDT_1.2 {
+	global:
+		fdt_next_node;
+} LIBFDT_1.1;
+
+LIBFDT_1.3 {
+	global:
+		fdt_get_property_namelen;
+		fdt_getprop_namelen;
+		fdt_get_alias_namelen;
+		fdt_get_alias;
+		fdt_first_property_offset;
+		fdt_next_property_offset;
+		fdt_get_property_by_offset;
+		fdt_getprop_by_offset;
+} LIBFDT_1.2;
+
+LIBFDT_1.4 {
+	global:
+		fdt_appendprop;
+		fdt_create_empty_tree;
+		fdt_stringlist_contains;
+		fdt_first_subnode;
+		fdt_next_subnode;
+} LIBFDT_1.3;
+
+LIBFDT_1.5 {
+	global:
+		fdt_resize;
+		fdt_address_cells;
+		fdt_size_cells;
+		fdt_path_offset_namelen;
+		fdt_stringlist_count;
+		fdt_stringlist_search;
+		fdt_stringlist_get;
+		fdt_get_max_phandle;
+		fdt_setprop_inplace_namelen_partial;
+		fdt_overlay_apply;
+		fdt_property_placeholder;
+		fdt_setprop_placeholder;
+		fdt_get_string;
+		fdt_check_full;
+} LIBFDT_1.4;
+
+LIBFDT_1.6 {
+	global:
+		fdt_appendprop_addrrange;
+		fdt_find_max_phandle;
+		fdt_generate_phandle;
+		fdt_create_with_flags;
+		fdt_header_size;
+} LIBFDT_1.5;
+
+LIBFDT_1.7 {
+	global:
+		fdt_overlay_target_offset;
+} LIBFDT_1.6;
+
+LIBFDT_1.8 {
+	global:
+		fdt_get_symbol_namelen;
+		fdt_get_symbol;
+} LIBFDT_1.7;
