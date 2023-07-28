@@ -1,12 +1,19 @@
-setup_py = find_program('../setup.py')
-setup_py = [setup_py.path(), '--quiet', '--top-builddir', meson.project_build_root()]
-
-custom_target(
-  'pylibfdt',
-  input: 'libfdt.i',
-  output: '_libfdt.so',
-  command: [setup_py, 'build_ext', '--build-lib=' + meson.current_build_dir()],
-  build_by_default: true,
+swig_generator = generator(
+  swig,
+  output: ['@BASENAME@_wrap.c'],
+  arguments: [
+    '-python',
+    '-I' + join_paths(meson.source_root(), 'libfdt'),
+    '-o', join_paths(meson.project_build_root(), '@OUTPUT@'),
+    '@INPUT@',
+  ]
 )
 
-meson.add_install_script(setup_py, 'install', '--prefix=' + get_option('prefix'), '--root=$DESTDIR')
+py.extension_module(
+  '_libfdt',
+  swig_generator.process('libfdt.i'),
+  dependencies: [
+    py.dependency(),
+    libfdt_dep,
+  ],
+)
