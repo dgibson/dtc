@@ -9,7 +9,7 @@ name: Build test
       - main
 
 jobs:
-  build:
+  build-make:
     runs-on: ubuntu-latest
 
     strategy:
@@ -35,3 +35,25 @@ jobs:
       - name: Run check
         run: |
           SETUPTOOLS_SCM_PRETEND_VERSION="0" make check
+  build-meson:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
+
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: "${GITHUB_WORKSPACE}/scripts/install-deps.sh"
+
+      - name: Build
+        run: |
+          meson setup . _build
+          meson compile -C _build
