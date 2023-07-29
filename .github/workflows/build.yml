@@ -43,11 +43,27 @@ jobs:
       fail-fast: false
       matrix:
           os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
+          include:
+            - install_git_cmd: apk add git
+              os: alpine
+            - install_git_cmd: pacman -Sy --noconfirm git
+              os: archlinux
+            - install_git_cmd: dnf --assumeyes install git
+              os: fedora
+            - install_git_cmd: |
+                export DEBIAN_FRONTEND=noninteractive
+                apt-get update
+                apt-get --assume-yes install git
+              os: ubuntu
 
     container:
       image: ${{ matrix.os }}
 
     steps:
+      # https://github.com/actions/checkout/issues/335
+      - name: Install git
+        run: ${{ matrix.install_git_cmd }}
+
       - name: Check out source
         uses: actions/checkout@v3
 
