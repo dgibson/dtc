@@ -70,6 +70,10 @@ jobs:
       - name: Install dependencies
         run: "${GITHUB_WORKSPACE}/scripts/install-deps.sh"
 
+      # https://github.com/actions/checkout/issues/766
+      - name: Add workspace to safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Build
         run: |
           meson setup . _build
