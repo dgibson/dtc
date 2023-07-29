@@ -2,6 +2,7 @@ project('dtc', 'c',
   version: '1.7.0',
   license: ['GPL2+', 'BSD-2'],
   default_options: 'werror=true',
+  meson_version: '>=0.56.0'
 )
 
 cc = meson.get_compiler('c')
