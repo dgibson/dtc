@@ -1,5 +1,5 @@
 setup_py = find_program('../setup.py')
-setup_py = [setup_py.path(), '--quiet', '--top-builddir', meson.project_build_root()]
+setup_py = [setup_py, '--quiet', '--top-builddir', meson.project_build_root()]
 
 custom_target(
   'pylibfdt',
