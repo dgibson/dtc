@@ -373,9 +373,10 @@ tree1_tests_rw () {
 check_tests () {
     tree="$1"
     shift
+    dtb=$(basename "$tree" .dts).test.dtb
     run_sh_test "$SRCDIR/dtc-checkfails.sh" "$@" -- -I dts -O dtb $tree
-    run_dtc_test -I dts -O dtb -o $tree.test.dtb -f $tree
-    run_sh_test "$SRCDIR/dtc-checkfails.sh" "$@" -- -I dtb -O dtb $tree.test.dtb
+    run_dtc_test -I dts -O dtb -o "$dtb" -f $tree
+    run_sh_test "$SRCDIR/dtc-checkfails.sh" "$@" -- -I dtb -O dtb "$dtb"
 }
 
 ALL_LAYOUTS="mts mst tms tsm smt stm"
