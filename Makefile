@@ -5,14 +5,11 @@
 
 #
 # Version information will be constructed in this order:
-# EXTRAVERSION might be "-rc", for example.
+# DTC_VERSION release version as MAJOR.MINOR.PATCH
 # LOCAL_VERSION is likely from command line.
 # CONFIG_LOCALVERSION from some future config system.
 #
-VERSION = 1
-PATCHLEVEL = 7
-SUBLEVEL = 0
-EXTRAVERSION =
+DTC_VERSION = $(shell cat VERSION.txt)
 LOCAL_VERSION =
 CONFIG_LOCALVERSION =
 
@@ -103,7 +100,6 @@ endif
 # Rules for versioning
 #
 
-DTC_VERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
 VERSION_FILE = version_gen.h
 
 CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \

@@ -1,8 +1,8 @@
 project('dtc', 'c',
-  version: '1.7.0',
+  version: files('VERSION.txt'),
   license: ['GPL2+', 'BSD-2'],
   default_options: 'werror=true',
-  meson_version: '>=0.56.0'
+  meson_version: '>=0.57.0'
 )
 
 cc = meson.get_compiler('c')
