@@ -120,8 +120,8 @@ if not py.found()
   env += 'NO_PYTHON=1'
 else
   env += [
-    'PYTHON=' + py.path(),
-    'PYTHONPATH=' + meson.source_root() / 'pylibfdt',
+    'PYTHON=' + py.full_path(),
+    'PYTHONPATH=' + meson.project_source_root() / 'pylibfdt',
   ]
 endif
 if not yaml.found()
