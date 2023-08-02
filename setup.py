@@ -22,6 +22,9 @@ srcdir = os.path.dirname(__file__)
 with open(os.path.join(srcdir, "README.md"), "r") as fh:
     long_description = fh.read()
 
+with open(os.path.join(srcdir, "VERSION.txt"), "r") as fh:
+    version = fh.readline().strip()
+
 def get_top_builddir():
     if '--top-builddir' in sys.argv:
         index = sys.argv.index('--top-builddir')
@@ -51,6 +54,8 @@ setup(
     name='libfdt',
     use_scm_version={
         "root": srcdir,
+        "fallback_version": version,
+        "fallback_root": srcdir,
     },
     cmdclass = {'build_py' : build_py},
     setup_requires = ['setuptools_scm'],
