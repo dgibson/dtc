@@ -30,8 +30,8 @@ jobs:
 
       - name: Build
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION="0" make
+          make
 
       - name: Run check
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION="0" make check
+          make check
