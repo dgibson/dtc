@@ -3,6 +3,7 @@
 *.a
 *.patch
 *.so
+*.so.*
 *~
 *.bak
 *.tab.[ch]
