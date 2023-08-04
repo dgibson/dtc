@@ -3,11 +3,15 @@
 # Print additional version information for non-release trees.
 
 usage() {
-	echo "Usage: $0 [srctree]" >&2
+	echo "Usage: $0 [srctree] [version]" >&2
 	exit 1
 }
 
 cd "${1:-.}" || usage
+
+if [ -n "${2}" ]; then
+        printf '%s' "${2}"
+fi
 
 # Check for git and a git repo.
 if head=`git rev-parse --verify HEAD 2>/dev/null`; then

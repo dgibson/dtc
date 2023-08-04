@@ -59,6 +59,11 @@ py = py.find_installation(required: get_option('python'))
 swig = find_program('swig', required: get_option('python'))
 
 version_gen_h = vcs_tag(
+  command: [
+    'scripts/setlocalversion',
+    meson.current_source_dir(),
+    meson.project_version()
+  ],
   input: 'version_gen.h.in',
   output: 'version_gen.h',
 )
