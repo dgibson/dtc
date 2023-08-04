@@ -28,3 +28,6 @@ indent_size = 4
 [meson.build]
 indent_style = space
 indent_size = 2
+
+[*.lds]
+indent_style = tab
