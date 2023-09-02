@@ -9,7 +9,7 @@ name: Build test
       - main
 
 jobs:
-  build:
+  build-make:
     runs-on: ubuntu-latest
 
     strategy:
@@ -35,3 +35,31 @@ jobs:
       - name: Run check
         run: |
           make check
+
+  build-meson:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
+
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          ./scripts/install-deps.sh
+
+      - name: Setup
+        run: meson setup build
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Run check
+        run: meson test -C build
