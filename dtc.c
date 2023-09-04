@@ -105,6 +105,7 @@ static const char * const usage_opts_help[] = {
 	"\n\tEnable/disable warnings (prefix with \"no-\")",
 	"\n\tEnable/disable errors (prefix with \"no-\")",
 	"\n\tEnable generation of symbols",
+	"\n\tPossibly generates a __local_fixups__ and a __fixups__ node at the root node",
 	"\n\tEnable auto-alias of labels",
 	"\n\tAnnotate output .dts with input source file and line (-T -T for more details)",
 	"\n\tPrint this help and exit",
