@@ -12,4 +12,5 @@
 	prop-uint32-array = <0x1>, <0x98765432>, <0xdeadbeef>;
 	prop-int64-array = /bits/ 64 <0x100000000 0xfffffffffffffffe>;
 	prop-uint64-array = /bits/ 64 <0x100000000 0x1>;
+	prop-bool;
 };
