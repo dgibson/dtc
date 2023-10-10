@@ -5,6 +5,10 @@
 	#size-cells = <0>;
 
 	aliases {
+		empty = "";
+		loop = "loop";
+		nonull = [626164];
+		relative = "s1/subsubnode";
 		s1 = &sub1;
 		ss1 = &subsub1;
 		sss1 = &subsubsub1;

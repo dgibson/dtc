@@ -21,8 +21,15 @@ static void check_alias(void *fdt, const char *path, const char *alias)
 
 	aliaspath = fdt_get_alias(fdt, alias);
 
-	if (path && !aliaspath)
+	if (!path && !aliaspath)
+		return;
+
+	if (!aliaspath)
 		FAIL("fdt_get_alias(%s) failed\n", alias);
+
+	if (!path)
+		FAIL("fdt_get_alias(%s) returned %s instead of NULL",
+		     alias, aliaspath);
 
 	if (strcmp(aliaspath, path) != 0)
 		FAIL("fdt_get_alias(%s) returned %s instead of %s\n",
@@ -36,9 +43,14 @@ int main(int argc, char *argv[])
 	test_init(argc, argv);
 	fdt = load_blob_arg(argc, argv);
 
+	check_alias(fdt, NULL, "empty");
+	check_alias(fdt, NULL, "nonull");
+	check_alias(fdt, NULL, "relative");
 	check_alias(fdt, "/subnode@1", "s1");
 	check_alias(fdt, "/subnode@1/subsubnode", "ss1");
 	check_alias(fdt, "/subnode@1/subsubnode/subsubsubnode", "sss1");
+
+	check_alias(fdt, NULL, "loop"); // Might trigger a stack overflow
 
 	PASS();
 }
