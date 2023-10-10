@@ -48,10 +48,13 @@ static void check_path_offset(void *fdt, const char *path, int offset)
 	verbose_printf("Checking offset of \"%s\" is %d...\n", path, offset);
 
 	rc = fdt_path_offset(fdt, path);
+	if (rc == offset)
+		return;
+
 	if (rc < 0)
 		FAIL("fdt_path_offset(\"%s\") failed: %s",
 		     path,  fdt_strerror(rc));
-	if (rc != offset)
+	else
 		FAIL("fdt_path_offset(\"%s\") returned incorrect offset"
 		     " %d instead of %d", path, rc, offset);
 }
@@ -102,6 +105,7 @@ int main(int argc, char *argv[])
 	check_path_offset(fdt, "/subnode@2/subsubnode", subsubnode2_offset2);
 
 	/* Test paths with extraneous separators */
+	check_path_offset(fdt, "", -FDT_ERR_BADPATH);
 	check_path_offset(fdt, "//", 0);
 	check_path_offset(fdt, "///", 0);
 	check_path_offset(fdt, "//subnode@1", subnode1_offset);
@@ -110,6 +114,8 @@ int main(int argc, char *argv[])
 	check_path_offset(fdt, "/subnode@2////subsubnode", subsubnode2_offset2);
 
 	/* Test fdt_path_offset_namelen() */
+	check_path_offset_namelen(fdt, "/subnode@1", -1, -FDT_ERR_BADPATH);
+	check_path_offset_namelen(fdt, "/subnode@1", 0, -FDT_ERR_BADPATH);
 	check_path_offset_namelen(fdt, "/subnode@1", 1, 0);
 	check_path_offset_namelen(fdt, "/subnode@1/subsubnode", 10, subnode1_offset);
 	check_path_offset_namelen(fdt, "/subnode@1/subsubnode", 11, subnode1_offset);
