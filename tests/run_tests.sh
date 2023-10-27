@@ -634,6 +634,10 @@ dtc_tests () {
     done
 
     # Check -Odts preserving type information
+    run_dtc_test -I dts -O dtb -o stringlist.test.dtb "$SRCDIR/stringlist.dts"
+    run_dtc_test -I dtb -O dts -o stringlist.test.dts stringlist.test.dtb
+    run_wrap_test cmp "$SRCDIR/stringlist.dts" stringlist.test.dts
+
     for tree in type-preservation.dts; do
         run_dtc_test -I dts -O dts -o $tree.test.dts "$SRCDIR/$tree"
         run_dtc_test -I dts -O dts $tree.test.dts
