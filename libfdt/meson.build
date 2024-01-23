@@ -34,18 +34,20 @@ libfdt = library(
   install: true,
 )
 
-libfdt_a = static_library(
-  'fdt', sources,
-  install: true,
-)
+link_with = libfdt
+
+if get_option('default_library') != 'static'
+  libfdt_a = static_library(
+    'fdt', sources,
+    install: true,
+  )
+
+  if static_build
+    link_with = libfdt_a
+  endif
+endif
 
 libfdt_inc = include_directories('.')
-
-if static_build
-  link_with = libfdt_a
-else
-  link_with = libfdt
-endif
 
 libfdt_dep = declare_dependency(
   include_directories: libfdt_inc,
