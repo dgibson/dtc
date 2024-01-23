@@ -32,7 +32,7 @@ if [ -n "$NO_YAML" ]; then
         no_yaml=false
     fi
 else
-    if pkg-config --atleast-version 0.2.3 yaml-0.1; then
+    if ${PKG_CONFIG:-pkg-config} --atleast-version 0.2.3 yaml-0.1; then
         no_yaml=false
     else
         no_yaml=true
