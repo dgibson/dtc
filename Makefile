@@ -29,7 +29,7 @@ SWIG = swig
 PKG_CONFIG ?= pkg-config
 PYTHON ?= python3
 
-INSTALL = /usr/bin/install
+INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_LIB = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
