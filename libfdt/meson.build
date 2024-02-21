@@ -26,7 +26,7 @@ else
 endif
 
 link_args += version_script
-libfdt = library(
+libfdt = both_libraries(
   'fdt', sources,
   version: meson.project_version(),
   link_args: link_args,
@@ -34,17 +34,10 @@ libfdt = library(
   install: true,
 )
 
-link_with = libfdt
-
-if get_option('default_library') != 'static'
-  libfdt_a = static_library(
-    'fdt', sources,
-    install: true,
-  )
-
-  if static_build
-    link_with = libfdt_a
-  endif
+if static_build
+  link_with = libfdt.get_static_lib()
+else
+  link_with = libfdt.get_shared_lib()
 endif
 
 libfdt_inc = include_directories('.')
