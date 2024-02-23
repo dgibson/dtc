@@ -101,26 +101,22 @@ int fdt_overlay_target_offset(const void *fdt, const void *fdto,
 static int overlay_phandle_add_offset(void *fdt, int node,
 				      const char *name, uint32_t delta)
 {
-	const fdt32_t *val;
-	uint32_t adj_val;
+	fdt32_t *valp, val;
 	int len;
 
-	val = fdt_getprop(fdt, node, name, &len);
-	if (!val)
+	valp = fdt_getprop_w(fdt, node, name, &len);
+	if (!valp)
 		return len;
 
-	if (len != sizeof(*val))
+	if (len != sizeof(val))
 		return -FDT_ERR_BADPHANDLE;
 
-	adj_val = fdt32_to_cpu(*val);
-	if ((adj_val + delta) < adj_val)
+	val = fdt32_ld(valp);
+	if (val + delta < val || val + delta == (uint32_t)-1)
 		return -FDT_ERR_NOPHANDLES;
 
-	adj_val += delta;
-	if (adj_val == (uint32_t)-1)
-		return -FDT_ERR_NOPHANDLES;
-
-	return fdt_setprop_inplace_u32(fdt, node, name, adj_val);
+	fdt32_st(valp, val + delta);
+	return 0;
 }
 
 /**
@@ -213,8 +209,8 @@ static int overlay_update_local_node_references(void *fdto,
 
 	fdt_for_each_property_offset(fixup_prop, fdto, fixup_node) {
 		const fdt32_t *fixup_val;
-		const char *tree_val;
 		const char *name;
+		char *tree_val;
 		int fixup_len;
 		int tree_len;
 		int i;
@@ -228,7 +224,7 @@ static int overlay_update_local_node_references(void *fdto,
 			return -FDT_ERR_BADOVERLAY;
 		fixup_len /= sizeof(uint32_t);
 
-		tree_val = fdt_getprop(fdto, tree_node, name, &tree_len);
+		tree_val = fdt_getprop_w(fdto, tree_node, name, &tree_len);
 		if (!tree_val) {
 			if (tree_len == -FDT_ERR_NOTFOUND)
 				return -FDT_ERR_BADOVERLAY;
@@ -237,33 +233,15 @@ static int overlay_update_local_node_references(void *fdto,
 		}
 
 		for (i = 0; i < fixup_len; i++) {
-			fdt32_t adj_val;
-			uint32_t poffset;
+			fdt32_t *refp;
 
-			poffset = fdt32_to_cpu(fixup_val[i]);
+			refp = (fdt32_t *)(tree_val + fdt32_ld_(fixup_val + i));
 
 			/*
-			 * phandles to fixup can be unaligned.
-			 *
-			 * Use a memcpy for the architectures that do
-			 * not support unaligned accesses.
+			 * phandles to fixup can be unaligned, so use
+			 * fdt32_{ld,st}() to read/write them.
 			 */
-			memcpy(&adj_val, tree_val + poffset, sizeof(adj_val));
-
-			adj_val = cpu_to_fdt32(fdt32_to_cpu(adj_val) + delta);
-
-			ret = fdt_setprop_inplace_namelen_partial(fdto,
-								  tree_node,
-								  name,
-								  strlen(name),
-								  poffset,
-								  &adj_val,
-								  sizeof(adj_val));
-			if (ret == -FDT_ERR_NOSPACE)
-				return -FDT_ERR_BADOVERLAY;
-
-			if (ret)
-				return ret;
+			fdt32_st(refp, fdt32_ld(refp) + delta);
 		}
 	}
 
