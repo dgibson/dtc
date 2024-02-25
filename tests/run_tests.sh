@@ -1040,6 +1040,34 @@ fdtoverlay_tests() {
     run_dtc_test -@ -I dts -O dtb -o $stacked_addlabeldtb $stacked_addlabel
 
     run_fdtoverlay_test baz "/foonode/barnode/baznode" "baz-property" "-ts" ${stacked_base_nolabeldtb} ${stacked_addlabel_targetdtb} ${stacked_addlabeldtb} ${stacked_bardtb} ${stacked_bazdtb}
+
+    # verify that phandles are not overwritten
+    run_dtc_test -@ -I dts -O dtb -o overlay_base_phandle.test.dtb "$SRCDIR/overlay_base_phandle.dts"
+    run_dtc_test -@ -I dts -O dtb -o overlay_overlay_phandle.test.dtb "$SRCDIR/overlay_overlay_phandle.dts"
+    run_wrap_test $FDTOVERLAY -i overlay_base_phandle.test.dtb -o overlay_base_phandleO.test.dtb overlay_overlay_phandle.test.dtb
+
+    pa=$($DTGET overlay_base_phandleO.test.dtb /a phandle)
+    pb=$($DTGET overlay_base_phandleO.test.dtb /b phandle)
+    pc=$($DTGET overlay_base_phandleO.test.dtb /c phandle)
+    pd=$($DTGET overlay_base_phandleO.test.dtb /d phandle)
+    ba=$($DTGET overlay_base_phandleO.test.dtb /b a)
+    bd=$($DTGET overlay_base_phandleO.test.dtb /b d)
+    cb=$($DTGET overlay_base_phandleO.test.dtb /c b)
+    da=$($DTGET overlay_base_phandleO.test.dtb /d a)
+    db=$($DTGET overlay_base_phandleO.test.dtb /d b)
+    dc=$($DTGET overlay_base_phandleO.test.dtb /d c)
+
+    shorten_echo "check phandle to noda a wasn't overwritten:	"
+    run_wrap_test test "$ba-$da" = "$pa-$pa"
+
+    shorten_echo "check phandle to noda b wasn't overwritten:	"
+    run_wrap_test test "$cb-$db" = "$pb-$pb"
+
+    shorten_echo "check phandle to noda c wasn't overwritten:	"
+    run_wrap_test test "$dc" = "$pc"
+
+    shorten_echo "check phandle to noda d wasn't overwritten:	"
+    run_wrap_test test "$bd" = "$pd"
 }
 
 pylibfdt_tests () {
