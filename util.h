@@ -13,7 +13,9 @@
  */
 
 #ifdef __GNUC__
-#if __GNUC__ >= 5 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+#ifdef __MINGW_PRINTF_FORMAT
+#define PRINTF(i, j)	__attribute__((format (__MINGW_PRINTF_FORMAT, i, j)))
+#elif __GNUC__ >= 5 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
 #define PRINTF(i, j)	__attribute__((format (gnu_printf, i, j)))
 #else
 #define PRINTF(i, j)	__attribute__((format (printf, i, j)))

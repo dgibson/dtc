@@ -22,13 +22,6 @@ add_project_arguments(
   language: 'c'
 )
 
-if host_machine.system() == 'windows'
-  add_project_arguments(
-    '-D__USE_MINGW_ANSI_STDIO=1',
-    language: 'c'
-  )
-endif
-
 add_project_arguments(
   '-DFDT_ASSUME_MASK=' + get_option('assume-mask').to_string(),
   language: 'c'
