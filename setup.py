@@ -52,13 +52,7 @@ class build_py(_build_py):
 
 setup(
     name='libfdt',
-    use_scm_version={
-        "root": srcdir,
-        "fallback_version": version,
-        "fallback_root": srcdir,
-    },
     cmdclass = {'build_py' : build_py},
-    setup_requires = ['setuptools_scm'],
     author='Simon Glass',
     author_email='sjg@chromium.org',
     description='Python binding for libfdt',
