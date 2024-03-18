@@ -4,6 +4,7 @@ setup_py = [setup_py, '--quiet', '--top-builddir', meson.project_build_root()]
 custom_target(
   'pylibfdt',
   input: 'libfdt.i',
+  depends: libfdt,
   output: '_libfdt.so',
   command: [setup_py, 'build_ext', '--build-lib=' + meson.current_build_dir()],
   build_by_default: true,
