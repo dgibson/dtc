@@ -129,17 +129,32 @@ if not yaml.found()
   env += 'NO_YAML=1'
 endif
 
+run_test_types = [
+  'libfdt',
+  'utilfdt',
+  'dtc',
+  'dtbs_equal',
+  'fdtget',
+  'fdtput',
+  'fdtdump',
+  'fdtoverlay'
+]
 run_test_deps = [
   dtc_tools, dumptrees_dtb, tests_exe
 ]
 if pylibfdt_enabled
+  run_test_types += 'pylibfdt'
   run_test_deps += pylibfdt
 endif
-test(
-  'run-test',
-  run_tests,
-  workdir: meson.current_build_dir(),
-  depends: run_test_deps,
-  env: env,
-  timeout: 1800, # mostly for valgrind
-)
+foreach test_type : run_test_types
+  test(
+    test_type,
+    run_tests,
+    args: ['-t', test_type],
+    is_parallel: false,
+    workdir: meson.current_build_dir(),
+    depends: run_test_deps,
+    env: env,
+    timeout: 1800, # mostly for valgrind
+  )
+endforeach
