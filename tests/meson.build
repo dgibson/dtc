@@ -109,8 +109,9 @@ if not static_build
   test_deps += [dl]
 endif
 
+tests_exe = []
 foreach t: tests
-  executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args)
+  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args)
 endforeach
 
 run_tests = find_program('run_tests.sh')
@@ -128,11 +129,17 @@ if not yaml.found()
   env += 'NO_YAML=1'
 endif
 
+run_test_deps = [
+  dtc_tools, dumptrees_dtb, tests_exe
+]
+if pylibfdt_enabled
+  run_test_deps += pylibfdt
+endif
 test(
   'run-test',
   run_tests,
   workdir: meson.current_build_dir(),
-  depends: dumptrees_dtb,
+  depends: run_test_deps,
   env: env,
   timeout: 1800, # mostly for valgrind
 )
