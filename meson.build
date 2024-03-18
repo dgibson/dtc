@@ -50,6 +50,7 @@ endif
 py = import('python')
 py = py.find_installation(required: get_option('python'))
 swig = find_program('swig', required: get_option('python'))
+pylibfdt_enabled = not meson.is_cross_build() and py.found() and swig.found() ? true : false
 
 version_gen_h = vcs_tag(
   command: ['git', 'describe', '--dirty=+'],
@@ -59,6 +60,7 @@ version_gen_h = vcs_tag(
 
 subdir('libfdt')
 
+dtc_tools = []
 if get_option('tools')
   flex = find_program('flex', required: true)
   bison = find_program('bison', required: true)
@@ -82,7 +84,7 @@ if get_option('tools')
   )
 
   if cc.check_header('fnmatch.h')
-    executable(
+    dtc_tools += executable(
       'convert-dtsv0',
       [
         lgen.process('convert-dtsv0-lexer.l'),
@@ -94,7 +96,7 @@ if get_option('tools')
     )
   endif
 
-  executable(
+  dtc_tools += executable(
     'dtc',
     [
       lgen.process('dtc-lexer.l'),
@@ -115,7 +117,7 @@ if get_option('tools')
   )
 
   foreach e: ['fdtdump', 'fdtget', 'fdtput', 'fdtoverlay']
-    executable(e, files(e + '.c'), dependencies: util_dep, install: true, link_args: extra_link_args)
+    dtc_tools += executable(e, files(e + '.c'), dependencies: util_dep, install: true, link_args: extra_link_args)
   endforeach
 
   install_data(
@@ -125,10 +127,8 @@ if get_option('tools')
   )
 endif
 
-if not meson.is_cross_build()
-  if py.found() and swig.found()
-    subdir('pylibfdt')
-  endif
+if pylibfdt_enabled
+  subdir('pylibfdt')
 endif
 
 if get_option('tests')
