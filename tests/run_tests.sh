@@ -271,7 +271,7 @@ libfdt_overlay_tests () {
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb "$SRCDIR/$tree.dts"
 	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
     done
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb -o /dev/null fixup-ref-to-path.dts
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb -o /dev/null "$SRCDIR/fixup-ref-to-path.dts"
 }
 
 # Tests to exercise dtc's overlay generation support
@@ -497,13 +497,13 @@ libfdt_tests () {
 
     run_dtc_test -I dts -O dtb "$SRCDIR/bad-size-cells.dts"
 
-    run_wrap_error_test $DTC division-by-zero.dts
-    run_wrap_error_test $DTC bad-octal-literal.dts
+    run_wrap_error_test $DTC "$SRCDIR/division-by-zero.dts"
+    run_wrap_error_test $DTC "$SRCDIR/bad-octal-literal.dts"
     run_dtc_test -I dts -O dtb "$SRCDIR/nul-in-escape.dts"
-    run_wrap_error_test $DTC nul-in-line-info1.dts
-    run_wrap_error_test $DTC nul-in-line-info2.dts
+    run_wrap_error_test $DTC "$SRCDIR/nul-in-line-info1.dts"
+    run_wrap_error_test $DTC "$SRCDIR/nul-in-line-info2.dts"
 
-    run_wrap_error_test $DTC -I dtb -O dts -o /dev/null ovf_size_strings.dtb
+    run_wrap_error_test $DTC -I dtb -O dts -o /dev/null "$SRCDIR/ovf_size_strings.dtb"
 
     run_test check_header test_tree1.dtb
 
@@ -774,7 +774,7 @@ dtc_tests () {
     # Check warning options
     run_sh_test "$SRCDIR/dtc-checkfails.sh" address_cells_is_cell interrupts_extended_is_cell -n size_cells_is_cell -- -Wno_size_cells_is_cell -I dts -O dtb "$SRCDIR/bad-ncells.dts"
     run_sh_test "$SRCDIR/dtc-fails.sh" -n test-warn-output.test.dtb -I dts -O dtb "$SRCDIR/bad-ncells.dts"
-    run_sh_test "$SRCDIR/dtc-fails.sh" test-error-output.test.dtb -I dts -O dtb bad-ncells.dts -Esize_cells_is_cell
+    run_sh_test "$SRCDIR/dtc-fails.sh" test-error-output.test.dtb -I dts -O dtb "$SRCDIR/bad-ncells.dts" -Esize_cells_is_cell
     run_sh_test "$SRCDIR/dtc-checkfails.sh" always_fail -- -Walways_fail -I dts -O dtb "$SRCDIR/test_tree1.dts"
     run_sh_test "$SRCDIR/dtc-checkfails.sh" -n always_fail -- -Walways_fail -Wno_always_fail -I dts -O dtb "$SRCDIR/test_tree1.dts"
     run_sh_test "$SRCDIR/dtc-fails.sh" test-negation-1.test.dtb -Ealways_fail -I dts -O dtb "$SRCDIR/test_tree1.dts"
