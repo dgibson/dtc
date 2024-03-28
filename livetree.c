@@ -174,8 +174,8 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 
 				old_prop->val = new_prop->val;
 				old_prop->deleted = 0;
-				free(old_prop->srcpos);
-				old_prop->srcpos = new_prop->srcpos;
+				old_prop->srcpos = srcpos_extend(
+					old_prop->srcpos, new_prop->srcpos);
 				free(new_prop);
 				new_prop = NULL;
 				break;
