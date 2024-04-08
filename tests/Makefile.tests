@@ -32,8 +32,7 @@ LIB_TESTS_L = get_mem_rsv \
 	fs_tree1
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
-LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv \
-	two_roots named_root
+LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv
 
 LIBTREE_TESTS = $(LIBTREE_TESTS_L:%=$(TESTS_PREFIX)%)
 
@@ -44,7 +43,9 @@ endif
 
 TESTS = $(LIB_TESTS) $(LIBTREE_TESTS) $(DL_LIB_TESTS)
 
-TESTS_TREES_L = test_tree1.dtb
+TESTS_TREES_L = test_tree1.dtb bad_node_char.dtb bad_node_format.dtb \
+	bad_prop_char.dtb ovf_size_strings.dtb truncated_property.dtb \
+	truncated_string.dtb truncated_memrsv.dtb two_roots.dtb named_root.dtb
 TESTS_TREES = $(TESTS_TREES_L:%=$(TESTS_PREFIX)%)
 
 TESTS_TARGETS = $(TESTS) $(TESTS_TREES)
