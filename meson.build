@@ -122,7 +122,7 @@ if get_option('tools')
 
   install_data(
     'dtdiff',
-    install_dir: get_option('prefix') / get_option('bindir'),
+    install_dir: get_option('bindir'),
     install_mode: 'rwxr-xr-x',
   )
 endif
