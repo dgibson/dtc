@@ -269,7 +269,7 @@ libfdt_overlay_tests () {
     for test in $BAD_FIXUP_TREES; do
 	tree="overlay_bad_fixup_$test"
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb "$SRCDIR/$tree.dts"
-	run_test overlay_bad_fixup overlay_base_no_symbols.test.dtb $tree.test.dtb
+	run_test overlay_bad_fixup overlay_base_manual_symbols.test.dtb $tree.test.dtb
     done
     run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb -o /dev/null "$SRCDIR/fixup-ref-to-path.dts"
 }
