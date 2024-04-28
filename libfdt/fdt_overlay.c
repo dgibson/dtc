@@ -315,7 +315,7 @@ static int overlay_update_local_references(void *fdto, uint32_t delta)
  * @name: Name of the property holding the phandle reference in the overlay
  * @name_len: number of name characters to consider
  * @poffset: Offset within the overlay property where the phandle is stored
- * @label: Label of the node referenced by the phandle
+ * @phandle: Phandle referencing the node
  *
  * overlay_fixup_one_phandle() resolves an overlay phandle pointing to
  * a node in the base device tree.
@@ -332,29 +332,13 @@ static int overlay_fixup_one_phandle(void *fdt, void *fdto,
 				     int symbols_off,
 				     const char *path, uint32_t path_len,
 				     const char *name, uint32_t name_len,
-				     int poffset, const char *label)
+				     int poffset, uint32_t phandle)
 {
-	const char *symbol_path;
-	uint32_t phandle;
 	fdt32_t phandle_prop;
-	int symbol_off, fixup_off;
-	int prop_len;
+	int fixup_off;
 
 	if (symbols_off < 0)
 		return symbols_off;
-
-	symbol_path = fdt_getprop(fdt, symbols_off, label,
-				  &prop_len);
-	if (!symbol_path)
-		return prop_len;
-
-	symbol_off = fdt_path_offset(fdt, symbol_path);
-	if (symbol_off < 0)
-		return symbol_off;
-
-	phandle = fdt_get_phandle(fdt, symbol_off);
-	if (!phandle)
-		return -FDT_ERR_NOTFOUND;
 
 	fixup_off = fdt_path_offset_namelen(fdto, path, path_len);
 	if (fixup_off == -FDT_ERR_NOTFOUND)
@@ -394,6 +378,10 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 	const char *value;
 	const char *label;
 	int len;
+	const char *symbol_path;
+	int prop_len;
+	int symbol_off;
+	uint32_t phandle;
 
 	value = fdt_getprop_by_offset(fdto, property,
 				      &label, &len);
@@ -403,6 +391,18 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 
 		return len;
 	}
+
+	symbol_path = fdt_getprop(fdt, symbols_off, label, &prop_len);
+	if (!symbol_path)
+		return prop_len;
+	
+	symbol_off = fdt_path_offset(fdt, symbol_path);
+	if (symbol_off < 0)
+		return symbol_off;
+	
+	phandle = fdt_get_phandle(fdt, symbol_off);
+	if (!phandle)
+		return -FDT_ERR_NOTFOUND;
 
 	do {
 		const char *path, *name, *fixup_end;
@@ -445,7 +445,7 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 
 		ret = overlay_fixup_one_phandle(fdt, fdto, symbols_off,
 						path, path_len, name, name_len,
-						poffset, label);
+						poffset, phandle);
 		if (ret)
 			return ret;
 	} while (len > 0);
