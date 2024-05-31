@@ -1675,6 +1675,10 @@ static void check_interrupt_map(struct check *c,
 			parent_cellsize += propval_cell(cellprop);
 
 		cell += 1 + parent_cellsize;
+		if (cell > map_cells)
+			FAIL_PROP(c, dti, node, irq_map_prop,
+				"property size (%d) mismatch, expected %zu",
+				irq_map_prop->val.len, cell * sizeof(cell_t));
 	}
 }
 WARNING(interrupt_map, check_interrupt_map, NULL, &phandle_references, &addr_size_cells, &interrupt_provider);
