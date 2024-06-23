@@ -6,7 +6,7 @@ pylibfdt = custom_target(
   input: 'libfdt.i',
   depends: libfdt,
   output: '_libfdt.so',
-  command: [setup_py, 'build_ext', '--build-lib=' + meson.current_build_dir()],
+  command: [setup_py, 'build_ext'],
   build_by_default: true,
 )
 
