@@ -18,7 +18,9 @@ if [ -n "$NO_PYTHON" ]; then
         no_python=false
     fi
 else
-    if [ -f ../pylibfdt/_libfdt.so ] || [ -f ../pylibfdt/_libfdt.cpython-3*.so ]; then
+    if [ -f ../pylibfdt/_libfdt.so ] \
+            || [ -f ../pylibfdt/_libfdt.cpython-3*.so ] \
+            || [ -f ../build/lib.*/_libfdt.cpython-3*.so ]; then
         no_python=false
     else
         no_python=true
@@ -56,6 +58,16 @@ if [ -z "$TEST_LIBDIR" ]; then
     TEST_LIBDIR=../libfdt
 fi
 export LD_LIBRARY_PATH="$TEST_LIBDIR"
+
+# Find the python module that distutils builds under a machine-specific path
+PYLIBFDT_BUILD=$(echo ../build/lib.*)
+if [ -e "$PYLIBFDT_BUILD" ]; then
+    if [ -n "$PYTHONPATH" ]; then
+        export PYTHONPATH="$PYTHONPATH:$PYLIBFDT_BUILD"
+    else
+        export PYTHONPATH="$PYLIBFDT_BUILD"
+    fi
+fi
 
 export QUIET_TEST=1
 STOP_ON_FAIL=0
