@@ -55,7 +55,11 @@ fi
 if [ -z "$TEST_LIBDIR" ]; then
     TEST_LIBDIR=../libfdt
 fi
-export LD_LIBRARY_PATH="$TEST_LIBDIR"
+if [ -n "$LD_LIBRARY_PATH" ]; then
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$TEST_LIBDIR"
+else
+    export LD_LIBRARY_PATH="$TEST_LIBDIR"
+fi
 
 export QUIET_TEST=1
 STOP_ON_FAIL=0
