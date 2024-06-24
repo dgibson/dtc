@@ -123,10 +123,13 @@ else
   env += [
     'PYTHON=' + py.full_path(),
     'PYTHONPATH=' + meson.project_source_root() / 'pylibfdt',
+    'NO_PYTHON=0',
   ]
 endif
 if not yaml.found()
   env += 'NO_YAML=1'
+else
+  env += 'NO_YAML=0'
 endif
 
 run_test_types = [
