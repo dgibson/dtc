@@ -72,6 +72,14 @@
 		};
 	};
 
+	fragment@7 {
+		target-path = "/new-local-node";
+
+		__overlay__ {
+			another-new-property;
+		};
+	};
+
 	__local_fixups__ {
 		fragment@5 {
 			__overlay__ {

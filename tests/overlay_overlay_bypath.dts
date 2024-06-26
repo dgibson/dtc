@@ -46,3 +46,7 @@
 		new-sub-test-property;
 	};
 };
+
+&{/new-local-node} {
+	another-new-property;
+};

@@ -729,7 +729,13 @@ static int overlay_prevent_phandle_overwrite(void *fdt, void *fdto)
 			return overlay;
 
 		target = fdt_overlay_target_offset(fdt, fdto, fragment, NULL);
-		if (target < 0)
+		if (target == -FDT_ERR_NOTFOUND)
+			/*
+			 * The subtree doesn't exist in the base, so nothing
+			 * will be overwritten.
+			 */
+			continue;
+		else if (target < 0)
 			return target;
 
 		ret = overlay_prevent_phandle_overwrite_node(fdt, target,
