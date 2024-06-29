@@ -104,14 +104,19 @@ if dl.found() and not static_build
   ]
 endif
 
-test_deps = [testutil_dep, util_dep, libfdt_dep]
+test_deps = [testutil_dep, util_dep]
 if not static_build
   test_deps += [dl]
 endif
 
 tests_exe = []
 foreach t: tests
-  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args)
+  tests_exe += executable(
+    t,
+    files(t + '.c'),
+    dependencies: test_deps,
+    objects: libfdt_static_objs,
+  )
 endforeach
 
 run_tests = find_program('run_tests.sh')
