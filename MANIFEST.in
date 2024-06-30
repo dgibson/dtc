@@ -9,3 +9,4 @@ include pylibfdt/libfdt.i
 include libfdt/libfdt.h
 include libfdt/fdt.h
 include libfdt/libfdt_env.h
+include VERSION.txt
