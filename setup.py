@@ -52,6 +52,7 @@ class build_py(_build_py):
 
 setup(
     name='libfdt',
+    version=version,
     cmdclass = {'build_py' : build_py},
     author='Simon Glass',
     author_email='sjg@chromium.org',
@@ -72,5 +73,4 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
         "Operating System :: OS Independent",
     ],
-
 )
