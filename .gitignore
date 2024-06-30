@@ -27,3 +27,4 @@ ncscope.*
 .eggs/
 build/
 dist/
+*.egg-info/

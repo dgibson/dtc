@@ -6,8 +6,8 @@ PYLIBFDT_srcs = $(PYLIBFDT_dir)/libfdt.i
 PYMODULE = $(PYLIBFDT_dir)/_libfdt.so
 PYLIBFDT_CLEANFILES_L = libfdt_wrap.c libfdt.py *.pyc *.so
 PYLIBFDT_CLEANFILES = $(PYLIBFDT_CLEANFILES_L:%=$(PYLIBFDT_dir)/%)
-PYLIBFDT_CLEANDIRS_L = build __pycache__
-PYLIBFDT_CLEANDIRS = $(PYLIBFDT_CLEANDIRS_L:%=$(PYLIBFDT_dir)/%)
+PYLIBFDT_CLEANDIRS_L = __pycache__ libfdt.egg-info
+PYLIBFDT_CLEANDIRS = build $(PYLIBFDT_CLEANDIRS_L:%=$(PYLIBFDT_dir)/%)
 
 SETUP = ./setup.py
 
