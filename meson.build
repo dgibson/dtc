@@ -27,16 +27,11 @@ add_project_arguments(
   language: 'c'
 )
 
-if get_option('static-build')
-  static_build = true
-  extra_link_args = ['-static']
-else
-  static_build = false
-  extra_link_args = []
-endif
+static_build = get_option('static-build')
+static_kwargs = static_build ? {'static': true} : {}
 
 yamltree = 'yamltree.c'
-yaml = dependency('yaml-0.1', version: '>=0.2.3', required: get_option('yaml'), static: static_build)
+yaml = dependency('yaml-0.1', version: '>=0.2.3', required: get_option('yaml'), kwargs: static_kwargs)
 if not yaml.found()
   add_project_arguments('-DNO_YAML', language: 'c')
   yamltree = []
@@ -68,7 +63,7 @@ if get_option('tools')
   util_dep = declare_dependency(
     sources: ['util.c', version_gen_h],
     include_directories: '.',
-    dependencies: libfdt_dep
+    dependencies: libfdt_static_dep
   )
 
   lgen = generator(
@@ -92,7 +87,7 @@ if get_option('tools')
       ],
       dependencies: util_dep,
       install: true,
-      link_args: extra_link_args,
+      objects: libfdt_static_objs,
     )
   endif
 
@@ -113,11 +108,17 @@ if get_option('tools')
     ],
     dependencies: [util_dep, yaml],
     install: true,
-    link_args: extra_link_args,
+    objects: libfdt_static_objs,
   )
 
   foreach e: ['fdtdump', 'fdtget', 'fdtput', 'fdtoverlay']
-    dtc_tools += executable(e, files(e + '.c'), dependencies: util_dep, install: true, link_args: extra_link_args)
+    dtc_tools += executable(
+      e,
+      files(e + '.c'),
+      dependencies: util_dep,
+      install: true,
+      objects: libfdt_static_objs
+    )
   endforeach
 
   install_data(
