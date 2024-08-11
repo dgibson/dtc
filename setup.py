@@ -16,11 +16,24 @@ from setuptools.command.build_py import build_py as _build_py
 
 srcdir = os.path.dirname(__file__)
 
-with open(os.path.join(srcdir, "README.md"), "r", encoding='utf-8') as fh:
-    long_description = fh.read()
+def scan_for_info(srcdir):
+    """Scan for the version and long_description fields
 
-with open(os.path.join(srcdir, "VERSION.txt"), "r", encoding='utf-8') as fh:
-    version = fh.readline().strip()
+    Args:
+        srcdir (str): Source-directory path
+
+    Returns: tuple
+        str: Full description (contents of README.md)
+        str: Version string
+    """
+    with open(os.path.join(srcdir, "VERSION.txt"), "r", encoding='utf-8') as fh:
+        version = fh.readline().strip()
+
+    with open(os.path.join(srcdir, "README.md"), "r", encoding='utf-8') as fh:
+        long_description = fh.read()
+
+    return version, long_description
+
 
 def get_top_builddir():
     """Figure out the top-level directory containing the source code
@@ -53,6 +66,7 @@ class BuildPy(_build_py):
         self.run_command("build_ext")
         return super().run()
 
+version, long_description = scan_for_info(srcdir)
 
 setup(
     name='libfdt',
