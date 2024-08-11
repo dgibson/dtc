@@ -14,8 +14,6 @@ from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
 
 
-srcdir = os.path.dirname(__file__)
-
 def scan_for_info(srcdir):
     """Scan for the version and long_description fields
 
@@ -35,8 +33,11 @@ def scan_for_info(srcdir):
     return version, long_description
 
 
-def get_top_builddir():
+def get_top_builddir(srcdir):
     """Figure out the top-level directory containing the source code
+
+    Args:
+        srcdir (str): Source-directory path
 
     Returns:
         str: Directory to build in
@@ -55,8 +56,8 @@ class BuildPy(_build_py):
         return super().run()
 
 
+srcdir = os.path.dirname(__file__)
 version, long_description = scan_for_info(srcdir)
-top_builddir = get_top_builddir()
 
 libfdt_module = Extension(
     '_libfdt',
@@ -64,7 +65,7 @@ libfdt_module = Extension(
     define_macros=[('PY_SSIZE_T_CLEAN', None)],
     include_dirs=[os.path.join(srcdir, 'libfdt')],
     libraries=['fdt'],
-    library_dirs=[os.path.join(top_builddir, 'libfdt')],
+    library_dirs=[os.path.join(get_top_builddir(srcdir), 'libfdt')],
     swig_opts=['-I' + os.path.join(srcdir, 'libfdt')],
 )
 
