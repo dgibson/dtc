@@ -7,28 +7,32 @@ Copyright (C) 2017 Google, Inc.
 Written by Simon Glass <sjg@chromium.org>
 """
 
+import os
+import sys
+
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
 
-import os
-import re
-import sys
 
 srcdir = os.path.dirname(__file__)
 
-with open(os.path.join(srcdir, "README.md"), "r") as fh:
+with open(os.path.join(srcdir, "README.md"), "r", encoding='utf-8') as fh:
     long_description = fh.read()
 
-with open(os.path.join(srcdir, "VERSION.txt"), "r") as fh:
+with open(os.path.join(srcdir, "VERSION.txt"), "r", encoding='utf-8') as fh:
     version = fh.readline().strip()
 
 def get_top_builddir():
+    """Figure out the top-level directory containing the source code
+
+    Returns:
+        str: Directory to build in
+    """
     if '--top-builddir' in sys.argv:
         index = sys.argv.index('--top-builddir')
         sys.argv.pop(index)
         return sys.argv.pop(index)
-    else:
-        return srcdir
+    return srcdir
 
 top_builddir = get_top_builddir()
 
@@ -42,15 +46,18 @@ libfdt_module = Extension(
     swig_opts=['-I' + os.path.join(srcdir, 'libfdt')],
 )
 
-class build_py(_build_py):
+
+class BuildPy(_build_py):
+    """Small class to run the build_ext command"""
     def run(self):
         self.run_command("build_ext")
         return super().run()
 
+
 setup(
     name='libfdt',
     version=version,
-    cmdclass = {'build_py' : build_py},
+    cmdclass = {'build_py' : BuildPy},
     author='Simon Glass',
     author_email='sjg@chromium.org',
     description='Python binding for libfdt',
