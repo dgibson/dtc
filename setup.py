@@ -47,6 +47,15 @@ def get_top_builddir():
         return sys.argv.pop(index)
     return srcdir
 
+
+class BuildPy(_build_py):
+    """Small class to run the build_ext command"""
+    def run(self):
+        self.run_command("build_ext")
+        return super().run()
+
+
+version, long_description = scan_for_info(srcdir)
 top_builddir = get_top_builddir()
 
 libfdt_module = Extension(
@@ -59,14 +68,6 @@ libfdt_module = Extension(
     swig_opts=['-I' + os.path.join(srcdir, 'libfdt')],
 )
 
-
-class BuildPy(_build_py):
-    """Small class to run the build_ext command"""
-    def run(self):
-        self.run_command("build_ext")
-        return super().run()
-
-version, long_description = scan_for_info(srcdir)
 
 setup(
     name='libfdt',
