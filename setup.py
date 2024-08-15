@@ -76,7 +76,6 @@ setup(
     cmdclass = {'build_py' : BuildPy},
     author='Simon Glass',
     author_email='sjg@chromium.org',
-    setup_requires = ['swig'],
     description='Python binding for libfdt',
     ext_modules=[libfdt_module],
     package_dir={'': os.path.join(srcdir, 'pylibfdt')},
