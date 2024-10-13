@@ -767,7 +767,8 @@ static int overlay_prevent_phandle_overwrite(void *fdt, void *fdto)
  *      Negative error code on failure
  */
 static int overlay_apply_node(void *fdt, int target,
-			      void *fdto, int node)
+			      void *fdto, int node,
+			      int depth)
 {
 	int property;
 	int subnode;
@@ -784,6 +785,9 @@ static int overlay_apply_node(void *fdt, int target,
 			return -FDT_ERR_INTERNAL;
 		if (prop_len < 0)
 			return prop_len;
+		if ((depth == 0) && ((strcmp(name, "phandle") == 0) ||
+				     (strcmp(name, "linux,phandle") == 0)))
+			continue;
 
 		ret = fdt_setprop(fdt, target, name, prop, prop_len);
 		if (ret)
@@ -805,7 +809,7 @@ static int overlay_apply_node(void *fdt, int target,
 		if (nnode < 0)
 			return nnode;
 
-		ret = overlay_apply_node(fdt, nnode, fdto, subnode);
+		ret = overlay_apply_node(fdt, nnode, fdto, subnode, depth + 1);
 		if (ret)
 			return ret;
 	}
@@ -852,7 +856,7 @@ static int overlay_merge(void *fdt, void *fdto)
 		if (target < 0)
 			return target;
 
-		ret = overlay_apply_node(fdt, target, fdto, overlay);
+		ret = overlay_apply_node(fdt, target, fdto, overlay, 0);
 		if (ret)
 			return ret;
 	}
