@@ -160,8 +160,10 @@ FILE *srcfile_relative_open(const char *fname, char **fullnamep)
 			    strerror(errno));
 	}
 
-	if (depfile)
-		fprintf(depfile, " %s", fullname);
+	if (depfile) {
+		fputc(' ', depfile);
+		fprint_path_escaped(depfile, fullname);
+	}
 
 	if (fullnamep)
 		*fullnamep = fullname;
