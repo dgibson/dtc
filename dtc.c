@@ -289,7 +289,9 @@ int main(int argc, char *argv[])
 		if (!depfile)
 			die("Couldn't open dependency file %s: %s\n", depname,
 			    strerror(errno));
-		fprintf(depfile, "%s:", outname);
+
+		fprint_path_escaped(depfile, outname);
+		fputc(':', depfile);
 	}
 
 	if (inform == NULL)
