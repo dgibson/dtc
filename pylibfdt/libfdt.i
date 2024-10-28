@@ -1137,7 +1137,7 @@ typedef uint32_t fdt32_t;
 			fdt_string(fdt1, fdt32_to_cpu($1->nameoff)));
 		buff = PyByteArray_FromStringAndSize(
 			(const char *)($1 + 1), fdt32_to_cpu($1->len));
-		resultobj = SWIG_Python_AppendOutput(resultobj, buff);
+		resultobj = SWIG_AppendOutput(resultobj, buff);
 	}
 }
 
@@ -1178,7 +1178,7 @@ typedef uint32_t fdt32_t;
 
 %typemap(argout) int *depth {
         PyObject *val = Py_BuildValue("i", *arg$argnum);
-        resultobj = SWIG_Python_AppendOutput(resultobj, val);
+        resultobj = SWIG_AppendOutput(resultobj, val);
 }
 
 %apply int *depth { int *depth };
@@ -1190,7 +1190,7 @@ typedef uint32_t fdt32_t;
 
 %typemap(argout) uint64_t * {
         PyObject *val = PyLong_FromUnsignedLongLong(*arg$argnum);
-        resultobj = SWIG_Python_AppendOutput(resultobj, val);
+        resultobj = SWIG_AppendOutput(resultobj, val);
 }
 
 %include "cstring.i"
