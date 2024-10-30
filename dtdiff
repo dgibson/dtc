@@ -17,7 +17,7 @@ source_and_sort () {
 	    *.dts)
 		IFORMAT=dts
 		;;
-	    *.dtb)
+	    *.dtb|*.dtbo)
 		IFORMAT=dtb
 		;;
 	esac
@@ -28,7 +28,7 @@ source_and_sort () {
 	exit 2
     fi
 
-    $DTC -I $IFORMAT -O dts -qq -f -s -o - "$DT"
+    $DTC -@ -L -I $IFORMAT -O dts -qq -f -s -o - "$DT"
 }
 
 if [ $# != 2 ]; then
