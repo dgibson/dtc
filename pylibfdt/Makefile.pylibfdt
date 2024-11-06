@@ -15,6 +15,7 @@ ifndef V
 SETUPFLAGS += --quiet
 endif
 
+$(PYMODULE): WARNINGS =  # suppress warnings from generated code
 $(PYMODULE): $(PYLIBFDT_srcs) $(LIBFDT_archive) $(SETUP)
 	@$(VECHO) PYMOD $@
 	CFLAGS="$(CFLAGS) -Wno-error" $(PYTHON) $(SETUP) $(SETUPFLAGS) build_ext
