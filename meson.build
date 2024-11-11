@@ -61,15 +61,15 @@ version_gen_h = vcs_tag(
 subdir('libfdt')
 
 dtc_tools = []
+util_dep = declare_dependency(
+  sources: ['util.c', version_gen_h],
+  include_directories: '.',
+  dependencies: libfdt_dep
+)
+
 if get_option('tools')
   flex = find_program('flex', required: true)
   bison = find_program('bison', required: true)
-
-  util_dep = declare_dependency(
-    sources: ['util.c', version_gen_h],
-    include_directories: '.',
-    dependencies: libfdt_dep
-  )
 
   lgen = generator(
     flex,
