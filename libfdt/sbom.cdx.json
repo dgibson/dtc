@@ -2,6 +2,13 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
+  "metadata": {
+    "authors": [
+      {
+        "name": "@VCS_SBOM_AUTHORS@"
+      }
+    ]
+  },
   "components": [
     {
       "type": "library",
@@ -10,11 +17,6 @@
       "name": "libfdt",
       "version": "@VCS_VERSION@",
       "description": "Utility library for reading and manipulating the FDT binary format",
-      "authors": [
-        {
-          "name": "@VCS_SBOM_AUTHORS@"
-        }
-      ],
       "supplier": {
         "name": "libfdt developers"
       },
