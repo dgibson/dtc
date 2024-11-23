@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	if (argc == 3) {
-		char *str = argv[2], *saveptr, *tok;
+		char *str = argv[2], *saveptr = NULL, *tok;
 		bool default_flag = false;
 
 		while ((tok = strtok_r(str, ",", &saveptr)) != NULL) {
