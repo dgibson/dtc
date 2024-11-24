@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          os: [ "alpine", "archlinux", "fedora", "ubuntu:23.10" ]
+          os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
 
     container:
       image: ${{ matrix.os }}
@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          os: [ "alpine", "archlinux", "fedora", "ubuntu:23.10" ]
+          os: [ "alpine", "archlinux", "fedora", "ubuntu" ]
 
     container:
       image: ${{ matrix.os }}
