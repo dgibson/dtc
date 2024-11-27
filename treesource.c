@@ -3,6 +3,8 @@
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
 
+#include <libfdt/libfdt.h>
+
 #include "dtc.h"
 #include "srcpos.h"
 
@@ -159,6 +161,36 @@ static void add_string_markers(struct property *prop)
 			nextp = &((*nextp)->next);
 		*nextp = m;
 	}
+}
+
+void add_phandle_marker(struct dt_info *dti, struct property *prop, unsigned int offset)
+{
+	struct marker *m, **mi;
+	cell_t phandle;
+	struct node *refn;
+
+	m = xmalloc(sizeof(*m));
+	m->offset = offset;
+	m->type = REF_PHANDLE;
+
+	phandle = fdt32_ld((fdt32_t *)(prop->val.val + m->offset));
+	refn = get_node_by_phandle(dti->dt, phandle);
+
+	if (refn) {
+		if (refn->labels)
+			m->ref = refn->labels->label;
+		else
+			m->ref = refn->fullpath;
+	} else if (quiet < 1) {
+		fprintf(stderr, "Warning: node referenced by phandle 0x%x in property %s not found\n",
+			phandle, prop->name);
+	}
+
+	for (mi = &prop->val.markers; *mi && (*mi)->offset < m->offset;)
+		mi = &(*mi)->next;
+
+	m->next = *mi;
+	*mi = m;
 }
 
 static enum markertype guess_value_type(struct property *prop)
