@@ -26,25 +26,31 @@ else
 endif
 
 link_args += version_script
-libfdt = both_libraries(
-  'fdt', sources,
-  version: meson.project_version(),
-  link_args: link_args,
-  link_depends: 'version.lds',
-  install: true,
-)
 
 if static_build
-  link_with = libfdt.get_static_lib()
+  libfdt = static_library(
+    'fdt',
+    sources,
+    link_args: link_args,
+    link_depends: 'version.lds',
+    install: true,
+  )
 else
-  link_with = libfdt.get_shared_lib()
+  libfdt = library(
+    'fdt',
+    sources,
+    version: meson.project_version(),
+    link_args: link_args,
+    link_depends: 'version.lds',
+    install: true,
+  )
 endif
 
 libfdt_inc = include_directories('.')
 
 libfdt_dep = declare_dependency(
   include_directories: libfdt_inc,
-  link_with: link_with,
+  link_with: libfdt,
 )
 
 install_headers(
