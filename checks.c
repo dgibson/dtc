@@ -1676,6 +1676,10 @@ static void check_interrupt_map(struct check *c,
 		cellprop = get_property(provider_node, "#address-cells");
 		if (cellprop)
 			parent_cellsize += propval_cell(cellprop);
+		else
+			FAIL_PROP(c, dti, node, irq_map_prop,
+				"Missing property '#address-cells' in node %s, using 0 as fallback",
+				provider_node->fullpath);
 
 		cell += 1 + parent_cellsize;
 		if (cell > map_cells)
