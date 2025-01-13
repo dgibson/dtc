@@ -504,7 +504,7 @@ struct node *get_subnode(struct node *node, const char *nodename)
 	struct node *child;
 
 	for_each_child(node, child)
-		if (streq(child->name, nodename))
+		if (streq(child->name, nodename) && !child->deleted)
 			return child;
 
 	return NULL;
