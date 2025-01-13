@@ -1056,16 +1056,29 @@ void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
 
 void generate_fixups_tree(struct dt_info *dti, const char *name)
 {
+	struct node *n = get_subnode(dti->dt, name);
+
+	/* Start with an empty __fixups__ node to not get duplicates */
+	if (n)
+		n->deleted = true;
+
 	if (!any_fixup_tree(dti, dti->dt))
 		return;
-	generate_fixups_tree_internal(dti, build_root_node(dti->dt, name),
+	generate_fixups_tree_internal(dti,
+				      build_and_name_child_node(dti->dt, name),
 				      dti->dt);
 }
 
 void generate_local_fixups_tree(struct dt_info *dti, const char *name)
 {
+	struct node *n = get_subnode(dti->dt, name);
+
+	/* Start with an empty __local_fixups__ node to not get duplicates */
+	if (n)
+		n->deleted = true;
 	if (!any_local_fixup_tree(dti, dti->dt))
 		return;
-	generate_local_fixups_tree_internal(dti, build_root_node(dti->dt, name),
+	generate_local_fixups_tree_internal(dti,
+					    build_and_name_child_node(dti->dt, name),
 					    dti->dt);
 }
