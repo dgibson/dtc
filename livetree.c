@@ -1014,9 +1014,7 @@ static void add_local_fixup_entry(struct dt_info *dti,
 	/* walk the path components creating nodes if they don't exist */
 	for (wn = lfn, i = 1; i < depth; i++, wn = nwn) {
 		/* if no node exists, create it */
-		nwn = get_subnode(wn, compp[i]);
-		if (!nwn)
-			nwn = build_and_name_child_node(wn, compp[i]);
+		nwn = build_root_node(wn, compp[i]);
 	}
 
 	free(compp);
