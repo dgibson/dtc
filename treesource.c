@@ -173,6 +173,12 @@ static struct marker **add_marker(struct marker **mi,
 	return &nm->next;
 }
 
+void property_add_marker(struct property *prop,
+			 enum markertype type, unsigned int offset, char *ref)
+{
+	add_marker(&prop->val.markers, type, offset, ref);
+}
+
 static void add_string_markers(struct property *prop, unsigned int offset, int len)
 {
 	int l;

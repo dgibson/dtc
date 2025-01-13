@@ -1090,6 +1090,102 @@ void generate_fixups_tree(struct dt_info *dti, const char *name)
 				      dti->dt);
 }
 
+void fixup_phandles(struct dt_info *dti, const char *name)
+{
+	struct node *an;
+	struct property *fp;
+
+	an = get_subnode(dti->dt, name);
+	if (!an)
+		return;
+
+	for_each_property(an, fp) {
+		char *fnext = fp->val.val;
+		char *fv;
+		unsigned int fl;
+
+		while ((fl = fp->val.len - (fnext - fp->val.val))) {
+			char *propname, *soffset;
+			struct node *n;
+			struct property *p;
+			long offset;
+
+			fv = fnext;
+			fnext = memchr(fv, 0, fl);
+
+			if (!fnext) {
+				if (quiet < 1)
+					fprintf(stderr, "Warning: Malformed fixup entry for label %s\n",
+						fp->name);
+				break;
+			}
+			fnext += 1;
+
+			propname = memchr(fv, ':', fnext - 1 - fv);
+			if (!propname) {
+				if (quiet < 1)
+					fprintf(stderr, "Warning: Malformed fixup entry for label %s\n",
+						fp->name);
+				continue;
+			}
+			propname++;
+
+			soffset = memchr(propname, ':', fnext - 1 - propname);
+			if (!soffset) {
+				if (quiet < 1)
+					fprintf(stderr, "Warning: Malformed fixup entry for label %s\n",
+						fp->name);
+				continue;
+			}
+			soffset++;
+
+			/*
+			 * temporarily modify the property to not have to create
+			 * a copy for the node path.
+			 */
+			*(propname - 1) = '\0';
+
+			n = get_node_by_path(dti->dt, fv);
+			if (!n && quiet < 1)
+				fprintf(stderr, "Warning: Label %s references non-existing node %s\n",
+					fp->name, fv);
+
+			*(propname - 1) = ':';
+
+			if (!n)
+				continue;
+
+			/*
+			 * temporarily modify the property to not have to create
+			 * a copy for the property name.
+			 */
+			*(soffset - 1) = '\0';
+
+			p = get_property(n, propname);
+
+			if (!p && quiet < 1)
+				fprintf(stderr, "Warning: Label %s references non-existing property %s in node %s\n",
+					fp->name, n->fullpath, propname);
+
+			*(soffset - 1) = ':';
+
+			if (!p)
+				continue;
+
+			offset = strtol(soffset, NULL, 0);
+			if (offset < 0 || offset + 4 > p->val.len) {
+				if (quiet < 1)
+					fprintf(stderr,
+						"Warning: Label %s contains invalid offset for property %s in node %s\n",
+						fp->name, p->name, n->fullpath);
+				continue;
+			}
+
+			property_add_marker(p, REF_PHANDLE, offset, fp->name);
+		}
+	}
+}
+
 void generate_local_fixups_tree(struct dt_info *dti, const char *name)
 {
 	struct node *n = get_subnode(dti->dt, name);
