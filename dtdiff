@@ -17,7 +17,7 @@ source_and_sort () {
 	    *.dts)
 		IFORMAT=dts
 		;;
-	    *.dtb)
+	    *.dtb|*.dtbo)
 		IFORMAT=dtb
 		;;
 	esac
