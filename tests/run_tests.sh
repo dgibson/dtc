@@ -201,7 +201,7 @@ run_dtc_test () {
 }
 
 asm_to_so () {
-    $CC -shared -o $1.test.so "$SRCDIR/data.S" $1.test.s
+    $CC -shared -Wl,-znoexecstack -o $1.test.so "$SRCDIR/data.S" $1.test.s
 }
 
 asm_to_so_test () {
