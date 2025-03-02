@@ -1,7 +1,9 @@
 trees = static_library('trees', files('trees.S'), c_args: '-D__ASSEMBLY__',
+                       build_by_default: false,
                        include_directories: libfdt_inc)
 
 dumptrees = executable('dumptrees', files('dumptrees.c'),
+                       build_by_default: false,
                        link_with: trees, dependencies: libfdt_dep)
 
 dumptrees_dtb = custom_target(
@@ -111,7 +113,7 @@ endif
 
 tests_exe = []
 foreach t: tests
-  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args)
+  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args, build_by_default: false)
 endforeach
 
 run_tests = find_program('run_tests.sh')
