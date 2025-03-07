@@ -98,22 +98,20 @@ tests += [
   'truncated_string',
 ]
 
+test_deps = [testutil_dep, util_dep, libfdt_dep]
+
 dl = cc.find_library('dl', required: false)
-if dl.found() and not static_build
+if dl.found()
   tests += [
     'asm_tree_dump',
     'value-labels',
   ]
-endif
-
-test_deps = [testutil_dep, util_dep, libfdt_dep]
-if not static_build
   test_deps += [dl]
 endif
 
 tests_exe = []
 foreach t: tests
-  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, link_args: extra_link_args, build_by_default: false)
+  tests_exe += executable(t, files(t + '.c'), dependencies: test_deps, build_by_default: false)
 endforeach
 
 run_tests = find_program('run_tests.sh')
