@@ -1,7 +1,7 @@
 project('dtc', 'c',
   version: files('VERSION.txt'),
   license: ['GPL2+', 'BSD-2'],
-  default_options: 'werror=true',
+  default_options: ['werror=true', 'default_library=both'],
   meson_version: '>=0.57.0'
 )
 
@@ -27,16 +27,8 @@ add_project_arguments(
   language: 'c'
 )
 
-if get_option('static-build')
-  static_build = true
-  extra_link_args = ['-static']
-else
-  static_build = false
-  extra_link_args = []
-endif
-
 yamltree = 'yamltree.c'
-yaml = dependency('yaml-0.1', version: '>=0.2.3', required: get_option('yaml'), static: static_build)
+yaml = dependency('yaml-0.1', version: '>=0.2.3', required: get_option('yaml'))
 if not yaml.found()
   add_project_arguments('-DNO_YAML', language: 'c')
   yamltree = []
@@ -92,7 +84,6 @@ if get_option('tools')
       ],
       dependencies: util_dep,
       install: true,
-      link_args: extra_link_args,
     )
   endif
 
@@ -113,11 +104,10 @@ if get_option('tools')
     ],
     dependencies: [util_dep, yaml],
     install: true,
-    link_args: extra_link_args,
   )
 
   foreach e: ['fdtdump', 'fdtget', 'fdtput', 'fdtoverlay']
-    dtc_tools += executable(e, files(e + '.c'), dependencies: util_dep, install: true, link_args: extra_link_args)
+    dtc_tools += executable(e, files(e + '.c'), dependencies: util_dep, install: true)
   endforeach
 
   install_data(
