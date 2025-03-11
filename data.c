@@ -228,11 +228,7 @@ struct data data_add_marker(struct data d, enum markertype type, char *ref)
 {
 	struct marker *m;
 
-	m = xmalloc(sizeof(*m));
-	m->offset = d.len;
-	m->type = type;
-	m->ref = ref;
-	m->next = NULL;
+	m = alloc_marker(d.len, type, ref);
 
 	return data_append_markers(d, m);
 }
@@ -253,4 +249,18 @@ bool data_is_one_string(struct data d)
 		return false;
 
 	return true;
+}
+
+struct marker *alloc_marker(unsigned int offset, enum markertype type,
+			    char *ref)
+{
+	struct marker *m;
+
+	m = xmalloc(sizeof(*m));
+	m->offset = offset;
+	m->type = type;
+	m->ref = ref;
+	m->next = NULL;
+
+	return m;
 }
