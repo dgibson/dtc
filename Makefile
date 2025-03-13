@@ -360,7 +360,7 @@ clean: libfdt_clean pylibfdt_clean tests_clean
 
 %.o: %.S
 	@$(VECHO) AS $@
-	$(CC) $(CPPFLAGS) $(AFLAGS) -D__ASSEMBLY__ -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(AFLAGS) -o $@ -c $<
 
 %.d: %.c
 	@$(VECHO) DEP $<

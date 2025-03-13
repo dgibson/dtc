@@ -1,4 +1,4 @@
-trees = static_library('trees', files('trees.S'), c_args: '-D__ASSEMBLY__',
+trees = static_library('trees', files('trees.S'),
                        build_by_default: false,
                        include_directories: libfdt_inc)
 

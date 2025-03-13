@@ -1,4 +1,4 @@
-#ifdef __ASSEMBLY__
+#ifdef __ASSEMBLER__
 #define ASM_CONST_LL(x)	(x)
 #else
 #define ASM_CONST_LL(x)	(x##ULL)
@@ -46,7 +46,7 @@
 #define TEST_MEMREGION_SIZE_HI	0x0fedcba900000000
 #define TEST_MEMREGION_SIZE_INC	0x1000
 
-#ifndef __ASSEMBLY__
+#ifndef __ASSEMBLER__
 extern struct fdt_header test_tree1;
 extern struct fdt_header truncated_property;
 extern struct fdt_header bad_node_char;
@@ -57,4 +57,4 @@ extern struct fdt_header truncated_string;
 extern struct fdt_header truncated_memrsv;
 extern struct fdt_header two_roots;
 extern struct fdt_header named_root;
-#endif /* ! __ASSEMBLY */
+#endif /* ! __ASSEMBLER__ */
