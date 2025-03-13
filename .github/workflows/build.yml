@@ -104,6 +104,7 @@ jobs:
           meson:p
           ninja:p
           libyaml:p
+          python-pip:p
           swig:p
           python-setuptools-scm:p
 
