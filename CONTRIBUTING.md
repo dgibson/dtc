@@ -2,7 +2,7 @@
 
 There are two ways to submit changes for dtc or libfdt:
 
-* Post patches directly to the the
+* Post patches directly to the
   [devicetree-compiler](mailto:devicetree-compiler@vger.kernel.org)
   mailing list.
 * Submit pull requests via

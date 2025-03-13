@@ -6,7 +6,7 @@ the hardware capabilities. This is insufficient for platforms
 that need to dynamically insert Device Tree fragments into the
 live tree.
 
-This document explains the the Device Tree object format and
+This document explains the Device Tree object format and
 modifications made to the Device Tree compiler, which make it possible.
 
 1. Simplified Problem Definition
