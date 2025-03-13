@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
 	verbose_printf("Nopulated structure block has new size %d\n", newsize);
 
-	/* Replace old strcutre block with the new */
+	/* Replace old structure block with the new */
 
 	fdt2 = xmalloc(fdt_totalsize(fdt) + newsize);
 

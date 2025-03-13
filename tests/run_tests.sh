@@ -805,7 +805,7 @@ dtc_tests () {
     run_dtc_test -I dtb -O dts -o stdin_odts_test_tree1.dtb.test.dts - < test_tree1.dtb
     run_wrap_test cmp stdin_odts_test_tree1.dtb.test.dts odts_test_tree1.dtb.test.dts
 
-    # Check integer expresisons
+    # Check integer expressions
     run_test integer-expressions -g integer-expressions.test.dts
     run_dtc_test -I dts -O dtb -o integer-expressions.test.dtb integer-expressions.test.dts
     run_test integer-expressions integer-expressions.test.dtb

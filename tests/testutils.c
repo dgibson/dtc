@@ -131,7 +131,7 @@ void check_property(void *fdt, int nodeoffset, const char *name,
 		     " differs from stored length (%d != %d)",
 		     name, retlen, proplen);
 	if (proplen != len)
-		FAIL("Size mismatch on property \"%s\": %d insead of %d",
+		FAIL("Size mismatch on property \"%s\": %d instead of %d",
 		     name, proplen, len);
 	if (len && memcmp(val, prop->data, len) != 0)
 		FAIL("Data mismatch on property \"%s\"", name);
@@ -148,7 +148,7 @@ const void *check_getprop(void *fdt, int nodeoffset, const char *name,
 		FAIL("fdt_getprop(\"%s\"): %s", name, fdt_strerror(proplen));
 
 	if (proplen != len)
-		FAIL("Size mismatch on property \"%s\": %d insead of %d",
+		FAIL("Size mismatch on property \"%s\": %d instead of %d",
 		     name, proplen, len);
 	if (len && memcmp(val, propval, len) != 0)
 		FAIL("Data mismatch on property \"%s\"", name);
@@ -172,7 +172,7 @@ const void *check_get_prop_offset(void *fdt, int poffset, const char *exp_name,
 		return NULL;
 
 	if (proplen != exp_len)
-		FAIL("Size mismatch on property \"%s\": %d insead of %d",
+		FAIL("Size mismatch on property \"%s\": %d instead of %d",
 		     name, proplen, exp_len);
 	if (exp_len && memcmp(exp_val, propval, exp_len))
 		FAIL("Data mismatch on property \"%s\"", name);
