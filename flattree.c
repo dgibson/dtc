@@ -218,23 +218,134 @@ static struct emitter asm_emitter = {
 	.property = asm_emit_property,
 };
 
-static int stringtable_insert(struct data *d, const char *str)
+struct stringtable {
+	unsigned int len, cap;
+	struct data data;
+	int *slots;
+};
+
+/*
+ * Must be 2^n to ensure stringtable.cap - 1 correctly masks hash into the
+ * index of slots
+ */
+#define stringtable_initcap		256
+
+static unsigned int stringtable_hash(const char *str, size_t len)
+{
+	unsigned int hash = (unsigned int)len;
+
+	for (; len > 0; len--)
+		hash ^= (hash << 5) + (hash >> 2) + str[len - 1];
+
+	return hash;
+}
+
+static void stringtable_init(struct stringtable *strtab)
 {
 	unsigned int i;
 
-	/* FIXME: do this more efficiently? */
+	*strtab = (struct stringtable) {
+			.len	= 0,
+			.cap	= stringtable_initcap,
+			.data	= empty_data,
+			.slots	= xmalloc(sizeof(int) * stringtable_initcap),
+		  };
 
-	for (i = 0; i < d->len; i++) {
-		if (streq(str, d->val + i))
-			return i;
-	}
+	for (i = 0; i < strtab->cap; i++)
+		strtab->slots[i] = -1;
+}
 
-	*d = data_append_data(*d, str, strlen(str)+1);
+/*
+ * Return the internal data and let the caller owns it.
+ */
+static struct data stringtable_data(struct stringtable *strtab)
+{
+	free(strtab->slots);
+	strtab->slots = NULL;
+
+	return strtab->data;
+}
+
+static void stringtable_free(struct stringtable *strtab)
+{
+	free(strtab->slots);
+	strtab->slots = NULL;
+
+	data_free(strtab->data);
+}
+
+static unsigned int stringtable_findslot(int *slots, unsigned int cap,
+					 unsigned int hash)
+{
+	unsigned int i, mask;
+
+	mask = cap - 1;
+
+	for (i = hash & mask; slots[i] != -1; i = (i + 1) & mask) ;
+
 	return i;
 }
 
+static void stringtable_grow(struct stringtable *strtab)
+{
+	unsigned int newcap = strtab->cap * 2;
+	int *newslots = xmalloc(newcap * sizeof(int));
+	unsigned int i;
+
+	for (i = 0; i < newcap; i++)
+		newslots[i] = -1;
+
+	for (i = 0; i < strtab->cap; i++) {
+		int off = strtab->slots[i];
+		const char *str = strtab->data.val + off;
+		unsigned int hash = stringtable_hash(str, strlen(str));
+		int newslot = stringtable_findslot(newslots, newcap, hash);
+
+		newslots[newslot] = off;
+	}
+
+	strtab->cap	= newcap;
+	strtab->slots	= newslots;
+}
+
+static int stringtable_insert(struct stringtable *strtab, const char *str)
+{
+	unsigned int hash, i, mask;
+	int *slots, *slot;
+	const char *dup;
+	size_t len;
+
+	if (strtab->cap < strtab->len * 2)
+		stringtable_grow(strtab);
+
+	len	= strlen(str);
+	mask	= strtab->cap - 1;
+	hash	= stringtable_hash(str, len);
+	slots	= strtab->slots;
+
+	for (i = hash & mask; *(slot = &slots[i]) != -1; i = (i + 1) & mask) {
+		const char *oldstr = strtab->data.val + *slot;
+
+		if (streq(str, oldstr))
+			return *slot;
+	}
+
+	/* Try to match a subsequence */
+	dup = memmem(strtab->data.val, strtab->data.len, str, len + 1);
+	if (dup) {
+		*slot = dup - strtab->data.val;
+	} else {
+		*slot = strtab->data.len;
+		strtab->data = data_append_data(strtab->data, str, len + 1);
+	}
+
+	strtab->len++;
+
+	return *slot;
+}
+
 static void flatten_tree(struct node *tree, struct emitter *emit,
-			 void *etarget, struct data *strbuf,
+			 void *etarget, struct stringtable *strbuf,
 			 struct version_info *vi)
 {
 	struct property *prop;
@@ -350,9 +461,11 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	struct data blob       = empty_data;
 	struct data reservebuf = empty_data;
 	struct data dtbuf      = empty_data;
-	struct data strbuf     = empty_data;
+	struct stringtable strbuf;
 	struct fdt_header fdt;
 	int padlen = 0;
+
+	stringtable_init(&strbuf);
 
 	for (i = 0; i < ARRAY_SIZE(version_table); i++) {
 		if (version_table[i].version == version)
@@ -367,7 +480,7 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	reservebuf = flatten_reserve_list(dti->reservelist, vi);
 
 	/* Make header */
-	make_fdt_header(&fdt, vi, reservebuf.len, dtbuf.len, strbuf.len,
+	make_fdt_header(&fdt, vi, reservebuf.len, dtbuf.len, strbuf.data.len,
 			dti->boot_cpuid_phys);
 
 	/*
@@ -407,7 +520,7 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	blob = data_merge(blob, reservebuf);
 	blob = data_append_zeroes(blob, sizeof(struct fdt_reserve_entry));
 	blob = data_merge(blob, dtbuf);
-	blob = data_merge(blob, strbuf);
+	blob = data_merge(blob, stringtable_data(&strbuf));
 
 	/*
 	 * If the user asked for more space than is used, pad out the blob.
@@ -448,9 +561,11 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 {
 	struct version_info *vi = NULL;
 	unsigned int i;
-	struct data strbuf = empty_data;
+	struct stringtable strbuf;
 	struct reserve_info *re;
 	const char *symprefix = "dt";
+
+	stringtable_init(&strbuf);
 
 	for (i = 0; i < ARRAY_SIZE(version_table); i++) {
 		if (version_table[i].version == version)
@@ -541,7 +656,7 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 	emit_label(f, symprefix, "struct_end");
 
 	emit_label(f, symprefix, "strings_start");
-	dump_stringtable_asm(f, strbuf);
+	dump_stringtable_asm(f, strbuf.data);
 	emit_label(f, symprefix, "strings_end");
 
 	emit_label(f, symprefix, "blob_end");
@@ -560,7 +675,7 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 		asm_emit_align(f, alignsize);
 	emit_label(f, symprefix, "blob_abs_end");
 
-	data_free(strbuf);
+	stringtable_free(&strbuf);
 }
 
 struct inbuf {
