@@ -3,6 +3,10 @@
 # Device Tree Compiler
 #
 
+$(warning WARNING: Building dtc using make is deprecated, in favour of using Meson (https://mesonbuild.com))
+$(warning )
+$(warning Use `meson setup builddir/ && meson compile -C builddir/` to build, `meson test -C builddir/` to test, or `meson configure` to see build options.)
+
 #
 # Version information will be constructed in this order:
 # DTC_VERSION release version as MAJOR.MINOR.PATCH
