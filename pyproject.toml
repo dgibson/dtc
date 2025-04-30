@@ -1,0 +1,33 @@
+[build-system]
+build-backend = 'mesonpy'
+requires = ['meson-python']
+
+[project]
+name = 'libfdt'
+authors = [
+    {name = 'Simon Glass', email = 'sjg@chromium.org'},
+]
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: BSD License',
+    'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+    'Operating System :: OS Independent',
+]
+description = 'Python binding for libfdt'
+readme = 'README.md'
+requires-python = '>=3.8'
+dynamic = ['version']
+
+[project.urls]
+'homepage' = 'https://git.kernel.org/pub/scm/utils/dtc/dtc.git'
+
+# These arguments are applied only when building a redistributable binary wheel
+# for uploading to PyPI. We don't want to install libraries (or headers /
+# pkgconfig files / executables) that clash with system C installs, so we
+# disable everything other than the python bindings themselves, and build the
+# python C-API extension using static linkage to avoid juggling "libdir" /
+# LD_LIBRARY_PATH / RPATH around. When building both the C library and the
+# python bindings for a distro, `meson setup` will still default to shared
+# libraries.
+[tool.meson-python.args]
+setup = ['-Ddefault_library=static', '-Dwheel-only=true']

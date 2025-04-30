@@ -10,3 +10,5 @@ option('python', type: 'feature', value: 'auto',
        description: 'Build pylibfdt Python library')
 option('tests', type: 'boolean', value: true,
        description: 'Build tests')
+option('wheel-only', type: 'boolean', value: false,
+       description: 'building from meson-python')

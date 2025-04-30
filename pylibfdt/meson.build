@@ -1,13 +1,21 @@
-setup_py = find_program('../setup.py')
-setup_py = [setup_py, '--quiet', '--top-builddir', meson.project_build_root()]
-
-pylibfdt = custom_target(
-  'pylibfdt',
+libfdt_c = custom_target(
+  'swig',
   input: 'libfdt.i',
-  depends: libfdt,
-  output: '_libfdt.so',
-  command: [setup_py, 'build_ext'],
-  build_by_default: true,
+  output: ['libfdt.c', 'libfdt.py'],
+  install: true,
+  install_dir: [false, py.get_install_dir(pure: false)],
+  command: [swig, '-python', '-I'+meson.current_source_dir() / '../libfdt', '-o', '@OUTPUT0@', '@INPUT@']
 )
 
-meson.add_install_script(setup_py, 'install', '--prefix=' + get_option('prefix'), '--root=$DESTDIR')
+nowarn_gen = cc.get_supported_arguments(
+  '-Wno-cast-qual',
+  '-Wno-missing-prototypes',
+  '-Wno-redundant-decls',
+)
+pylibfdt = py.extension_module(
+  '_libfdt',
+  libfdt_c,
+  c_args: ['-DPY_SSIZE_T_CLEAN'] + nowarn_gen,
+  dependencies: [libfdt_dep, py.dependency()],
+  install: true,
+)
