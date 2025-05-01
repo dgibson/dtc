@@ -1,0 +1,23 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	labelfornodea: nodea {
+		property = <&labelfornodea>;
+	};
+
+	nodeb {
+		property = <&nonexisting>;
+	};
+
+	__fixups__ {
+		nonexisting = "/nodeb:property:0";
+	};
+
+	__local_fixups__ {
+		nodea {
+			property = <0>;
+		};
+	};
+};
+
