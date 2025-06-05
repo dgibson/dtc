@@ -287,6 +287,17 @@ struct srcpos *srcpos_extend(struct srcpos *pos, struct srcpos *newtail)
 	return pos;
 }
 
+void srcpos_free(struct srcpos *pos)
+{
+	struct srcpos *p_next;
+
+	while (pos) {
+		p_next = pos->next;
+		free(pos);
+		pos = p_next;
+	}
+}
+
 char *
 srcpos_string(struct srcpos *pos)
 {
