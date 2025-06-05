@@ -182,6 +182,7 @@ struct data data_append_addr(struct data d, uint64_t addr);
 struct data data_append_byte(struct data d, uint8_t byte);
 struct data data_append_zeroes(struct data d, int len);
 struct data data_append_align(struct data d, int align);
+struct data data_insert_data(struct data d, struct marker *m, struct data old);
 
 struct marker *alloc_marker(unsigned int offset, enum markertype type,
 			    char *ref);
