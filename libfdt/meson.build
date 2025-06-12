@@ -40,6 +40,7 @@ libfdt_dep = declare_dependency(
   include_directories: libfdt_inc,
   link_with: libfdt,
 )
+meson.override_dependency('libfdt', libfdt_dep)
 
 if not wheel_only
   install_headers(

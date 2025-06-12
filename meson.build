@@ -118,6 +118,10 @@ if get_option('tools') and not wheel_only
   )
 endif
 
+foreach e: dtc_tools
+  meson.override_find_program(e.name(), e)
+endforeach
+
 if pylibfdt_enabled
   subdir('pylibfdt')
 endif
