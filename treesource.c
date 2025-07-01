@@ -347,7 +347,10 @@ void dt_to_source(FILE *f, struct dt_info *dti)
 {
 	struct reserve_info *re;
 
-	fprintf(f, "/dts-v1/;\n\n");
+	fprintf(f, "/dts-v1/;\n");
+	if (dti->dtsflags & DTSF_PLUGIN)
+		fprintf(f, "/plugin/;\n");
+	fprintf(f, "\n");
 
 	for (re = dti->reservelist; re; re = re->next) {
 		struct label *l;
