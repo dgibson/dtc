@@ -389,8 +389,8 @@ static struct option const usage_long_opts[] = {
 	USAGE_COMMON_LONG_OPTS,
 };
 static const char * const usage_opts_help[] = {
-	"Create nodes if they don't already exist",
-	"Delete nodes (and any subnodes) if they already exist",
+	"Create nodes",
+	"Delete nodes (and any subnodes)",
 	"Delete properties if they already exist",
 	"Automatically create nodes as needed for the node path",
 	"Type of data",
