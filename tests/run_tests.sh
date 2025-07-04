@@ -570,6 +570,10 @@ dtc_tests () {
     run_dtc_test -I dts -O dtb -o dtc_sized_cells.test.dtb "$SRCDIR/sized_cells.dts"
     run_test sized_cells dtc_sized_cells.test.dtb
 
+    run_dtc_test -I dts -O dts -o over-determined-once.test.dts "$SRCDIR/over-determined.dts"
+    run_dtc_test -I dts -O dts -o over-determined-twice.test.dts "over-determined-once.test.dts"
+    run_wrap_test cmp over-determined-once.test.dts over-determined-twice.test.dts
+
     run_dtc_test -I dts -O dtb -o dtc_extra-terminating-null.test.dtb "$SRCDIR/extra-terminating-null.dts"
     run_test extra-terminating-null dtc_extra-terminating-null.test.dtb
 
