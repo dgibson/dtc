@@ -1024,7 +1024,7 @@ static void check_i2c_bus_bridge(struct check *c, struct dt_info *dti, struct no
 	} else if (strprefixeq(node->name, node->basenamelen, "i2c")) {
 		struct node *child;
 		for_each_child(node, child) {
-			if (strprefixeq(child->name, node->basenamelen, "i2c-bus"))
+			if (strprefixeq(child->name, child->basenamelen, "i2c-bus"))
 				return;
 		}
 		node->bus = &i2c_bus;
