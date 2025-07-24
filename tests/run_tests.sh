@@ -43,13 +43,14 @@ fi
 
 # stat differs between platforms
 if [ -z "$STATSZ" ]; then
-	stat --version 2>/dev/null | grep -q 'GNU'
-	GNUSTAT=$?
-	if [ "$GNUSTAT" -ne 0 ]; then
-		# Assume BSD stat if we can't detect as GNU stat
-		STATSZ="stat -f %Uz"
-	else
+	# First attempt GNU style, this is supported by both the
+	# actual GNU coreutils version, and the Rust re-implementation
+	# uutils, used in recent Ubuntu versions
+	if stat -c %s $0; then
 		STATSZ="stat -c %s"
+	else
+		# Otherwise assume BSD style stat
+		STATSZ="stat -f %Uz"
 	fi
 fi
 
