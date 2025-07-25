@@ -9,7 +9,7 @@ rm -f $LOG $EXPECT
 trap "rm -f $LOG $EXPECT" 0
 
 expect="$1"
-printf '%b\n' "$expect" > $EXPECT
+printf "$expect\n" > $EXPECT
 shift
 
 verbose_run_log_check "$LOG" $VALGRIND $DTGET "$@"
