@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <libfdt.h>
 
@@ -64,16 +65,12 @@ static int encode_value(struct display_info *disp, char **arg, int arg_count,
 	int len;		/* length of this cell/string/byte */
 	int ival;
 	int upto;	/* the number of bytes we have written to buf */
-	char fmt[3];
 
 	upto = 0;
 
 	if (disp->verbose)
 		fprintf(stderr, "Decoding value:\n");
 
-	fmt[0] = '%';
-	fmt[1] = disp->type ? disp->type : 'd';
-	fmt[2] = '\0';
 	for (; arg_count > 0; arg++, arg_count--, upto += len) {
 		/* assume integer unless told otherwise */
 		if (disp->type == 's')
@@ -94,7 +91,34 @@ static int encode_value(struct display_info *disp, char **arg, int arg_count,
 				fprintf(stderr, "\tstring: '%s'\n", ptr);
 		} else {
 			fdt32_t *iptr = (fdt32_t *)ptr;
-			sscanf(*arg, fmt, &ival);
+			char *endptr;
+
+			errno = 0;
+			switch (disp->type) {
+			case 'x':
+				ival = strtoul(*arg, &endptr, 16);
+				break;
+			case 'o':
+				ival = strtoul(*arg, &endptr, 8);
+				break;
+			case 'i':
+				ival = strtol(*arg, &endptr, 0);
+				break;
+			case 'u':
+				ival = strtoul(*arg, &endptr, 0);
+				break;
+			default: /* 0 or 'd' */
+				ival = strtol(*arg, &endptr, 10);
+			}
+
+			if (*endptr != '\0' || errno) {
+				if (disp->verbose) {
+					fprintf(stderr,
+						"Couldn't parse \"%s\" as an integer\n",
+						*arg);
+				}
+				return -1;
+			}
 			if (len == 4)
 				*iptr = cpu_to_fdt32(ival);
 			else
