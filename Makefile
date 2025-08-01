@@ -24,7 +24,10 @@ ASSUME_MASK ?= 0
 CPPFLAGS = -I libfdt -I . -DFDT_ASSUME_MASK=$(ASSUME_MASK)
 WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs -Wsign-compare \
 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow \
-	-Wsuggest-attribute=format -Wwrite-strings
+	-Wwrite-strings
+ifeq ($(shell $(CC) --version | grep -q gcc && echo gcc),gcc)
+WARNINGS += -Wsuggest-attribute=format
+endif
 CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS) $(EXTRA_CFLAGS)
 
 BISON = bison
@@ -65,6 +68,8 @@ else
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags yaml-0.1)
 endif
 
+HAS_VERSION_SCRIPT := $(shell echo 'int main(){}' | $(CC) -Wl,--version-script=/dev/null -x c - -o /dev/null 2>/dev/null && echo y)
+
 ifeq ($(HOSTOS),darwin)
 SHAREDLIB_EXT     = dylib
 SHAREDLIB_CFLAGS  = -fPIC
@@ -72,11 +77,15 @@ SHAREDLIB_LDFLAGS = -fPIC -dynamiclib -Wl,-install_name -Wl,
 else ifeq ($(HOSTOS),$(filter $(HOSTOS),msys cygwin))
 SHAREDLIB_EXT     = so
 SHAREDLIB_CFLAGS  =
-SHAREDLIB_LDFLAGS = -shared -Wl,--version-script=$(LIBFDT_version) -Wl,-soname,
+SHAREDLIB_LDFLAGS = -shared -Wl,-soname,
 else
 SHAREDLIB_EXT     = so
 SHAREDLIB_CFLAGS  = -fPIC
-SHAREDLIB_LDFLAGS = -fPIC -shared -Wl,--version-script=$(LIBFDT_version) -Wl,-soname,
+SHAREDLIB_LDFLAGS = -fPIC -shared -Wl,-soname,
+endif
+
+ifeq ($(HAS_VERSION_SCRIPT),y)
+SHAREDLIB_LDFLAGS += -Wl,--version-script=$(LIBFDT_version)
 endif
 
 #
