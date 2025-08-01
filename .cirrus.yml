@@ -1,0 +1,39 @@
+# FreeBSD build with multiple versions
+freebsd_versions_task:
+  name: FreeBSD $FREEBSD_VERSION make build
+  freebsd_instance:
+    image_family: $FREEBSD_IMAGE
+  matrix:
+    - env:
+        FREEBSD_VERSION: "13.5"
+        FREEBSD_IMAGE: freebsd-13-5
+    - env:
+        FREEBSD_VERSION: "14.3"
+        FREEBSD_IMAGE: freebsd-14-3
+  install_script:
+    - pkg install -y git gmake flex bison python3 py312-setuptools swig libyaml pkgconf
+  build_script:
+    - gmake
+  check_script:
+    - gmake check
+
+# FreeBSD meson builds with multiple versions
+freebsd_meson_versions_task:
+  name: FreeBSD $FREEBSD_VERSION meson build
+  freebsd_instance:
+    image_family: $FREEBSD_IMAGE
+  matrix:
+    - env:
+        FREEBSD_VERSION: "13.5"
+        FREEBSD_IMAGE: freebsd-13-5
+    - env:
+        FREEBSD_VERSION: "14.3"
+        FREEBSD_IMAGE: freebsd-14-3
+  install_script:
+    - pkg install -y git meson ninja flex bison python3 py312-setuptools swig libyaml pkgconf
+  setup_script:
+    - meson setup -D python=enabled -D yaml=enabled build
+  build_script:
+    - meson compile -C build
+  test_script:
+    - if ! meson test -C build; then cat build/meson-logs/testlog.txt; false; fi
