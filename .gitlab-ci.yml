@@ -1,0 +1,65 @@
+stages:
+  - build
+
+variables:
+  GIT_DEPTH: 1
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "ci"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Linux builds with make
+.build-make-template: &build-make-template
+  stage: build
+  before_script:
+    - ./scripts/install-deps.sh
+  script:
+    - make
+    - make check
+  interruptible: true
+
+build-make-alpine:
+  <<: *build-make-template
+  image: alpine:latest
+
+build-make-archlinux:
+  <<: *build-make-template
+  image: archlinux:latest
+
+build-make-fedora:
+  <<: *build-make-template
+  image: fedora:latest
+
+build-make-ubuntu:
+  <<: *build-make-template
+  image: ubuntu:latest
+
+# Linux builds with meson
+.build-meson-template: &build-meson-template
+  stage: build
+  before_script:
+    - ./scripts/install-deps.sh
+  script:
+    - meson setup -D python=enabled -D yaml=enabled build
+    - meson compile -C build
+    - if ! meson test -C build; then cat build/meson-logs/testlog.txt; false; fi
+  interruptible: true
+
+build-meson-alpine:
+  <<: *build-meson-template
+  image: alpine:latest
+
+build-meson-archlinux:
+  <<: *build-meson-template
+  image: archlinux:latest
+
+build-meson-fedora:
+  <<: *build-meson-template
+  image: fedora:latest
+
+build-meson-ubuntu:
+  <<: *build-meson-template
+  image: ubuntu:latest
+
