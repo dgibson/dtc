@@ -1,5 +1,6 @@
 version_script = '-Wl,--version-script=@0@'.format(meson.current_source_dir() / 'version.lds')
-if not cc.has_link_argument(version_script)
+test_code = 'void test_func(){} int main(){}'
+if not cc.links(test_code, args: ['-Wl,--version-script=' + meson.current_source_dir() / 'test.lds'])
   version_script = []
 endif
 

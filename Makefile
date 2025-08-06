@@ -68,7 +68,7 @@ else
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags yaml-0.1)
 endif
 
-HAS_VERSION_SCRIPT := $(shell echo 'int main(){}' | $(CC) -Wl,--version-script=/dev/null -x c - -o /dev/null 2>/dev/null && echo y)
+HAS_VERSION_SCRIPT := $(shell printf 'void test_func(){}\nint main(){}' | $(CC) -Wl,--version-script=libfdt/test.lds -x c - && echo y || echo n)
 
 ifeq ($(HOSTOS),darwin)
 SHAREDLIB_EXT     = dylib
