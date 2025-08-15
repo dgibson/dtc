@@ -340,20 +340,16 @@ void append_to_property(struct node *node,
 			char *name, const void *data, int len,
 			enum markertype type)
 {
-	struct data d;
 	struct property *p;
 
 	p = get_property(node, name);
-	if (p) {
-		d = data_add_marker(p->val, type, name);
-		d = data_append_data(d, data, len);
-		p->val = d;
-	} else {
-		d = data_add_marker(empty_data, type, name);
-		d = data_append_data(d, data, len);
-		p = build_property(name, d, NULL);
+	if (!p) {
+		p = build_property(name, empty_data, NULL);
 		add_property(node, p);
 	}
+
+	p->val = data_add_marker(p->val, type, name);
+	p->val = data_append_data(p->val, data, len);
 }
 
 struct reserve_info *build_reserve_entry(uint64_t address, uint64_t size)
