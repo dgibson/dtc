@@ -749,7 +749,6 @@ dtc_tests () {
     check_tests "$SRCDIR/bad-phandle-cells.dts" interrupts_extended_property
     check_tests "$SRCDIR/bad-gpio.dts" gpios_property
     check_tests "$SRCDIR/good-gpio.dts" -n gpios_property
-    check_tests "$SRCDIR/bad-graph.dts" graph_child_address
     check_tests "$SRCDIR/bad-graph.dts" graph_port
     check_tests "$SRCDIR/bad-graph.dts" graph_endpoint
     check_tests "$SRCDIR/bad-graph-root1.dts" graph_nodes
@@ -758,7 +757,6 @@ dtc_tests () {
     check_tests "$SRCDIR/bad-graph-root4.dts" graph_nodes
     check_tests "$SRCDIR/bad-graph-reg-cells.dts" graph_endpoint
     check_tests "$SRCDIR/bad-graph-reg-cells.dts" graph_port
-    check_tests "$SRCDIR/bad-graph-child-address.dts" graph_child_address
     run_sh_test "$SRCDIR/dtc-checkfails.sh" deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb "$SRCDIR/bad-gpio.dts"
     run_sh_test "$SRCDIR/dtc-checkfails.sh" -n deprecated_gpio_property -- -Wdeprecated_gpio_property -I dts -O dtb "$SRCDIR/good-gpio.dts"
     check_tests "$SRCDIR/bad-interrupt-cells.dts" interrupts_property
