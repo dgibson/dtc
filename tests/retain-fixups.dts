@@ -1,0 +1,29 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	fixup-node {
+		property = <0xffffffff>;
+		property-with-fixup = <0xffffffff>;
+		property-with-label = <&somenode>;
+		property-with-label-and-fixup = <&somenode>;
+	};
+
+	label: local-fixup-node {
+		property = <0xffffffff>;
+		property-with-local-fixup = <0xffffffff>;
+		property-with-local-label = <&label>;
+		property-with-local-label-and-fixup = <&label>;
+	};
+
+	__fixups__ {
+		somenode = "/fixup-node:property-with-fixup:0", "/fixup-node:property-with-label-and-fixup:0";
+	};
+
+	__local_fixups__ {
+		local-fixup-node {
+			property-with-local-fixup = <0x00>;
+			property-with-local-label-and-fixup = <0x00>;
+		};
+	};
+};

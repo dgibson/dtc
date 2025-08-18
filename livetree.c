@@ -352,6 +352,63 @@ void append_to_property(struct node *node,
 	p->val = data_append_data(p->val, data, len);
 }
 
+static int append_unique_str_to_property(struct node *node,
+					 char *name, const char *data, int len)
+{
+	struct property *p;
+
+	p = get_property(node, name);
+	if (p) {
+		const char *s;
+
+		if (p->val.len && p->val.val[p->val.len - 1] != '\0')
+			/* The current content doesn't look like a string */
+			return -1;
+
+		for (s = p->val.val; s < p->val.val + p->val.len; s = strchr(s, '\0') + 1) {
+			if (strcmp(data, s) == 0)
+				/* data already contained in node.name */
+				return 0;
+		}
+	} else {
+		p = build_property(name, empty_data, NULL);
+		add_property(node, p);
+	}
+
+	p->val = data_add_marker(p->val, TYPE_STRING, name);
+	p->val = data_append_data(p->val, data, len);
+
+	return 0;
+}
+
+static int append_unique_u32_to_property(struct node *node, char *name, fdt32_t value)
+{
+	struct property *p;
+
+	p = get_property(node, name);
+	if (p) {
+		const fdt32_t *v, *val_end = (const fdt32_t *)p->val.val + p->val.len / 4;
+
+		if (p->val.len % 4 != 0)
+			/* The current content doesn't look like a u32 array */
+			return -1;
+
+		for (v = (const void *)p->val.val; v < val_end; v++) {
+			if (*v == value)
+				/* value already contained */
+				return 0;
+		}
+	} else {
+		p = build_property(name, empty_data, NULL);
+		add_property(node, p);
+	}
+
+	p->val = data_add_marker(p->val, TYPE_UINT32, name);
+	p->val = data_append_data(p->val, &value, 4);
+
+	return 0;
+}
+
 struct reserve_info *build_reserve_entry(uint64_t address, uint64_t size)
 {
 	struct reserve_info *new = xmalloc(sizeof(*new));
@@ -914,11 +971,12 @@ static bool any_fixup_tree(struct dt_info *dti, struct node *node)
 	return false;
 }
 
-static void add_fixup_entry(struct dt_info *dti, struct node *fn,
-			    struct node *node, struct property *prop,
-			    struct marker *m)
+static int add_fixup_entry(struct dt_info *dti, struct node *fn,
+			   struct node *node, struct property *prop,
+			   struct marker *m)
 {
 	char *entry;
+	int ret;
 
 	/* m->ref can only be a REF_PHANDLE, but check anyway */
 	assert(m->type == REF_PHANDLE);
@@ -935,32 +993,39 @@ static void add_fixup_entry(struct dt_info *dti, struct node *fn,
 
 	xasprintf(&entry, "%s:%s:%u",
 			node->fullpath, prop->name, m->offset);
-	append_to_property(fn, m->ref, entry, strlen(entry) + 1, TYPE_STRING);
+	ret = append_unique_str_to_property(fn, m->ref, entry, strlen(entry) + 1);
 
 	free(entry);
+
+	return ret;
 }
 
-static void generate_fixups_tree_internal(struct dt_info *dti,
-					  struct node *fn,
-					  struct node *node)
+static int generate_fixups_tree_internal(struct dt_info *dti,
+					 struct node *fn,
+					 struct node *node)
 {
 	struct node *dt = dti->dt;
 	struct node *c;
 	struct property *prop;
 	struct marker *m;
 	struct node *refnode;
+	int ret = 0;
 
 	for_each_property(node, prop) {
 		m = prop->val.markers;
 		for_each_marker_of_type(m, REF_PHANDLE) {
 			refnode = get_node_by_ref(dt, m->ref);
 			if (!refnode)
-				add_fixup_entry(dti, fn, node, prop, m);
+				if (add_fixup_entry(dti, fn, node, prop, m))
+					ret = -1;
 		}
 	}
 
 	for_each_child(node, c)
-		generate_fixups_tree_internal(dti, fn, c);
+		if (generate_fixups_tree_internal(dti, fn, c))
+			ret = -1;
+
+	return ret;
 }
 
 static bool any_local_fixup_tree(struct dt_info *dti, struct node *node)
@@ -985,7 +1050,7 @@ static bool any_local_fixup_tree(struct dt_info *dti, struct node *node)
 	return false;
 }
 
-static void add_local_fixup_entry(struct dt_info *dti,
+static int add_local_fixup_entry(struct dt_info *dti,
 		struct node *lfn, struct node *node,
 		struct property *prop, struct marker *m,
 		struct node *refnode)
@@ -1016,30 +1081,35 @@ static void add_local_fixup_entry(struct dt_info *dti,
 	free(compp);
 
 	value_32 = cpu_to_fdt32(m->offset);
-	append_to_property(wn, prop->name, &value_32, sizeof(value_32), TYPE_UINT32);
+	return append_unique_u32_to_property(wn, prop->name, value_32);
 }
 
-static void generate_local_fixups_tree_internal(struct dt_info *dti,
-						struct node *lfn,
-						struct node *node)
+static int generate_local_fixups_tree_internal(struct dt_info *dti,
+					       struct node *lfn,
+					       struct node *node)
 {
 	struct node *dt = dti->dt;
 	struct node *c;
 	struct property *prop;
 	struct marker *m;
 	struct node *refnode;
+	int ret = 0;
 
 	for_each_property(node, prop) {
 		m = prop->val.markers;
 		for_each_marker_of_type(m, REF_PHANDLE) {
 			refnode = get_node_by_ref(dt, m->ref);
 			if (refnode)
-				add_local_fixup_entry(dti, lfn, node, prop, m, refnode);
+				if (add_local_fixup_entry(dti, lfn, node, prop, m, refnode))
+					ret = -1;
 		}
 	}
 
 	for_each_child(node, c)
-		generate_local_fixups_tree_internal(dti, lfn, c);
+		if (generate_local_fixups_tree_internal(dti, lfn, c))
+			ret = -1;
+
+	return ret;
 }
 
 void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
@@ -1052,29 +1122,20 @@ void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
 
 void generate_fixups_tree(struct dt_info *dti, const char *name)
 {
-	struct node *n = get_subnode(dti->dt, name);
-
-	/* Start with an empty __fixups__ node to not get duplicates */
-	if (n)
-		n->deleted = true;
-
 	if (!any_fixup_tree(dti, dti->dt))
 		return;
-	generate_fixups_tree_internal(dti,
-				      build_and_name_child_node(dti->dt, name),
-				      dti->dt);
+	if (generate_fixups_tree_internal(dti, build_root_node(dti->dt, name), dti->dt))
+		fprintf(stderr,
+			"Warning: Preexisting data in %s malformed, some content could not be added.\n",
+			name);
 }
 
 void generate_local_fixups_tree(struct dt_info *dti, const char *name)
 {
-	struct node *n = get_subnode(dti->dt, name);
-
-	/* Start with an empty __local_fixups__ node to not get duplicates */
-	if (n)
-		n->deleted = true;
 	if (!any_local_fixup_tree(dti, dti->dt))
 		return;
-	generate_local_fixups_tree_internal(dti,
-					    build_and_name_child_node(dti->dt, name),
-					    dti->dt);
+	if (generate_local_fixups_tree_internal(dti, build_root_node(dti->dt, name), dti->dt))
+		fprintf(stderr,
+			"Warning: Preexisting data in %s malformed, some content could not be added.\n",
+			name);
 }

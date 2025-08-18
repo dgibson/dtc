@@ -667,6 +667,11 @@ dtc_tests () {
         run_test dtbs_equal_ordered $tree.test.dtb $tree.test.dts.test.dtb
     done
 
+    # Check preservation of __fixups__ and __local_fixups__
+    run_dtc_test -I dts -O dtb -o retain-fixups.test.dtb "$SRCDIR/retain-fixups.dts"
+    run_fdtget_test "/fixup-node:property-with-fixup:0 /fixup-node:property-with-label-and-fixup:0 /fixup-node:property-with-label:0" retain-fixups.test.dtb /__fixups__ somenode
+    run_fdtget_test "property-with-local-fixup\nproperty-with-local-label-and-fixup\nproperty-with-local-label" -p retain-fixups.test.dtb /__local_fixups__/local-fixup-node
+
     # Check -Oyaml output
     if ! $no_yaml; then
             for tree in type-preservation; do
