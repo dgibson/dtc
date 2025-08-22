@@ -718,11 +718,14 @@ static void check_alias_paths(struct check *c, struct dt_info *dti,
 			continue;
 		}
 
-		if (!prop->val.val || !get_node_by_path(dti->dt, prop->val.val)) {
+		/* This check does not work for overlays with external paths */
+		if (!(dti->dtsflags & DTSF_PLUGIN) &&
+		    (!prop->val.val || !get_node_by_path(dti->dt, prop->val.val))) {
 			FAIL_PROP(c, dti, node, prop, "aliases property is not a valid node (%s)",
 				  prop->val.val);
 			continue;
 		}
+
 		if (strspn(prop->name, LOWERCASE DIGITS "-") != strlen(prop->name))
 			FAIL(c, dti, node, "aliases property name must include only lowercase and '-'");
 	}
