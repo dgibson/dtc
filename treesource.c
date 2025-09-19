@@ -183,6 +183,39 @@ static void add_string_markers(struct property *prop, unsigned int offset, int l
 		mi = add_marker(mi, TYPE_STRING, offset + l, NULL);
 }
 
+void add_phandle_marker(struct dt_info *dti, struct property *prop, unsigned int offset)
+{
+	cell_t phandle;
+	struct node *refn;
+	char *ref;
+
+	if (prop->val.len < offset + 4) {
+		if (quiet < 1)
+			fprintf(stderr,
+				"Warning: property %s too short to contain a phandle at offset %u\n",
+				prop->name, offset);
+		return;
+	}
+
+	phandle = dtb_ld32(prop->val.val + offset);
+	refn = get_node_by_phandle(dti->dt, phandle);
+
+	if (!refn) {
+		if (quiet < 1)
+			fprintf(stderr,
+				"Warning: node referenced by phandle 0x%x in property %s not found\n",
+				phandle, prop->name);
+		return;
+	}
+
+	if (refn->labels)
+		ref = refn->labels->label;
+	else
+		ref = refn->fullpath;
+
+	add_marker(&prop->val.markers, REF_PHANDLE, offset, ref);
+}
+
 static enum markertype guess_value_type(struct property *prop, unsigned int offset, int len)
 {
 	const char *p = prop->val.val + offset;

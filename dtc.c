@@ -343,6 +343,8 @@ int main(int argc, char *argv[])
 	if (generate_symbols)
 		generate_label_tree(dti, "__symbols__", true);
 
+	local_fixup_phandles(dti, "__local_fixups__");
+
 	if (generate_fixups) {
 		generate_fixups_tree(dti, "__fixups__");
 		generate_local_fixups_tree(dti, "__local_fixups__");
