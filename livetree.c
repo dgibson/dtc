@@ -1112,6 +1112,27 @@ static int generate_local_fixups_tree_internal(struct dt_info *dti,
 	return ret;
 }
 
+void generate_labels_from_tree(struct dt_info *dti, const char *name)
+{
+	struct node *an;
+	struct property *p;
+
+	an = get_subnode(dti->dt, name);
+	if (!an)
+		return;
+
+	for_each_property(an, p) {
+		struct node *labeled_node;
+
+		labeled_node = get_node_by_path(dti->dt, p->val.val);
+		if (labeled_node)
+			add_label(&labeled_node->labels, p->name);
+		else if (quiet < 1)
+			fprintf(stderr, "Warning: Path %s referenced in property %s/%s missing",
+				p->val.val, name, p->name);
+	}
+}
+
 void generate_label_tree(struct dt_info *dti, const char *name, bool allocph)
 {
 	if (!any_label_tree(dti, dti->dt))
