@@ -92,7 +92,7 @@ static inline uint64_t fdt64_ld_(const fdt64_t *p)
  * signature or hash check before using libfdt.
  *
  * For situations where security is not a concern it may be safe to enable
- * ASSUME_SANE.
+ * ASSUME_PERFECT.
  */
 enum {
 	/*
