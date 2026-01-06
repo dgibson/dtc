@@ -18,6 +18,7 @@ add_project_arguments(
     '-Wshadow',
     '-Wsuggest-attribute=format',
     '-Wwrite-strings',
+    '-Wdiscarded-qualifiers',
   ]),
   language: 'c'
 )

@@ -254,19 +254,21 @@ static int create_paths(char **blob, const char *in_path)
 static int create_node(char **blob, const char *node_name)
 {
 	int node = 0;
-	char *p;
+	const char *p;
+	char *path = NULL;
 
 	p = strrchr(node_name, '/');
 	if (!p) {
 		report_error(node_name, -1, -FDT_ERR_BADPATH);
 		return -1;
 	}
-	*p = '\0';
 
 	*blob = realloc_node(*blob, p + 1);
 
 	if (p > node_name) {
-		node = fdt_path_offset(*blob, node_name);
+		path = xstrndup(node_name, (size_t)(p - node_name));
+		node = fdt_path_offset(*blob, path);
+		free(path);
 		if (node < 0) {
 			report_error(node_name, -1, node);
 			return -1;
