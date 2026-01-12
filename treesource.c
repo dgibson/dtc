@@ -206,7 +206,7 @@ static enum markertype guess_value_type(struct property *prop)
 			nnotcelllbl++;
 	}
 
-	if ((p[len-1] == '\0') && (nnotstring == 0) && (nnul <= (len-nnul))
+	if ((p[len-1] == '\0') && (nnotstring == 0) && (nnul < (len-nnul))
 	    && (nnotstringlbl == 0)) {
 		if (nnul > 1)
 			add_string_markers(prop);
