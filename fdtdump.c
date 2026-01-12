@@ -129,23 +129,25 @@ static void dump_blob(void *blob, bool debug)
 			continue;
 		}
 
-		if (tag != FDT_PROP) {
-			fprintf(stderr, "%*s ** Unknown tag 0x%08"PRIx32"\n", depth * shift, "", tag);
-			break;
+		if (tag == FDT_PROP) {
+			sz = fdt32_to_cpu(GET_CELL(p));
+			s = p_strings + fdt32_to_cpu(GET_CELL(p));
+			if (version < 16 && sz >= 8)
+				p = PALIGN(p, 8);
+			t = p;
+
+			p = PALIGN(p + sz, 4);
+
+			dumpf("%04"PRIxPTR": string: %s\n", (uintptr_t)s - blob_off, s);
+			dumpf("%04"PRIxPTR": value\n", (uintptr_t)t - blob_off);
+			printf("%*s%s", depth * shift, "", s);
+			utilfdt_print_data(t, sz);
+			printf(";\n");
+			continue;
 		}
-		sz = fdt32_to_cpu(GET_CELL(p));
-		s = p_strings + fdt32_to_cpu(GET_CELL(p));
-		if (version < 16 && sz >= 8)
-			p = PALIGN(p, 8);
-		t = p;
 
-		p = PALIGN(p + sz, 4);
-
-		dumpf("%04"PRIxPTR": string: %s\n", (uintptr_t)s - blob_off, s);
-		dumpf("%04"PRIxPTR": value\n", (uintptr_t)t - blob_off);
-		printf("%*s%s", depth * shift, "", s);
-		utilfdt_print_data(t, sz);
-		printf(";\n");
+		fprintf(stderr, "%*s ** Unknown tag 0x%08"PRIx32"\n", depth * shift, "", tag);
+		break;
 	}
 }
 
