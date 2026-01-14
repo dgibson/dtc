@@ -340,6 +340,14 @@ static void check_node_name_format(struct check *c, struct dt_info *dti,
 }
 ERROR(node_name_format, check_node_name_format, NULL, &node_name_chars);
 
+static void check_node_name_not_empty(struct check *c, struct dt_info *dti,
+				      struct node *node)
+{
+	if (node->basenamelen == 0 && node->parent != NULL)
+		FAIL(c, dti, node, "Empty node name");
+}
+ERROR(node_name_not_empty, check_node_name_not_empty, NULL, &node_name_chars);
+
 static void check_node_name_vs_property_name(struct check *c,
 					     struct dt_info *dti,
 					     struct node *node)
@@ -1899,7 +1907,7 @@ WARNING(graph_endpoint, check_graph_endpoint, NULL, &graph_nodes);
 
 static struct check *check_table[] = {
 	&duplicate_node_names, &duplicate_property_names,
-	&node_name_chars, &node_name_format, &property_name_chars,
+	&node_name_chars, &node_name_format, &node_name_not_empty, &property_name_chars,
 	&name_is_string, &name_properties, &node_name_vs_property_name,
 
 	&duplicate_label,
