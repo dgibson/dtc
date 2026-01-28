@@ -570,9 +570,10 @@ int fdt_path_offset_namelen(const void *fdt, const char *path, int namelen);
  * address).
  *
  * If the path is not absolute (i.e. does not begin with '/'), the
- * first component is treated as an alias.  That is, the property by
- * that name is looked up in the /aliases node, and the value of that
- * property used in place of that first component.
+ * first component is treated as an alias (or, if it begins with '&',
+ * the rest is treated as a symbol).  That is, the property by that
+ * name is looked up in the /aliases (or /__symbols__) node, and the
+ * value of that property used in place of that first component.
  *
  * For example, for this small fragment
  *
@@ -592,12 +593,17 @@ int fdt_path_offset_namelen(const void *fdt, const char *path, int namelen);
  *
  *   /soc@0/i2c@30a40000/eeprom@52
  *   i2c2/eeprom@52
+ *   &foo/eeprom@52
+ *   &bar
+ *
+ * The latter two only work if the device tree blob has been compiled
+ * with the -@ dtc option.
  *
  * returns:
  *	structure block offset of the node with the requested path (>=0), on
  *		success
  *	-FDT_ERR_BADPATH, given path does not begin with '/' and the first
- *		component is not a valid alias
+ *		component is not a valid alias or symbol
  *	-FDT_ERR_NOTFOUND, if the requested node does not exist
  *	-FDT_ERR_BADMAGIC,
  *	-FDT_ERR_BADVERSION,
