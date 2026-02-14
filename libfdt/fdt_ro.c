@@ -258,14 +258,18 @@ int fdt_path_offset_namelen(const void *fdt, const char *path, int namelen)
 	if (!can_assume(VALID_INPUT) && namelen <= 0)
 		return -FDT_ERR_BADPATH;
 
-	/* see if we have an alias */
+	/* see if we have an alias or symbol */
 	if (*path != '/') {
 		const char *q = memchr(path, '/', end - p);
 
 		if (!q)
 			q = end;
 
-		p = fdt_get_alias_namelen(fdt, p, q - p);
+		if (*p == '&')
+			p = fdt_get_symbol_namelen(fdt, p + 1, q - p - 1);
+		else
+			p = fdt_get_alias_namelen(fdt, p, q - p);
+
 		if (!p)
 			return -FDT_ERR_BADPATH;
 		offset = fdt_path_offset(fdt, p);
