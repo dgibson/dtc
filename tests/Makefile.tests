@@ -32,7 +32,8 @@ LIB_TESTS_L = get_mem_rsv \
 	fs_tree1
 LIB_TESTS = $(LIB_TESTS_L:%=$(TESTS_PREFIX)%)
 
-LIBTREE_TESTS_L = truncated_property truncated_string truncated_memrsv
+LIBTREE_TESTS_L = truncated_property truncated_string \
+	truncated_memrsv unterminated_memrsv
 
 LIBTREE_TESTS = $(LIBTREE_TESTS_L:%=$(TESTS_PREFIX)%)
 

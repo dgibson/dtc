@@ -291,6 +291,23 @@ truncated_memrsv_rsvmap_end:
 
 truncated_memrsv_end:
 
+	/* unterminated_memrsv */
+	treehdr	unterminated_memrsv
+
+unterminated_memrsv_rsvmap:
+	rsvmape	TEST_ADDR_1H, TEST_ADDR_1L, TEST_SIZE_1H, TEST_SIZE_1L
+unterminated_memrsv_rsvmap_end:
+
+unterminated_memrsv_struct:
+	beginn	""
+	endn
+	fdtlong	FDT_END
+unterminated_memrsv_struct_end:
+
+unterminated_memrsv_strings:
+unterminated_memrsv_strings_end:
+
+unterminated_memrsv_end:
 
         /* two root nodes */
 	treehdr	two_roots

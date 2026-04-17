@@ -495,6 +495,7 @@ libfdt_tests () {
     run_test truncated_property
     run_test truncated_string
     run_test truncated_memrsv
+    run_test unterminated_memrsv
 
     # Check aliases support in fdt_path_offset
     run_dtc_test -I dts -O dtb -o aliases.dtb "$SRCDIR/aliases.dts"

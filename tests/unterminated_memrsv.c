@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 /*
  * libfdt - Flat Device Tree manipulation
- *	Testcase for misbehaviour on a truncated string
- * Copyright (C) 2018 David Gibson, IBM Corporation.
+ *	Testcase for misbehaviour on an unterminated memrsv map
+ * Copyright Red Hat
+ *
+ * Based on a proof of concept report from:
+ *   Moshe Strauss <moshestrauss10@gmail.com>
  */
 
 #include <stdlib.h>
@@ -19,7 +22,7 @@
 
 int main(int argc, char *argv[])
 {
-	void *fdt = &truncated_memrsv;
+	void *fdt = &unterminated_memrsv;
 	void *buf;
 	int err;
 	uint64_t addr, size;
@@ -44,11 +47,16 @@ int main(int argc, char *argv[])
 		     (unsigned long long)addr, (unsigned long long)size,
 		     TEST_ADDR_1, TEST_SIZE_1);
 
-	err = fdt_get_mem_rsv(fdt, 1, &addr, &size);
-	if (err != -FDT_ERR_BADOFFSET)
-		FAIL("fdt_get_mem_rsv(1) returned %d instead of -FDT_ERR_BADOFFSET",
+	err = fdt_add_mem_rsv(fdt, TEST_ADDR_2, TEST_SIZE_2);
+	if (err != -FDT_ERR_TRUNCATED)
+		FAIL("fdt_add_mem_rsv() returned %d instead of -FDT_ERR_TRUNCATED",
 		     err);
 
+	err = fdt_del_mem_rsv(fdt, 0);
+	if (err != -FDT_ERR_TRUNCATED)
+		FAIL("fdt_del_mem_rsv() returned %d instead of -FDT_ERR_TRUNCATED",
+		     err);
+		
 	buf = xmalloc(SPACE);
 	err = fdt_open_into(fdt, buf, SPACE);
 	if (err != -FDT_ERR_TRUNCATED)

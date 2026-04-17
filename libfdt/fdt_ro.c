@@ -191,6 +191,8 @@ int fdt_num_mem_rsv(const void *fdt)
 	int i;
 	const struct fdt_reserve_entry *re;
 
+	FDT_RO_PROBE(fdt);
+
 	for (i = 0; (re = fdt_mem_rsv(fdt, i)) != NULL; i++) {
 		if (fdt64_ld_(&re->size) == 0)
 			return i;

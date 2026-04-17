@@ -96,6 +96,7 @@ tests += [
   'truncated_memrsv',
   'truncated_property',
   'truncated_string',
+  'unterminated_memrsv',
 ]
 
 test_deps = [testutil_dep, util_dep, libfdt_dep]

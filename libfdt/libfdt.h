@@ -475,7 +475,12 @@ int fdt_generate_phandle(const void *fdt, uint32_t *phandle);
  * or any other (0,0) entries reserved for expansion.
  *
  * returns:
- *     the number of entries
+ *     the number of entries, on success
+ *     -FDT_ERR_ALIGNMENT,
+ *     -FDT_ERR_BADMAGIC,
+ *     -FDT_ERR_BADVERSION,
+ *     -FDT_ERR_BADSTATE,
+ *     -FDT_ERR_TRUNCATED, standard meanings
  */
 int fdt_num_mem_rsv(const void *fdt);
 
