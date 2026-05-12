@@ -1769,7 +1769,7 @@ static void check_interrupts_property(struct check *c,
 			  irq_prop->val.len, (int)(irq_cells * sizeof(cell_t)));
 	}
 }
-WARNING(interrupts_property, check_interrupts_property, &phandle_references);
+WARNING(interrupts_property, check_interrupts_property, NULL, &phandle_references);
 
 static const struct bus_type graph_port_bus = {
 	.name = "graph-port",
