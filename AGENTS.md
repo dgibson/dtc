@@ -86,6 +86,7 @@ See the "AI Coding Assistants" section in CONTRIBUTING.md. Key rules:
 - **Do not** add `Signed-off-by` tags — only humans can certify the DCO
 - Use `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]` for attribution in commit messages
 - The human submitter is responsible for reviewing all AI-generated code and ensuring license compliance
+- Do not add `Co-authored-by` tags.
 
 ## Tagging a New Release
 

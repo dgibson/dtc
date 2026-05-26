@@ -42,24 +42,21 @@ static inline void VALGRIND_MAKE_MEM_DEFINED(void *p, size_t len)
 int verbose_test = 1;
 char *test_name;
 
-static void sigint_handler(int signum, siginfo_t *si, void *uc)
+static void sigint_handler(int signum)
 {
-	fprintf(stderr, "%s: %s (pid=%d)\n", test_name,
-		strsignal(signum), getpid());
+	fprintf(stderr, "%s: signal %d (pid=%d)\n", test_name,
+		signum, getpid());
 	exit(RC_BUG);
 }
 
 void test_init(int argc, char *argv[])
 {
-	int err;
-	struct sigaction sa_int = {
-		.sa_sigaction = sigint_handler,
-	};
-
 	test_name = argv[0];
 
-	err = sigaction(SIGINT, &sa_int, NULL);
-	if (err)
+	/* Use signal(), not sigaction() because it also works on the Windows /
+	 * mingw environments we support.
+	 */
+	if (signal(SIGINT, sigint_handler) == SIG_ERR)
 		FAIL("Can't install SIGINT handler");
 
 	if (getenv("QUIET_TEST"))
