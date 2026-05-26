@@ -42,13 +42,8 @@ static inline void VALGRIND_MAKE_MEM_DEFINED(void *p, size_t len)
 int verbose_test = 1;
 char *test_name;
 
-void  __attribute__((weak)) cleanup(void)
-{
-}
-
 static void sigint_handler(int signum, siginfo_t *si, void *uc)
 {
-	cleanup();
 	fprintf(stderr, "%s: %s (pid=%d)\n", test_name,
 		strsignal(signum), getpid());
 	exit(RC_BUG);

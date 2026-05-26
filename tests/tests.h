@@ -25,9 +25,6 @@ void test_init(int argc, char *argv[]);
 
 #define streq(s1, s2)	(strcmp((s1),(s2)) == 0)
 
-/* Each test case must define this function */
-void cleanup(void);
-
 #define verbose_printf(...) \
 	if (verbose_test) { \
 		printf(__VA_ARGS__); \
@@ -39,21 +36,18 @@ void cleanup(void);
 
 #define	PASS()						\
 	do {						\
-		cleanup();				\
 		printf("PASS\n");			\
 		exit(RC_PASS);				\
 	} while (0)
 
 #define	PASS_INCONCLUSIVE()				\
 	do {						\
-		cleanup();				\
 		printf("PASS (inconclusive)\n");	\
 		exit(RC_PASS);				\
 	} while (0)
 
 #define IRRELEVANT()					\
 	do {						\
-		cleanup();				\
 		printf("PASS (irrelevant)\n");		\
 		exit(RC_PASS);				\
 	} while (0)
@@ -61,21 +55,18 @@ void cleanup(void);
 /* Look out, gcc extension below... */
 #define FAIL(fmt, ...)					\
 	do {						\
-		cleanup();				\
 		printf("FAIL\t" fmt "\n", ##__VA_ARGS__);	\
 		exit(RC_FAIL);				\
 	} while (0)
 
 #define CONFIG(fmt, ...)				\
 	do {						\
-		cleanup();				\
 		printf("Bad configuration: " fmt "\n", ##__VA_ARGS__);	\
 		exit(RC_CONFIG);			\
 	} while (0)
 
 #define TEST_BUG(fmt, ...)				\
 	do {						\
-		cleanup();				\
 		printf("BUG in testsuite: " fmt "\n", ##__VA_ARGS__);	\
 		exit(RC_BUG);				\
 	} while (0)
