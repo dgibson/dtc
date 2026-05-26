@@ -24,7 +24,11 @@ static void start_dir(const char *name)
 {
 	int rc;
 
+#ifndef _WIN32
 	rc = mkdir(name, 0777);
+#else
+	rc = mkdir(name);
+#endif
 	if (rc != 0)
 		FAIL("mkdir(\"%s\"): %s", name, strerror(errno));
 
