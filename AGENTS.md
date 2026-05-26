@@ -94,20 +94,14 @@ Releases use the `vMAJOR.MINOR.PATCH` tag format (e.g., `v1.7.2`).
 An AI agent can prepare the release; the human maintainer reviews,
 adds `Signed-off-by`, and signs the tag.
 
-1. **Update `VERSION.txt`** — change the single line to the new version
-   number (e.g., `1.7.2`). `meson.build` reads its version from this
-   file. No other version files need editing.
-
-2. **Draft the version bump commit** — create the commit *without*
-   `Signed-off-by` (agents must not add S-o-b per the AI contribution
-   policy). Use the message format:
+1. **Update `VERSION.txt` and commit** — run the prepare script:
+   ```sh
+   scripts/prepare-release X.Y.Z
    ```
-   Bump version to vX.Y.Z
+   This updates `VERSION.txt` and creates the version bump commit
+   (without `Signed-off-by`, per the AI contribution policy).
 
-   Prepare for a new release.
-   ```
-
-3. **Draft the tag message** — write it to a temporary file (e.g.,
+2. **Draft the tag message** — write it to a temporary file (e.g.,
    `tag-message.txt`) for the maintainer to review. The format is:
    ```
    DTC X.Y.Z
@@ -121,16 +115,18 @@ adds `Signed-off-by`, and signs the tag.
    fdtoverlay, Build, General, etc.) with a bullet per notable change.
    Generate the changelog from `git log vPREV..HEAD`.
 
-4. **Human review** — the maintainer reviews the commit and tag
+3. **Human review** — the maintainer reviews the commit and tag
    message, then runs the finalize script which amends the commit to
-   add `Signed-off-by` and creates the signed annotated tag:
+   add `Signed-off-by`, creates the signed annotated tag, pushes the
+   release commit and tag to origin, and optionally uploads to
+   kernel.org via kup:
    ```sh
    scripts/finalize-release tag-message.txt
    ```
 
 Agents must **never** run `scripts/finalize-release` or
-`scripts/kup-dtc`. These perform signing and upload operations that
-only a human maintainer may execute.
+`scripts/kup-dtc`. These perform signing, push, and upload operations
+that only a human maintainer may execute.
 
 ## Coding Conventions
 

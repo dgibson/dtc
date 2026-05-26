@@ -61,6 +61,10 @@ echo "Created signed tag $TAG."
 echo "Review with: git show $TAG"
 echo ""
 
+git push origin main "$TAG"
+git push github main "$TAG"
+git push gitlab main "$TAG"
+
 SCRIPTDIR=$(dirname "$0")
 
 printf "Upload to kernel.org via kup? [y/N] "
@@ -69,3 +73,26 @@ case "$answer" in
 	y|Y) "$SCRIPTDIR/kup-dtc" "$VERSION" ;;
 	*) echo "Skipping kup upload." ;;
 esac
+
+TAG_BODY=$(git tag -l --format='%(contents:body)' "$TAG")
+
+ANNOUNCE="announce-${TAG}.txt"
+cat > "$ANNOUNCE" <<MAIL
+To: devicetree-compiler@vger.kernel.org
+Subject: DTC $VERSION released
+
+DTC $VERSION is now available.
+
+Git tree:
+  https://git.kernel.org/pub/scm/utils/dtc/dtc.git
+
+Tagged release ($TAG):
+  https://git.kernel.org/pub/scm/utils/dtc/dtc.git/tag/?h=$TAG
+
+Tarball:
+  https://kernel.org/pub/software/utils/dtc/dtc-${VERSION}.tar.gz
+
+$TAG_BODY
+MAIL
+
+echo "Announcement draft written to $ANNOUNCE"

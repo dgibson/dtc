@@ -1,0 +1,70 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Prepare a release: update VERSION.txt and create the version bump
+# commit.  This handles steps 1 and 2 of the release procedure in
+# AGENTS.md.  Step 3 (drafting the tag message) requires judgement to
+# categorise and summarise changes, so is left to the caller.
+
+set -e
+
+usage() {
+	echo "Usage: $0 <version>" >&2
+	echo "" >&2
+	echo "  version   X.Y.Z or vX.Y.Z" >&2
+	echo "" >&2
+	echo "Example: $0 1.8.1" >&2
+	exit 1
+}
+
+RAW="$1"
+if [ -z "$RAW" ]; then
+	usage
+fi
+
+VERSION="${RAW#v}"
+
+case "$VERSION" in
+	[0-9]*.[0-9]*.[0-9]*)
+		;;
+	*)
+		echo "Error: version '$VERSION' does not look like X.Y.Z" >&2
+		exit 1
+		;;
+esac
+
+TAG="v${VERSION}"
+
+if git rev-parse "$TAG" >/dev/null 2>&1; then
+	echo "Error: tag $TAG already exists" >&2
+	exit 1
+fi
+
+if ! git diff-index --quiet HEAD; then
+	echo "Error: working tree is dirty; commit or stash first" >&2
+	exit 1
+fi
+
+echo "$VERSION" > VERSION.txt
+git add VERSION.txt
+git commit -m "$(cat <<EOF
+Bump version to $TAG
+
+Prepare for a new release.
+EOF
+)"
+
+echo "Building with make..."
+git clean -fdx
+make check
+
+echo ""
+echo "Building with meson..."
+git clean -fdx
+meson setup build
+meson test -C build
+
+echo ""
+echo "All builds and tests passed."
+echo "Next: draft the tag message to tag-message.txt, then run:"
+echo "  scripts/finalize-release tag-message.txt"
