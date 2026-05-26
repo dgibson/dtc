@@ -71,6 +71,37 @@ jobs:
       - name: Run check
         run: if ! meson test -C build; then cat build/meson-logs/testlog.txt; false; fi
 
+  build-macos:
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ "make", "meson" ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        run: |
+          brew install libyaml swig meson ninja pkg-config
+
+      - name: Build (Make)
+        if: matrix.build == 'make'
+        run: |
+          make
+
+      - name: Setup (Meson)
+        if: matrix.build == 'meson'
+        run: meson setup -D python=enabled -D yaml=enabled -D tests=false build
+
+      - name: Build (Meson)
+        if: matrix.build == 'meson'
+        run: meson compile -C build
+
   build-windows:
     runs-on: windows-latest
     strategy:

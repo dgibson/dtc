@@ -153,6 +153,11 @@ include Makefile.convert-dtsv0
 include Makefile.dtc
 include Makefile.utils
 
+# Flex-generated source triggers -Wsign-compare in its templates
+dtc-lexer.lex.o: CFLAGS += -Wno-sign-compare
+convert-dtsv0-lexer.lex.o: CFLAGS += -Wno-sign-compare
+
+
 BIN += convert-dtsv0
 BIN += dtc
 BIN += fdtdump
