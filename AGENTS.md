@@ -87,6 +87,51 @@ See the "AI Coding Assistants" section in CONTRIBUTING.md. Key rules:
 - Use `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]` for attribution in commit messages
 - The human submitter is responsible for reviewing all AI-generated code and ensuring license compliance
 
+## Tagging a New Release
+
+Releases use the `vMAJOR.MINOR.PATCH` tag format (e.g., `v1.7.2`).
+
+An AI agent can prepare the release; the human maintainer reviews,
+adds `Signed-off-by`, and signs the tag.
+
+1. **Update `VERSION.txt`** — change the single line to the new version
+   number (e.g., `1.7.2`). `meson.build` reads its version from this
+   file. No other version files need editing.
+
+2. **Draft the version bump commit** — create the commit *without*
+   `Signed-off-by` (agents must not add S-o-b per the AI contribution
+   policy). Use the message format:
+   ```
+   Bump version to vX.Y.Z
+
+   Prepare for a new release.
+   ```
+
+3. **Draft the tag message** — write it to a temporary file (e.g.,
+   `tag-message.txt`) for the maintainer to review. The format is:
+   ```
+   DTC X.Y.Z
+
+   Changes since vPREV include:
+    * Component
+      - Change description
+      - ...
+   ```
+   Group changes by component (dtc, libfdt, pylibfdt, fdtget,
+   fdtoverlay, Build, General, etc.) with a bullet per notable change.
+   Generate the changelog from `git log vPREV..HEAD`.
+
+4. **Human review** — the maintainer reviews the commit and tag
+   message, then runs the finalize script which amends the commit to
+   add `Signed-off-by` and creates the signed annotated tag:
+   ```sh
+   scripts/finalize-release tag-message.txt
+   ```
+
+Agents must **never** run `scripts/finalize-release` or
+`scripts/kup-dtc`. These perform signing and upload operations that
+only a human maintainer may execute.
+
 ## Coding Conventions
 
 - License: GPL-2.0-or-later for dtc tools; (GPL-2.0-or-later OR BSD-2-Clause) for libfdt

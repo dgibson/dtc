@@ -1,0 +1,71 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Finalize a release (possibly prepared with AI agent assistance)
+# Amends the version bump commit to add Signed-off-by, then creates a
+# signed annotated tag from the drafted tag message.
+
+set -e
+
+usage() {
+	echo "Usage: $0 <tag-message-file>" >&2
+	echo "" >&2
+	echo "Run this from the repository root with VERSION.txt updated" >&2
+	echo "and a draft tag message in given file." >&2
+	exit 1
+}
+
+TAG_MSG_FILE="$1"
+if [ -z "$TAG_MSG_FILE" ] || [ ! -f "$TAG_MSG_FILE" ]; then
+	usage
+fi
+
+VERSION=$(cat VERSION.txt)
+TAG="v${VERSION}"
+
+if git rev-parse "$TAG" >/dev/null 2>&1; then
+	echo "Error: tag $TAG already exists" >&2
+	exit 1
+fi
+
+HEAD_SUBJECT=$(git log -1 --format=%s)
+EXPECTED="Bump version to $TAG"
+if [ "$HEAD_SUBJECT" != "$EXPECTED" ]; then
+	echo "Error: HEAD commit subject is:" >&2
+	echo "  $HEAD_SUBJECT" >&2
+	echo "Expected:" >&2
+	echo "  $EXPECTED" >&2
+	exit 1
+fi
+
+echo "Version:  $VERSION"
+echo "Tag:      $TAG"
+echo ""
+echo "--- Tag message ---"
+cat "$TAG_MSG_FILE"
+echo "--- End tag message ---"
+echo ""
+
+printf "Proceed? [y/N] "
+read answer
+case "$answer" in
+	y|Y) ;;
+	*) echo "Aborted."; exit 1 ;;
+esac
+
+git commit --amend -s --no-edit
+git tag -s "$TAG" -F "$TAG_MSG_FILE"
+
+echo ""
+echo "Created signed tag $TAG."
+echo "Review with: git show $TAG"
+echo ""
+
+SCRIPTDIR=$(dirname "$0")
+
+printf "Upload to kernel.org via kup? [y/N] "
+read answer
+case "$answer" in
+	y|Y) "$SCRIPTDIR/kup-dtc" "$VERSION" ;;
+	*) echo "Skipping kup upload." ;;
+esac
