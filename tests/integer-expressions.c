@@ -17,6 +17,14 @@
 #include "tests.h"
 #include "testdata.h"
 
+/*
+ * Some of these trip the -Wconstant-logical-operand warning introduced in gcc
+ * 17.  Disable it temporarily, we also have to disable -Wpragmas for the
+ * benefit of older compiler versions that don't know about that warning.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wconstant-logical-operand"
 static struct test_expr {
 	const char *expr;
 	uint32_t result;
@@ -51,6 +59,7 @@ static struct test_expr {
 	TE(11 * 257 * 1321517ULL),
 	TE(123456790 - 4/2 + 17%4),
 };
+#pragma GCC diagnostic pop
 
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
 
