@@ -292,6 +292,13 @@ int fdt_setprop_placeholder_namelen(void *fdt, int nodeoffset, const char *name,
 	return 0;
 }
 
+int fdt_setprop_placeholder(void *fdt, int nodeoffset,
+			    const char *name, int len, void **prop_data)
+{
+	return fdt_setprop_placeholder_namelen(fdt, nodeoffset, name,
+					       strlen(name), len, prop_data);
+}
+
 int fdt_setprop_namelen(void *fdt, int nodeoffset, const char *name,
 			int namelen, const void *val, int len)
 {
@@ -306,6 +313,13 @@ int fdt_setprop_namelen(void *fdt, int nodeoffset, const char *name,
 	if (len)
 		memcpy(prop_data, val, len);
 	return 0;
+}
+
+int fdt_setprop(void *fdt, int nodeoffset, const char *name,
+		const void *val, int len)
+{
+	return fdt_setprop_namelen(fdt, nodeoffset, name, strlen(name), val,
+				   len);
 }
 
 int fdt_appendprop(void *fdt, int nodeoffset, const char *name,

@@ -1935,12 +1935,8 @@ int fdt_setprop_namelen(void *fdt, int nodeoffset, const char *name,
  *	-FDT_ERR_BADLAYOUT,
  *	-FDT_ERR_TRUNCATED, standard meanings
  */
-static inline int fdt_setprop(void *fdt, int nodeoffset, const char *name,
-			      const void *val, int len)
-{
-	return fdt_setprop_namelen(fdt, nodeoffset, name, strlen(name), val,
-				   len);
-}
+int fdt_setprop(void *fdt, int nodeoffset, const char *name,
+		const void *val, int len);
 
 /**
  * fdt_setprop_placeholder_namelen - allocate space for a property
@@ -2002,13 +1998,8 @@ int fdt_setprop_placeholder_namelen(void *fdt, int nodeoffset, const char *name,
  *	-FDT_ERR_BADLAYOUT,
  *	-FDT_ERR_TRUNCATED, standard meanings
  */
-static inline int fdt_setprop_placeholder(void *fdt, int nodeoffset,
-					  const char *name, int len,
-					  void **prop_data)
-{
-	return fdt_setprop_placeholder_namelen(fdt, nodeoffset, name,
-					       strlen(name), len, prop_data);
-}
+int fdt_setprop_placeholder(void *fdt, int nodeoffset,
+			    const char *name, int len, void **prop_data);
 
 /**
  * fdt_setprop_u32 - set a property to a 32-bit integer
