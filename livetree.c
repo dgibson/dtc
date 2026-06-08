@@ -1234,7 +1234,7 @@ void fixup_phandles(struct dt_info *dti, const char *name)
 				continue;
 
 			offset = strtol(soffset, NULL, 0);
-			if (offset < 0 || offset + 4 > p->val.len) {
+			if (offset < 0 || (unsigned int)offset + 4 > p->val.len) {
 				if (quiet < 1)
 					fprintf(stderr,
 						"Warning: Label %s contains invalid offset for property %s in node %s\n",
