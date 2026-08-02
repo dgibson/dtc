@@ -10,8 +10,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+/* Avoid hosted libc headers for EFI (freestanding) builds. */
+#if !defined(__STDC_HOSTED__) || __STDC_HOSTED__
 #include <stdlib.h>
 #include <string.h>
+#endif
 #include <limits.h>
 
 #ifdef __CHECKER__
