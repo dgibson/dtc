@@ -411,6 +411,21 @@ class PyLibfdtBasicTests(unittest.TestCase):
                           self.fdt.get_mem_rsv(0))
         self.assertEqual([123456789, 0o10000], self.fdt.get_mem_rsv(1))
 
+    def testCells(self):
+        """Test that we can read #address-cells and #size-cells"""
+        self.assertEqual(1, self.fdt.address_cells(0))
+        self.assertEqual(0, self.fdt.size_cells(0))
+
+        # A node without the properties inherits neither, so the libfdt
+        # defaults of 2 and 1 apply
+        node = self.fdt.path_offset('/subnode@1')
+        self.assertEqual(2, self.fdt.address_cells(node))
+        self.assertEqual(1, self.fdt.size_cells(node))
+
+        node = self.fdt.path_offset('/subnode@2')
+        self.assertEqual(1, self.fdt.address_cells(node))
+        self.assertEqual(0, self.fdt.size_cells(node))
+
     def testEmpty(self):
         """Test that we can create an empty tree"""
         self.assertEqual(-libfdt.NOSPACE,
