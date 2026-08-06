@@ -411,6 +411,20 @@ class PyLibfdtBasicTests(unittest.TestCase):
                           self.fdt.get_mem_rsv(0))
         self.assertEqual([123456789, 0o10000], self.fdt.get_mem_rsv(1))
 
+    def testAddDelReserveMap(self):
+        """Test that we can add to and remove from the memory reserve map"""
+        fdt = _ReadFdt('test_tree1.dtb')
+        fdt.resize(fdt.totalsize() + 64)
+
+        self.assertEqual(0, fdt.add_mem_rsv(0x40000000, 0x2000))
+        self.assertEqual(3, fdt.num_mem_rsv())
+        self.assertEqual([0x40000000, 0x2000], fdt.get_mem_rsv(2))
+
+        self.assertEqual(0, fdt.del_mem_rsv(2))
+        self.assertEqual(2, fdt.num_mem_rsv())
+        self.assertEqual(-libfdt.NOTFOUND,
+                         fdt.del_mem_rsv(2, QUIET_NOTFOUND))
+
     def testCells(self):
         """Test that we can read #address-cells and #size-cells"""
         self.assertEqual(1, self.fdt.address_cells(0))
