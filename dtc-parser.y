@@ -267,12 +267,16 @@ nodedef:
 		{
 			$$ = build_node($2, $3, &@$);
 		}
+	| '{' subnodes '}' ';'
+		{
+			$$ = build_node(NULL, $2, &@$);
+		}
 	;
 
 proplist:
-	  /* empty */
+	  propdef
 		{
-			$$ = NULL;
+			$$ = chain_property($1, NULL);
 		}
 	| proplist propdef
 		{
