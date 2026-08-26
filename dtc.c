@@ -28,23 +28,6 @@ static int is_power_of_2(int x)
 	return (x > 0) && ((x & (x - 1)) == 0);
 }
 
-static void fill_fullpaths(struct node *tree, const char *prefix)
-{
-	struct node *child;
-	const char *unit;
-
-	tree->fullpath = join_path(prefix, tree->name);
-
-	unit = strchr(tree->name, '@');
-	if (unit)
-		tree->basenamelen = unit - tree->name;
-	else
-		tree->basenamelen = strlen(tree->name);
-
-	for_each_child(tree, child)
-		fill_fullpaths(child, tree->fullpath);
-}
-
 /* Usage related data. */
 static const char usage_synopsis[] = "dtc [options] <input file>";
 static const char usage_short_opts[] = "qI:O:o:V:d:R:S:p:a:fb:i:H:sW:E:@LAThv";
@@ -325,8 +308,6 @@ int main(int argc, char *argv[])
 
 	if (cmdline_boot_cpuid != -1)
 		dti->boot_cpuid_phys = cmdline_boot_cpuid;
-
-	fill_fullpaths(dti->dt, "");
 
 	/* on a plugin, generate by default */
 	if (dti->dtsflags & DTSF_PLUGIN) {

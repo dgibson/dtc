@@ -448,6 +448,23 @@ struct reserve_info *add_reserve_entry(struct reserve_info *list,
 	return list;
 }
 
+static void fill_fullpaths(struct node *tree, const char *prefix)
+{
+	struct node *child;
+	const char *unit;
+
+	tree->fullpath = join_path(prefix, tree->name);
+
+	unit = strchr(tree->name, '@');
+	if (unit)
+		tree->basenamelen = unit - tree->name;
+	else
+		tree->basenamelen = strlen(tree->name);
+
+	for_each_child(tree, child)
+		fill_fullpaths(child, tree->fullpath);
+}
+
 struct dt_info *build_dt_info(unsigned int dtsflags,
 			      struct reserve_info *reservelist,
 			      struct node *tree, uint32_t boot_cpuid_phys)
@@ -459,6 +476,8 @@ struct dt_info *build_dt_info(unsigned int dtsflags,
 	dti->reservelist = reservelist;
 	dti->dt = tree;
 	dti->boot_cpuid_phys = boot_cpuid_phys;
+
+	fill_fullpaths(dti->dt, "");
 
 	return dti;
 }
