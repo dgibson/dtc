@@ -80,14 +80,15 @@ static const char * const usage_opts_help[] = {
 	 "\t\tdts - device tree source text\n"
 	 "\t\tdtb - device tree blob\n"
 	 "\t\tfs  - /proc/device-tree style directory",
-	"\n\tOutput file",
+	"\n\tOutput file/directory",
 	"\n\tOutput formats are:\n"
 	 "\t\tdts - device tree source text\n"
 	 "\t\tdtb - device tree blob\n"
 #ifndef NO_YAML
 	 "\t\tyaml - device tree encoded as YAML\n"
 #endif
-	 "\t\tasm - assembler source",
+	 "\t\tasm - assembler source\n"
+	 "\t\tfs  - /proc/device-tree style directory",
 	"\n\tBlob version to produce, defaults to "stringify(DEFAULT_FDT_VERSION)" (for dtb and asm output)",
 	"\n\tOutput dependency file",
 	"\n\tMake space for <number> reserve map entries (for dtb and asm output)",
@@ -354,6 +355,11 @@ int main(int argc, char *argv[])
 	if (sort)
 		sort_tree(dti);
 
+	if (streq(outform, "fs")) {
+		dt_to_fs(outname, dti);
+		goto out_done;
+	}
+
 	if (streq(outname, "-")) {
 		outf = stdout;
 	} else {
@@ -381,5 +387,6 @@ int main(int argc, char *argv[])
 		die("Unknown output format \"%s\"\n", outform);
 	}
 
+out_done:
 	exit(0);
 }

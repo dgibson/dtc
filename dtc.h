@@ -373,5 +373,6 @@ void dt_to_yaml(FILE *f, struct dt_info *dti);
 /* FS trees */
 
 struct dt_info *dt_from_fs(const char *dirname);
+void dt_to_fs(const char *dirname, struct dt_info *dti);
 
 #endif /* DTC_H */
