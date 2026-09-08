@@ -27,8 +27,10 @@ endif
 
 link_args += version_script
 libfdt = library(
-  'fdt', sources,
+  'fdt',
+  sources: sources,
   version: meson.project_version(),
+  soversion: '1',
   link_args: link_args,
   link_depends: 'version.lds',
   install: get_option('default_library') != 'static' or not wheel_only,
