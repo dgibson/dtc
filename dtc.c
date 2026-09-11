@@ -80,14 +80,15 @@ static const char * const usage_opts_help[] = {
 	 "\t\tdts - device tree source text\n"
 	 "\t\tdtb - device tree blob\n"
 	 "\t\tfs  - /proc/device-tree style directory",
-	"\n\tOutput file",
+	"\n\tOutput file or directory",
 	"\n\tOutput formats are:\n"
 	 "\t\tdts - device tree source text\n"
 	 "\t\tdtb - device tree blob\n"
 #ifndef NO_YAML
 	 "\t\tyaml - device tree encoded as YAML\n"
 #endif
-	 "\t\tasm - assembler source",
+	 "\t\tasm - assembler source\n"
+	 "\t\tfs  - /proc/device-tree style directory",
 	"\n\tBlob version to produce, defaults to "stringify(DEFAULT_FDT_VERSION)" (for dtb and asm output)",
 	"\n\tOutput dependency file",
 	"\n\tMake space for <number> reserve map entries (for dtb and asm output)",
@@ -354,7 +355,9 @@ int main(int argc, char *argv[])
 	if (sort)
 		sort_tree(dti);
 
-	if (streq(outname, "-")) {
+	if (streq(outform, "fs")) {
+		/* Output to directory, outf is not used */
+	} else if (streq(outname, "-")) {
 		outf = stdout;
 	} else {
 		outf = fopen(outname, "wb");
@@ -375,6 +378,8 @@ int main(int argc, char *argv[])
 		dt_to_blob(outf, dti, outversion);
 	} else if (streq(outform, "asm")) {
 		dt_to_asm(outf, dti, outversion);
+	} else if (streq(outform, "fs")) {
+		dt_to_fs(outname, dti);
 	} else if (streq(outform, "null")) {
 		/* do nothing */
 	} else {
