@@ -47,7 +47,7 @@ pylibfdt_enabled = not meson.is_cross_build() and py.found() and swig.found() ? 
 wheel_only = get_option('wheel-only')
 
 version_gen_h = vcs_tag(
-  command: ['git', 'describe', '--dirty=+'],
+  command: ['git', '--git-dir=.git', 'describe', '--dirty=+'],
   input: 'version_gen.h.in',
   output: 'version_gen.h',
 )
