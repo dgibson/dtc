@@ -114,12 +114,12 @@ endforeach
 run_tests = find_program('run_tests.sh')
 
 env = []
-if not py.found()
+if not pylibfdt_enabled
   env += 'NO_PYTHON=1'
 else
   env += [
     'PYTHON=' + py.full_path(),
-    'PYTHONPATH=' + meson.project_source_root() / 'pylibfdt',
+    'PYTHONPATH=' + meson.project_build_root() / 'pylibfdt',
     'NO_PYTHON=0',
   ]
 endif
