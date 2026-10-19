@@ -135,7 +135,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ "13.5", "14.3" ]
+        version: [ "14.5", "15.1" ]
         build: [ "make", "meson" ]
 
     name: FreeBSD ${{ matrix.version }} ${{ matrix.build }} build
