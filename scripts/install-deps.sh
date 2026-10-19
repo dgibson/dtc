@@ -1,6 +1,8 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+set -e
+
 if [ "$(uname -s)" = "Darwin" ]
 then
     brew install --quiet libyaml swig meson ninja pkg-config
