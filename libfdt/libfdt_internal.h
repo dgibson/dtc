@@ -86,6 +86,20 @@ static inline uint64_t fdt64_ld_(const fdt64_t *p)
 #endif
 
 /*
+ * Maximum node depth for which fdt_parent_offset() finds a node's parent in
+ * a single pass over the tree. Deeper nodes fall back to walking the tree
+ * twice, which is correct but slower.
+ *
+ * The single pass needs an int for each level, so this costs that much
+ * stack. Reduce it if that matters more than the speed; no real device tree
+ * comes close to the default. Set it to 0 to leave out the single-pass code
+ * altogether, for the smallest build.
+ */
+#ifndef FDT_PARENT_MAX_DEPTH
+#define FDT_PARENT_MAX_DEPTH 32
+#endif
+
+/*
  * Defines assumptions which can be enabled. Each of these can be enabled
  * individually. For maximum safety, don't enable any assumptions!
  *
