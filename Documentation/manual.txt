@@ -755,9 +755,9 @@ Options are:
         Optional modifier prefix:
             hh or b=byte, h=2 byte, l=4 byte (default)
 
-    -c, --create     Create nodes if they don't already exist
-    -r, --remove     Delete nodes (and any subnodes) if they already exist
-    -d, --delete     Delete properties if they already exist
+    -c, --create     Create nodes
+    -r, --remove     Delete nodes (and any subnodes)
+    -d, --delete     Delete properties
     -p, --auto-path  Automatically create nodes as needed for the node path
     -t, --type <arg> Type of data
     -v, --verbose    Display each value decoded from command line
@@ -771,3 +771,31 @@ create/delete nodes and delete properties.
 For the first usage, the command line arguments are joined together into a
 single value which is written to the property. The -t option is required so
 that fdtput knows how to decode its arguments.
+
+When writing a property, the node must already exist unless -p is given, in
+which case fdtput creates any missing nodes along the node path.
+
+With -c, fdtput creates each node given. This fails if the node already exists
+or its parent does not. Adding -p creates any missing parents as well, and
+does not complain about nodes which already exist.
+
+With -r, it is an error if a node does not exist. With -d, it is an error if a
+property does not exist.
+
+Examples:
+
+    # Add a node to an existing parent
+    fdtput -c test.dtb /soc/serial@1000
+
+    # Add a node, along with any missing parents
+    fdtput -cp test.dtb /soc/bus/serial@2000
+
+    # Write a string property, creating the node if needed
+    fdtput -p -ts test.dtb /soc/i2c@3000 compatible vendor,i2c
+
+    # Write a property with two cells, given in hex
+    fdtput -tx test.dtb /soc/serial@1000 reg 1000 100
+
+    # Delete a property, then a node and its subnodes
+    fdtput -d test.dtb /soc/i2c@3000 compatible
+    fdtput -r test.dtb /soc/bus

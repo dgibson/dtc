@@ -403,6 +403,7 @@ static const char usage_synopsis[] =
 	"	fdtput -d <options> <dt file> <node> [<property>...]\n"
 	"\n"
 	"The command line arguments are joined together into a single value.\n"
+	"Use -p to create any missing nodes in the node path.\n"
 	USAGE_TYPE_MSG;
 static const char usage_short_opts[] = "crdpt:v" USAGE_COMMON_SHORT_OPTS;
 static struct option const usage_long_opts[] = {
@@ -417,7 +418,7 @@ static struct option const usage_long_opts[] = {
 static const char * const usage_opts_help[] = {
 	"Create nodes",
 	"Delete nodes (and any subnodes)",
-	"Delete properties if they already exist",
+	"Delete properties",
 	"Automatically create nodes as needed for the node path",
 	"Type of data",
 	"Display each value decoded from command line",
