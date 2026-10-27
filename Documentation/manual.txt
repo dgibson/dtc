@@ -769,8 +769,8 @@ is performed. The first usage adds or updates properties; the rest are used to
 create/delete nodes and delete properties.
 
 For the first usage, the command line arguments are joined together into a
-single value which is written to the property. The -t option is required so
-that fdtput knows how to decode its arguments.
+single value which is written to the property. The -t option tells fdtput how
+to decode its arguments. Without it, each argument is a decimal integer.
 
 When writing a property, the node must already exist unless -p is given, in
 which case fdtput creates any missing nodes along the node path.
