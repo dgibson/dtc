@@ -970,8 +970,12 @@ fdtput_tests () {
 	"-ts" "fine wine"
     run_wrap_test $DTPUT $dtb -p /you/are/drunk/sir/winston slurp -ts twice
 
+    # A path must start with '/'
+    run_wrap_error_test $DTPUT $dtb -cp baldrick/turnip
+    run_wrap_error_test $DTGET $dtb -l /baldrick
+
     # Test expansion of the blob when insufficient room for a new node
-    run_wrap_test $DTPUT $dtb -cp "$(cat $text $text)/longish"
+    run_wrap_test $DTPUT $dtb -cp "/$(cat $text $text)/longish"
 
     # Allowed to create an existing node with -p
     run_wrap_test $DTPUT $dtb -cp /chosen
