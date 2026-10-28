@@ -243,6 +243,22 @@ class PyLibfdtBasicTests(unittest.TestCase):
             node_list.append(self.fdt.get_name(node))
             node = self.fdt.next_subnode(node, QUIET_NOTFOUND)
         self.assertEqual(node_list, ['subnode@1', 'subnode@2'])
+        self.assertEqual(
+            [self.fdt.get_name(n) for n in self.fdt.subnodes(0)],
+            ['subnode@1', 'subnode@2'],
+        )
+        leaf = self.fdt.path_offset('/subnode@1/ss1')
+        self.assertEqual(list(self.fdt.subnodes(leaf)), [])
+
+    def testPropertiesIterator(self):
+        """Check that we can iterate through properties of a node"""
+        node = self.fdt.path_offset('/subnode@1')
+        props = list(self.fdt.properties(node))
+        self.assertEqual([p.name for p in props],
+                         ['compatible', 'reg', 'prop-int'])
+        self.assertEqual(props[0], b'subnode1\0')
+        leaf = self.fdt.path_offset('/subnode@1/ss1')
+        self.assertEqual(list(self.fdt.properties(leaf)), [])
 
     def testFirstNextSubnodeOffsetExceptions(self):
         """Check except handling for first/next subnode functions"""
@@ -410,6 +426,8 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEqual([ 0xdeadbeef00000000, 0x100000],
                           self.fdt.get_mem_rsv(0))
         self.assertEqual([123456789, 0o10000], self.fdt.get_mem_rsv(1))
+        self.assertEqual([(0xdeadbeef00000000, 0x100000), (123456789, 0o10000)],
+                         self.fdt.get_mem_rsv_list())
 
     def testAddDelReserveMap(self):
         """Test that we can add to and remove from the memory reserve map"""

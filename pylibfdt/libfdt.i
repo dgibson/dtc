@@ -201,6 +201,23 @@ class FdtRo(object):
         """
         return check_err(fdt_next_subnode(self._fdt, nodeoffset), quiet)
 
+    def subnodes(self, nodeoffset):
+        """Iterate over the subnodes of a node
+
+        Args:
+            nodeoffset: Offset of parent node to check
+
+        Yields:
+            Node offset of each direct subnode in order
+
+        Raises:
+            FdtException on error (e.g. invalid nodeoffset)
+        """
+        soff = self.first_subnode(nodeoffset, quiet=QUIET_NOTFOUND)
+        while soff >= 0:
+            yield soff
+            soff = self.next_subnode(soff, quiet=QUIET_NOTFOUND)
+
     def magic(self):
         """Return the magic word from the header
 
@@ -301,6 +318,17 @@ class FdtRo(object):
         val = fdt_get_mem_rsv(self._fdt, index)
         check_err(val[0], quiet)
         return val[1:]
+
+    def get_mem_rsv_list(self):
+        """Return a list of all memory reserve-map records
+
+        Returns:
+            List of (address, size) tuples for each memory reserve-map record
+        """
+        return [
+            tuple(self.get_mem_rsv(i))
+            for i in range(self.num_mem_rsv())
+        ]
 
     def address_cells(self, nodeoffset, quiet=()):
         """Return the number of address cells used by a node's children
@@ -433,6 +461,23 @@ class FdtRo(object):
         if pdata[0] is None:
             return pdata[1]
         return Property(pdata[0], pdata[1])
+
+    def properties(self, nodeoffset):
+        """Iterate over the properties of a node
+
+        Args:
+            nodeoffset: Offset of node to check
+
+        Yields:
+            Property object for each property on @nodeoffset in order
+
+        Raises:
+            FdtException on error (e.g. invalid nodeoffset)
+        """
+        poff = self.first_property_offset(nodeoffset, quiet=QUIET_NOTFOUND)
+        while poff >= 0:
+            yield self.get_property_by_offset(poff)
+            poff = self.next_property_offset(poff, quiet=QUIET_NOTFOUND)
 
     def getprop(self, nodeoffset, prop_name, quiet=()):
         """Get a property from a node
