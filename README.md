@@ -37,7 +37,8 @@ distributions:
 $ sudo apt-get install swig python3-dev
 ```
 
-The library provides an `Fdt` class which you can use like this:
+The library provides an `Fdt` class which you can use like this, from
+`build/tests` after running the tests:
 
 ```
 $ PYTHONPATH=../pylibfdt python3
@@ -59,7 +60,7 @@ You will find tests in `tests/pylibfdt_tests.py` showing how to use each
 method. Help is available using the Python help command, e.g.:
 
 ```
-$ cd pylibfdt
+$ cd build/pylibfdt
 $ python3 -c "import libfdt; help(libfdt)"
 ```
 
@@ -67,9 +68,9 @@ If you add new features, please check code coverage:
 
 ```
 $ sudo apt-get install python3-coverage
-$ cd tests
+$ cd build/tests
 # It's just 'coverage' on most other distributions
-$ python3-coverage run pylibfdt_tests.py
+$ python3-coverage run ../../tests/pylibfdt_tests.py
 $ python3-coverage html
 # Open 'htmlcov/index.html' in your browser
 ```
@@ -91,20 +92,21 @@ host system first. Generally, using `--user` or `--prefix` is not
 necessary and pip will use the default location for the Python
 installation which varies if the user is root or not.
 
-You can also install everything via make if you like, but pip is
+You can also install everything with meson if you like, but pip is
 recommended.
 
 To install both libfdt and pylibfdt you can use:
 
 ```
-$ make install [PREFIX=/path/to/install_dir]
+$ meson setup [--prefix=/path/to/install_dir] build
+$ meson install -C build
 ```
 
 To disable building the python library, even if swig and Python are available,
 use:
 
 ```
-$ make NO_PYTHON=1
+$ meson setup -Dpython=disabled build
 ```
 
 More work remains to support all of libfdt, including access to numeric
