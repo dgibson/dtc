@@ -17,8 +17,8 @@ works with pylibfdt. If it cannot be supported, put the declaration in
 
 ## Tests
 
-Test files are kept in the `tests/` directory. Use `make check` to build and run
-all tests.
+Test files are kept in the `tests/` directory. Use `meson test -C build` to
+build and run all tests (see [README.md](README.md#building)).
 
 If you want to adjust a test file, be aware that `tree_tree1.dts` is compiled
 and checked against a binary tree from assembler macros in `trees.S`. So

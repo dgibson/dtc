@@ -8,6 +8,25 @@ dtc and libfdt are maintained by:
 
 * [David Gibson `<david@gibson.dropbear.id.au>`](mailto:david@gibson.dropbear.id.au)
 
+## Building
+
+dtc and libfdt are built with [Meson](https://mesonbuild.com/):
+
+```
+$ meson setup build
+$ meson compile -C build
+$ meson test -C build
+$ meson install -C build
+```
+
+`meson configure build` lists the build options, e.g. `-Dpython=disabled`
+to skip the Python library. See the
+[Meson quick guide](https://mesonbuild.com/Quick-guide.html) for more,
+such as installing with `--destdir`. `scripts/install-deps.sh` installs
+the packages needed on common systems.
+
+Building with `make` still works but is deprecated.
+
 ## Python library
 
 A Python library wrapping libfdt is also available. To build this you
