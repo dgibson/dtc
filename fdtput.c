@@ -201,8 +201,9 @@ static int store_key_value(char **blob, const char *node_name,
 /**
  * Create paths as needed for all components of a path
  *
- * Any components of the path that do not exist are created. The path
- * must start with '/'. Errors are reported.
+ * Any components of the path that do not exist are created. If the path
+ * starts with an alias, they are created below the node which the alias
+ * points to. Otherwise the path must start with '/'. Errors are reported.
  *
  * @param blob		FDT blob to write into
  * @param in_path	Path to process
@@ -214,9 +215,17 @@ static int create_paths(char **blob, const char *in_path)
 	const char *sep;
 	int node, offset = 0;
 
+	/* a path which does not start with '/' must start with an alias */
 	if (*path != '/') {
-		report_error(path, -1, -FDT_ERR_BADPATH);
-		return -1;
+		sep = strchr(path, '/');
+		if (!sep)
+			sep = path + strlen(path);
+		offset = fdt_path_offset_namelen(*blob, path, sep - path);
+		if (offset < 0) {
+			report_error(path, -1, offset);
+			return -1;
+		}
+		path = sep;
 	}
 
 	/* skip leading '/' */

@@ -970,7 +970,14 @@ fdtput_tests () {
 	"-ts" "fine wine"
     run_wrap_test $DTPUT $dtb -p /you/are/drunk/sir/winston slurp -ts twice
 
-    # A path must start with '/'
+    # Automatic node creation below an alias
+    run_wrap_test $DTPUT $dtb -p /aliases second -ts /blackadder/the-second
+    run_wrap_test $DTPUT $dtb -cp second/carrot
+    run_fdtput_test "orange" $dtb second/carrot colour -ts "orange"
+    run_fdtget_test "orange" $dtb /blackadder/the-second/carrot colour
+    run_wrap_error_test $DTGET $dtb -l /second
+
+    # A path must start with '/' or an alias
     run_wrap_error_test $DTPUT $dtb -cp baldrick/turnip
     run_wrap_error_test $DTGET $dtb -l /baldrick
 
