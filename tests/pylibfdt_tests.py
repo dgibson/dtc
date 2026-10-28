@@ -646,6 +646,14 @@ class PyLibfdtSwTests(unittest.TestCase):
         # Make sure we did at least two resizes
         self.assertTrue(len(fdt.as_bytearray()) > FdtSw.INC_SIZE * 2)
 
+        # Check that as_fdt() resizes when fewer than 4 bytes remain for FDT_END
+        sw_exact = FdtSw(76)
+        sw_exact.finish_reservemap()
+        sw_exact.begin_node('')
+        sw_exact.end_node()
+        fdt_exact = sw_exact.as_fdt()
+        self.assertEqual(80, fdt_exact.totalsize())
+
 
 class PyLibfdtRoTests(unittest.TestCase):
     """Test class for read-only pylibfdt access functions
