@@ -334,7 +334,8 @@ static int delete_prop(char *blob, const char *node_name, const char *prop_name)
 
 	node = fdt_delprop(blob, node, prop_name);
 	if (node < 0) {
-		report_error(node_name, -1, node);
+		fprintf(stderr, "Error at '%s', property '%s': %s\n",
+			node_name, prop_name, fdt_strerror(node));
 		return -1;
 	}
 

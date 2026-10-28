@@ -1045,7 +1045,9 @@ fdtput_tests () {
     run_fdtget_test "bootargs\nlinux,platform" $dtb -p  /chosen
 
     # Delete the non-existent property
-    run_wrap_error_test $DTPUT $dtb -d /chosen   non-existent-prop
+    run_wrap_error_msg_test \
+	"Error at '/chosen', property 'non-existent-prop'" \
+	$DTPUT $dtb -d /chosen non-existent-prop
 
     # TODO: Add tests for verbose mode?
 }
