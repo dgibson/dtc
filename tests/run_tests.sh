@@ -181,6 +181,37 @@ run_wrap_error_test () {
     base_run_test wrap_error "$@"
 }
 
+# Run a command, checking that it fails and that its output has $1 in it
+wrap_error_msg () {
+    (
+	msg="$1"
+	shift
+	log=tmp.log.$$
+	trap "rm -f $log" 0
+	verbose_run_log "$log" "$@"
+	ret="$?"
+	FAIL_IF_SIGNAL $ret
+	if [ "$ret" -eq 0 ]; then
+	    FAIL "Expected non-zero return code"
+	fi
+	if ! grep -qF -- "$msg" "$log"; then
+	    FAIL "Expected message '$msg'"
+	fi
+	PASS
+    )
+}
+
+# Check that a command fails and prints a message
+# $1: message to look for in the output
+# $2...: command to run
+run_wrap_error_msg_test () {
+    msg="$1"
+    shift
+    shorten_echo "$@"
+    printf " {!= 0, \"%s\"}:	" "$msg"
+    base_run_test wrap_error_msg "$msg" "$@"
+}
+
 # $1: dtb file
 # $2: align base
 check_align () {
@@ -961,6 +992,12 @@ fdtput_tests () {
     # Not allowed to create an existing node
     run_wrap_error_test $DTPUT $dtb -c /chosen
     run_wrap_error_test $DTPUT $dtb -c /chosen/son
+
+    # Writing below a missing node fails without -p, suggesting -p
+    run_wrap_error_msg_test "Use -p to create missing nodes" \
+	$DTPUT $dtb -c /blackadder/the-second
+    run_wrap_error_msg_test "Use -p to create missing nodes" \
+	$DTPUT $dtb /blackadder/the-second cost -ts high
 
     # Automatic node creation
     run_wrap_test $DTPUT $dtb -cp /blackadder/the-second/turnip \

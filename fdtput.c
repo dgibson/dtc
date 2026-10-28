@@ -48,6 +48,22 @@ static void report_error(const char *name, int namelen, int err)
 }
 
 /**
+ * Report an error looking up a node which must exist before writing to it.
+ *
+ * If the node is missing, suggest -p, since it creates missing nodes.
+ *
+ * @param name		Node name to report error on
+ * @param namelen	Length of node name, or -1 to use entire string
+ * @param err		Error number to report (-FDT_ERR_...)
+ */
+static void report_node_error(const char *name, int namelen, int err)
+{
+	report_error(name, namelen, err);
+	if (err == -FDT_ERR_NOTFOUND)
+		fprintf(stderr, "Use -p to create missing nodes\n");
+}
+
+/**
  * Encode a series of arguments in a property value.
  *
  * @param disp		Display information / options
@@ -182,7 +198,7 @@ static int store_key_value(char **blob, const char *node_name,
 
 	node = fdt_path_offset(*blob, node_name);
 	if (node < 0) {
-		report_error(node_name, -1, node);
+		report_node_error(node_name, -1, node);
 		return -1;
 	}
 
@@ -284,7 +300,7 @@ static int create_node(char **blob, const char *node_name)
 		node = fdt_path_offset(*blob, path);
 		free(path);
 		if (node < 0) {
-			report_error(node_name, -1, node);
+			report_node_error(node_name, p - node_name, node);
 			return -1;
 		}
 	}
