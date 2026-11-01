@@ -330,10 +330,10 @@ static int overlay_update_local_references(void *fdto, uint32_t delta)
 static int overlay_fixup_one_phandle(void *fdto, int symbols_off,
 				     const char *path, uint32_t path_len,
 				     const char *name, uint32_t name_len,
-				     int poffset, uint32_t phandle)
+				     uint32_t poffset, uint32_t phandle)
 {
 	fdt32_t phandle_prop;
-	int fixup_off;
+	int fixup_off, ret;
 
 	if (symbols_off < 0)
 		return symbols_off;
@@ -345,10 +345,20 @@ static int overlay_fixup_one_phandle(void *fdto, int symbols_off,
 		return fixup_off;
 
 	phandle_prop = cpu_to_fdt32(phandle);
-	return fdt_setprop_inplace_namelen_partial(fdto, fixup_off,
-						   name, name_len, poffset,
-						   &phandle_prop,
-						   sizeof(phandle_prop));
+	ret = fdt_setprop_inplace_namelen_partial(fdto, fixup_off,
+						  name, name_len, poffset,
+						  &phandle_prop,
+						  sizeof(phandle_prop));
+	/*
+	 * fdt_setprop_inplace_namelen_partial() only returns -FDT_ERR_NOSPACE
+	 * when poffset + sizeof(phandle_prop) exceeds the existing property's
+	 * length in the overlay, which means the overlay is malformed (not
+	 * that the base DTB buffer ran out of space).
+	 */
+	if (ret == -FDT_ERR_NOSPACE)
+		return -FDT_ERR_BADOVERLAY;
+
+	return ret;
 }
 
 /**
@@ -409,7 +419,8 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		uint32_t fixup_len;
 		const char *sep;
 		char *endptr;
-		int poffset, ret;
+		unsigned long poffset;
+		int ret;
 
 		fixup_end = memchr(value, '\0', len);
 		if (!fixup_end)
@@ -438,8 +449,15 @@ static int overlay_fixup_phandle(void *fdt, void *fdto, int symbols_off,
 		if (!name_len)
 			return -FDT_ERR_BADOVERLAY;
 
+		/*
+		 * Require an initial ASCII digit because strtoul() accepts
+		 * leading whitespace and '+'/'-' signs (wrapping negative
+		 * values to unsigned long).
+		 */
+		if ((*(sep + 1) < '0') || (*(sep + 1) > '9'))
+			return -FDT_ERR_BADOVERLAY;
 		poffset = strtoul(sep + 1, &endptr, 10);
-		if ((*endptr != '\0') || (endptr <= (sep + 1)))
+		if ((*endptr != '\0') || (poffset > UINT32_MAX))
 			return -FDT_ERR_BADOVERLAY;
 
 		ret = overlay_fixup_one_phandle(fdto, symbols_off,

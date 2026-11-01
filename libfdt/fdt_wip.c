@@ -23,7 +23,12 @@ int fdt_setprop_inplace_namelen_partial(void *fdt, int nodeoffset,
 	if (!propval)
 		return proplen;
 
-	if ((unsigned)proplen < (len + idx))
+	/*
+	 * Check that idx + len fits within proplen using subtraction rather
+	 * than addition so that a large idx (or negative len) cannot wrap
+	 * around 32-bit unsigned arithmetic.
+	 */
+	if (idx > (unsigned)proplen || (unsigned)len > (unsigned)proplen - idx)
 		return -FDT_ERR_NOSPACE;
 
 	memcpy((char *)propval + idx, val, len);

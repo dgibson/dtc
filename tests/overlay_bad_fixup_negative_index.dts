@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+/include/ "overlay_bad_fixup_base.dtsi"
+
+/ {
+	__fixups__ {
+		test = "/fragment@0:target:-4";
+	};
+};

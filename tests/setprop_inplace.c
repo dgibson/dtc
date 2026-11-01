@@ -80,5 +80,13 @@ int main(int argc, char *argv[])
 	check_getprop(fdt, 0, "compatible", strlen(TEST_STRING_4_RESULT) + 1,
 		      TEST_STRING_4_RESULT);
 
+	err = fdt_setprop_inplace_namelen_partial(fdt, 0, "compatible",
+						  strlen("compatible"),
+						  0xfffffffcU,
+						  TEST_STRING_4_PARTIAL, 4);
+	if (err != -FDT_ERR_NOSPACE)
+		FAIL("fdt_setprop_inplace_namelen_partial() with wrapping idx returned %d instead of -FDT_ERR_NOSPACE\n",
+		     err);
+
 	PASS();
 }

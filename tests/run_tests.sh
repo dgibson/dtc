@@ -274,6 +274,8 @@ BAD_FIXUP_TREES="bad_index \
 		empty \
 		empty_index \
 		index_trailing \
+		negative_index \
+		overflow_index \
 		path_empty_prop \
 		path_only \
 		path_only_sep \
