@@ -423,6 +423,10 @@ class PyLibfdtBasicTests(unittest.TestCase):
                          self.fdt.getprop(node, "compatible").as_stringlist())
         self.assertEqual(["this is a placeholder string", "string2"],
                          self.fdt.getprop(node, "placeholder").as_stringlist())
+        self.assertEqual([], libfdt.Property('empty', b'').as_stringlist())
+        with self.assertRaises(ValueError) as e:
+            libfdt.Property('bad', b'no-nul').as_stringlist()
+        self.assertIn('lacks nul termination', str(e.exception))
 
     def testReserveMap(self):
         """Test that we can access the memory reserve map"""
@@ -522,6 +526,9 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEqual(TEST_STRING_2, self.fdt.getprop(node, prop).as_str())
         with self.assertRaises(ValueError) as e:
             self.fdt.getprop(node, 'prop-int').as_str()
+        self.assertIn('lacks nul termination', str(e.exception))
+        with self.assertRaises(ValueError) as e:
+            libfdt.Property('empty', b'').as_str()
         self.assertIn('lacks nul termination', str(e.exception))
 
         node2 = self.fdt.path_offset('/subnode@1/subsubnode')
