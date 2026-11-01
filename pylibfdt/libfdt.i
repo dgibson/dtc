@@ -908,6 +908,12 @@ class Property(bytearray):
         bytearray.__init__(self, value)
         self.name = name
 
+    def __copy__(self):
+        return type(self)(self.name, self)
+
+    def __deepcopy__(self, memo):
+        return type(self)(self.name, self)
+
     def as_cell(self, fmt):
         return struct.unpack('>' + fmt, self)[0]
 

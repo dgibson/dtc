@@ -4,6 +4,7 @@
 # Written by Simon Glass <sjg@chromium.org>
 #
 
+import copy
 import struct
 import sys
 import types
@@ -192,6 +193,11 @@ class PyLibfdtBasicTests(unittest.TestCase):
         prop = self.fdt.get_property_by_offset(poffset)
         self.assertEqual(prop.name, 'compatible')
         self.assertEqual(prop, b'test_tree1\0')
+        for copied in (copy.copy(prop), copy.deepcopy(prop)):
+            self.assertIsInstance(copied, libfdt.Property)
+            self.assertIsNot(copied, prop)
+            self.assertEqual(copied.name, 'compatible')
+            self.assertEqual(copied, b'test_tree1\0')
 
         with self.assertRaises(FdtException) as e:
             self.fdt.get_property_by_offset(-2)
