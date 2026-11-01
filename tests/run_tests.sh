@@ -321,7 +321,9 @@ libfdt_overlay_tests () {
 	run_dtc_test -I dts -O dtb -o $tree.test.dtb "$SRCDIR/$tree.dts"
 	run_test overlay_bad_fixup overlay_base_manual_symbols.test.dtb $tree.test.dtb
     done
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb -o /dev/null "$SRCDIR/fixup-ref-to-path.dts"
+    run_sh_test "$SRCDIR/dtc-fatal.sh" \
+	-m "Can't generate fixup for reference to path" \
+	-I dts -O dtb -o /dev/null "$SRCDIR/fixup-ref-to-path.dts"
 }
 
 # Tests to exercise dtc's overlay generation support
@@ -766,7 +768,8 @@ dtc_tests () {
     check_tests "$SRCDIR/minusone-phandle.dts" explicit_phandles
     run_sh_test "$SRCDIR/dtc-checkfails.sh" phandle_references -- -I dts -O dtb "$SRCDIR/nonexist-node-ref.dts"
     run_sh_test "$SRCDIR/dtc-checkfails.sh" phandle_references -- -I dts -O dtb "$SRCDIR/nonexist-label-ref.dts"
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb "$SRCDIR/nonexist-node-ref2.dts"
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -m "Label or path nosuchnode not found" \
+	-I dts -O dtb "$SRCDIR/nonexist-node-ref2.dts"
     check_tests "$SRCDIR/bad-name-property.dts" name_properties
 
     check_tests "$SRCDIR/bad-ncells.dts" address_cells_is_cell size_cells_is_cell interrupts_extended_is_cell
@@ -849,9 +852,12 @@ dtc_tests () {
     run_test integer-expressions integer-expressions.test.dtb
 
     # Check for graceful failure in some error conditions
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dts -O dtb nosuchfile.dts
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I dtb -O dtb nosuchfile.dtb
-    run_sh_test "$SRCDIR/dtc-fatal.sh" -I fs -O dtb nosuchfile
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -m 'open "nosuchfile.dts"' \
+	-I dts -O dtb nosuchfile.dts
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -m 'open "nosuchfile.dtb"' \
+	-I dtb -O dtb nosuchfile.dtb
+    run_sh_test "$SRCDIR/dtc-fatal.sh" -m 'opendir() "nosuchfile"' \
+	-I fs -O dtb nosuchfile
 
     # Dependencies
     run_dtc_test -I dts -O dtb -o dependencies.test.dtb -d dependencies.test.d "$SRCDIR/dependencies.dts"
