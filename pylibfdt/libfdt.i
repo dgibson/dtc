@@ -684,6 +684,14 @@ class Fdt(FdtRo):
         del self._fdt[self.totalsize():]
         return err
 
+    def set_boot_cpuid_phys(self, boot_cpuid_phys):
+        """Set the physical boot CPU ID
+
+        Args:
+            boot_cpuid_phys: Physical boot CPU ID
+        """
+        fdt_set_boot_cpuid_phys(self._fdt, boot_cpuid_phys)
+
     def add_mem_rsv(self, addr, size, quiet=()):
         """Add a memory reserve-map record
 
