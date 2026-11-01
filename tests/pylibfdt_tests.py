@@ -171,6 +171,10 @@ class PyLibfdtBasicTests(unittest.TestCase):
             self.fdt.first_property_offset(node)
         self.assertEqual(e.exception.err, -libfdt.NOTFOUND)
 
+        with self.assertRaises(FdtException) as e:
+            list(self.fdt.properties(-1))
+        self.assertEqual(e.exception.err, -libfdt.BADOFFSET)
+
     def testGetName(self):
         """Check that we can get the name of a node"""
         self.assertEqual(self.fdt.get_name(0), '')

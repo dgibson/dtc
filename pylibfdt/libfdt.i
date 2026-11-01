@@ -204,14 +204,14 @@ class FdtRo(object):
     def subnodes(self, nodeoffset):
         """Iterate over the subnodes of a node
 
+        The device tree must not be modified while iterating, as node offsets
+        may shift.
+
         Args:
             nodeoffset: Offset of parent node to check
 
         Yields:
             Node offset of each direct subnode in order
-
-        Raises:
-            FdtException on error (e.g. invalid nodeoffset)
         """
         soff = self.first_subnode(nodeoffset, quiet=QUIET_NOTFOUND)
         while soff >= 0:
@@ -464,6 +464,9 @@ class FdtRo(object):
 
     def properties(self, nodeoffset):
         """Iterate over the properties of a node
+
+        The device tree must not be modified while iterating, as property
+        offsets may shift.
 
         Args:
             nodeoffset: Offset of node to check
