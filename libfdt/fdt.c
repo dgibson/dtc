@@ -145,37 +145,59 @@ int fdt_check_header(const void *fdt)
 	return 0;
 }
 
-const void *fdt_offset_ptr(const void *fdt, int offset, unsigned int len)
+/*
+ * End offset (exclusive, relative to the structure block) of the range that
+ * fdt_offset_ptr() accepts, capped at INT_MAX.
+ */
+static int fdt_struct_limit_(const void *fdt)
 {
-	unsigned int uoffset = offset;
-	unsigned int absoffset = offset + fdt_off_dt_struct(fdt);
+	uint32_t limit = INT_MAX;
 
-	if (offset < 0)
+	if (!can_assume(VALID_INPUT)) {
+		uint32_t base = fdt_off_dt_struct(fdt);
+		uint32_t totalsize = fdt_totalsize(fdt);
+
+		if (base > totalsize)
+			return 0;
+		if (totalsize - base < limit)
+			limit = totalsize - base;
+	}
+
+	if (can_assume(LATEST) || fdt_version(fdt) >= 0x11) {
+		uint32_t size = fdt_size_dt_struct(fdt);
+
+		if (size < limit)
+			limit = size;
+	}
+
+	return limit;
+}
+
+static const void *fdt_offset_ptr_limit_(const void *fdt, int limit,
+					 int offset, unsigned int len)
+{
+	if ((offset < 0) || (offset > limit)
+	    || (len > (unsigned int)(limit - offset)))
 		return NULL;
 
-	if (!can_assume(VALID_INPUT))
-		if ((absoffset < uoffset)
-		    || ((absoffset + len) < absoffset)
-		    || (absoffset + len) > fdt_totalsize(fdt))
-			return NULL;
-
-	if (can_assume(LATEST) || fdt_version(fdt) >= 0x11)
-		if (((uoffset + len) < uoffset)
-		    || ((offset + len) > fdt_size_dt_struct(fdt)))
-			return NULL;
-
 	return fdt_offset_ptr_(fdt, offset);
+}
+
+const void *fdt_offset_ptr(const void *fdt, int offset, unsigned int len)
+{
+	return fdt_offset_ptr_limit_(fdt, fdt_struct_limit_(fdt), offset, len);
 }
 
 uint32_t fdt_next_tag(const void *fdt, int startoffset, int *nextoffset)
 {
 	const fdt32_t *tagp, *lenp;
 	uint32_t tag, len, sum;
+	int limit = fdt_struct_limit_(fdt);
 	int offset = startoffset;
-	const char *p;
+	const char *p, *nul;
 
 	*nextoffset = -FDT_ERR_TRUNCATED;
-	tagp = fdt_offset_ptr(fdt, offset, FDT_TAGSIZE);
+	tagp = fdt_offset_ptr_limit_(fdt, limit, offset, FDT_TAGSIZE);
 	if (!can_assume(VALID_DTB) && !tagp)
 		return FDT_END; /* premature end */
 	tag = fdt32_to_cpu(*tagp);
@@ -184,16 +206,18 @@ uint32_t fdt_next_tag(const void *fdt, int startoffset, int *nextoffset)
 	*nextoffset = -FDT_ERR_BADSTRUCTURE;
 	switch (tag) {
 	case FDT_BEGIN_NODE:
-		/* skip name */
-		do {
-			p = fdt_offset_ptr(fdt, offset++, 1);
-		} while (p && (*p != '\0'));
-		if (!can_assume(VALID_DTB) && !p)
+		/* skip name: check the rest of the block once, then scan it */
+		if (offset < 0 || offset >= limit)
 			return FDT_END; /* premature end */
+		p = fdt_offset_ptr_(fdt, offset);
+		nul = memchr(p, '\0', limit - offset);
+		if (!nul)
+			return FDT_END; /* premature end */
+		offset += nul - p + 1;
 		break;
 
 	case FDT_PROP:
-		lenp = fdt_offset_ptr(fdt, offset, sizeof(*lenp));
+		lenp = fdt_offset_ptr_limit_(fdt, limit, offset, sizeof(*lenp));
 		if (!can_assume(VALID_DTB) && !lenp)
 			return FDT_END; /* premature end */
 
@@ -221,7 +245,8 @@ uint32_t fdt_next_tag(const void *fdt, int startoffset, int *nextoffset)
 		return FDT_END;
 	}
 
-	if (!fdt_offset_ptr(fdt, startoffset, offset - startoffset))
+	if (!fdt_offset_ptr_limit_(fdt, limit, startoffset,
+				   offset - startoffset))
 		return FDT_END; /* premature end */
 
 	*nextoffset = FDT_TAGALIGN(offset);
