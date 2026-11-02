@@ -80,6 +80,16 @@ const char *fdt_get_string(const void *fdt, int stroffset, int *lenp)
 	}
 
 	s = (const char *)fdt + absoffset;
+
+	/*
+	 * If the range ends with a NUL (always the case for a string block made
+	 * of NUL-terminated strings), the string is terminated within it, so
+	 * there is no need to search for the terminator unless the caller
+	 * wants the length.
+	 */
+	if (!lenp && len && s[len - 1] == '\0')
+		return s;
+
 	n = memchr(s, '\0', len);
 	if (!n) {
 		/* missing terminating NULL */
