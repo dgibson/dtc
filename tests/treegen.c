@@ -701,6 +701,41 @@ static struct buf make_named_root(void)
 	return b;
 }
 
+static struct buf make_bad_proplen(void)
+{
+	struct buf b = buf_init();
+	size_t hdr;
+
+	hdr = emit_fdt_header(&b);
+	emit_align(&b, 8);
+
+	emit_rsvmap_empty(&b, hdr);
+
+	{
+		size_t ss = start_block(&b);
+
+		emit_begin_node(&b, "");
+		/* Property with length exceeding the remaining blob size */
+		emit_u32(&b, FDT_PROP);
+		emit_u32(&b, 0x80000000);	/* proplen: exceeds blob */
+		emit_u32(&b, 0);		/* nameoff */
+		emit_end_node(&b);
+		emit_fdt_end(&b);
+		finish_struct_block(&b, hdr, ss);
+	}
+
+	{
+		size_t strs = start_block(&b);
+
+		emit_string(&b, "x");
+		finish_strings_block(&b, hdr, strs);
+	}
+
+	finish_totalsize(&b, hdr);
+
+	return b;
+}
+
 /* Tree table and main */
 
 static struct {
@@ -716,6 +751,7 @@ static struct {
 	TREE(unterminated_memrsv),
 	TREE(two_roots),
 	TREE(named_root),
+	TREE(bad_proplen),
 };
 
 int main(int argc, char *argv[])
