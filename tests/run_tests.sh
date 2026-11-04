@@ -810,6 +810,9 @@ dtc_tests () {
     run_sh_test "$SRCDIR/dtc-checkfails.sh" node_name_format -- -I dtb -O dtb bad_node_format.dtb
     run_sh_test "$SRCDIR/dtc-checkfails.sh" property_name_chars -- -I dtb -O dtb bad_prop_char.dtb
 
+    # Check that oversized property length is rejected
+    run_sh_test "$SRCDIR/dtc-fails.sh" bad_proplen.test.dtb -I dtb -O dtb bad_proplen.dtb
+
     run_sh_test "$SRCDIR/dtc-checkfails.sh" duplicate_label -- -I dts -O dtb "$SRCDIR/reuse-label1.dts"
     run_sh_test "$SRCDIR/dtc-checkfails.sh" duplicate_label -- -I dts -O dtb "$SRCDIR/reuse-label2.dts"
     run_sh_test "$SRCDIR/dtc-checkfails.sh" duplicate_label -- -I dts -O dtb "$SRCDIR/reuse-label3.dts"
