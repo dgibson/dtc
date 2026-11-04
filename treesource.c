@@ -93,7 +93,7 @@ static void write_propval_string(FILE *f, const char *s, size_t len)
 			if (isprint((unsigned char)c))
 				fprintf(f, "%c", c);
 			else
-				fprintf(f, "\\x%02"PRIx8, c);
+				fprintf(f, "\\x%02"PRIx8, (unsigned char)c);
 		}
 	}
 	fprintf(f, "\"");
