@@ -669,6 +669,9 @@ static struct property *flat_read_property(struct inbuf *dtbuf,
 	struct data val;
 
 	proplen = flat_read_word(dtbuf);
+	if (proplen > INT_MAX)
+		die("Property length 0x%x exceeds maximum\n", proplen);
+
 	stroff = flat_read_word(dtbuf);
 
 	name = flat_read_stringtable(strbuf, stroff);
