@@ -63,6 +63,36 @@ static void check_path(void *fdt, const char *path)
 	check_path_buf(fdt, path, pathlen, 2);
 }
 
+/*
+ * An offset past the root node's FDT_END_NODE tag is not a node offset,
+ * but fdt_next_node() still returns it rather than an error (see commit
+ * ce4d9c0f "libfdt: Rework fdt_next_node()"), so fdt_get_path() has to
+ * recognise it from the depth going negative.  Before it did, the path
+ * trimming scanned back past the start of the buffer for such an offset.
+ */
+static void check_path_bad_offset(void *fdt)
+{
+	int offset, depth = 0, badoffset = 0;
+	int buflen = 64;
+	char *buf = xmalloc(buflen);
+	int len, i;
+
+	/* The offset fdt_next_node() reports once it has left the tree. */
+	for (offset = 0; offset >= 0; offset = fdt_next_node(fdt, offset, &depth))
+		badoffset = offset;
+
+	for (i = 0; i < 8; i++) {
+		memset(buf, POISON, buflen);
+
+		len = fdt_get_path(fdt, badoffset + i, buf, buflen);
+		if (len != -FDT_ERR_BADOFFSET)
+			FAIL("fdt_get_path(%d) returns %d instead of "
+			     "-FDT_ERR_BADOFFSET", badoffset + i, len);
+	}
+
+	free(buf);
+}
+
 int main(int argc, char *argv[])
 {
 	void *fdt;
@@ -75,6 +105,8 @@ int main(int argc, char *argv[])
 	check_path(fdt, "/subnode@2");
 	check_path(fdt, "/subnode@1/subsubnode");
 	check_path(fdt, "/subnode@2/subsubnode@0");
+
+	check_path_bad_offset(fdt);
 
 	PASS();
 }

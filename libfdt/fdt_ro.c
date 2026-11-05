@@ -583,7 +583,7 @@ const char *fdt_get_symbol(const void *fdt, const char *name)
 int fdt_get_path(const void *fdt, int nodeoffset, char *buf, int buflen)
 {
 	int pdepth = 0, p = 0;
-	int offset, depth, namelen;
+	int offset, depth, namelen, err;
 	const char *name;
 
 	FDT_RO_PROBE(fdt);
@@ -591,8 +591,12 @@ int fdt_get_path(const void *fdt, int nodeoffset, char *buf, int buflen)
 	if (buflen < 2)
 		return -FDT_ERR_NOSPACE;
 
+	if (!can_assume(VALID_INPUT)
+	    && ((err = fdt_check_node_offset_(fdt, nodeoffset)) < 0))
+		return err;
+
 	for (offset = 0, depth = 0;
-	     (offset >= 0) && (offset <= nodeoffset);
+	     (offset >= 0) && (depth >= 0) && (offset <= nodeoffset);
 	     offset = fdt_next_node(fdt, offset, &depth)) {
 		while (pdepth > depth) {
 			do {
