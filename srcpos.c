@@ -324,6 +324,9 @@ srcpos_string(struct srcpos *pos)
 	const char *fname = "<no-file>";
 	char *pos_str;
 
+	if (!pos)
+		return xstrdup("<no-file>:<no-line>");
+
 	if (pos->file && pos->file->name)
 		fname = pos->file->name;
 
