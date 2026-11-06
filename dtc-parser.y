@@ -25,11 +25,6 @@ extern void yyerror(char const *s);
 extern struct dt_info *parser_output;
 extern bool treesource_error;
 
-static bool is_ref_relative(const char *ref)
-{
-	return ref[0] != '/' && strchr(&ref[1], '/');
-}
-
 %}
 
 %union {

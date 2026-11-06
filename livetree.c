@@ -482,6 +482,12 @@ struct dt_info *build_dt_info(unsigned int dtsflags,
 	return dti;
 }
 
+/* Check whether a reference is relative to a label, e.g. &{label/node} */
+bool is_ref_relative(const char *ref)
+{
+	return ref[0] != '/' && strchr(&ref[1], '/');
+}
+
 /*
  * Tree accessor functions
  */
