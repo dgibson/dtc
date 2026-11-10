@@ -625,7 +625,7 @@ static const char *flat_read_string(struct inbuf *inb)
 	return str;
 }
 
-static struct data flat_read_data(struct inbuf *inb, int len)
+static struct data flat_read_data(struct inbuf *inb, unsigned int len)
 {
 	struct data d = empty_data;
 
