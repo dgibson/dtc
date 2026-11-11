@@ -52,12 +52,11 @@ static void dump_blob(void *blob, bool debug)
 	uint32_t off_dt = fdt32_to_cpu(bph->off_dt_struct);
 	uint32_t off_str = fdt32_to_cpu(bph->off_dt_strings);
 	const char *p_struct = (const char *)blob + off_dt;
-	const char *p_strings = (const char *)blob + off_str;
 	uint32_t version = fdt32_to_cpu(bph->version);
 	uint32_t totalsize = fdt32_to_cpu(bph->totalsize);
 	uint32_t tag;
-	const char *p, *s, *t;
-	int depth, sz, shift;
+	const char *p, *t;
+	int depth, shift;
 	int i;
 	uint64_t addr, size;
 
@@ -112,7 +111,7 @@ static void dump_blob(void *blob, bool debug)
 		        (uintptr_t)p - blob_off - 4, tag, tagname(tag));
 
 		if (tag == FDT_BEGIN_NODE) {
-			s = p;
+			const char *s = p;
 			p = PALIGN(p + strlen(s) + 1, 4);
 
 			if (*s == '\0')
@@ -137,15 +136,24 @@ static void dump_blob(void *blob, bool debug)
 		}
 
 		if (tag == FDT_PROP) {
-			sz = fdt32_to_cpu(GET_CELL(p));
-			s = p_strings + fdt32_to_cpu(GET_CELL(p));
+			uint32_t sz = fdt32_to_cpu(GET_CELL(p));
+			uint32_t off = off_str + fdt32_to_cpu(GET_CELL(p));
+			const char *s;
+
 			if (version < 16 && sz >= 8)
 				p = PALIGN(p, 8);
 			t = p;
 
 			p = PALIGN(p + sz, 4);
 
-			dumpf("%04"PRIxPTR": string: %s\n", (uintptr_t)s - blob_off, s);
+			if (off >= totalsize) {
+				s = "<out of bounds>";
+			} else {
+				s = (const char *)blob + off;
+				if (!memchr(s, '\0', totalsize-off))
+					s = "<unterminated>";
+			}
+			dumpf("%04"PRIx32": string: %s\n", off, s);
 			dumpf("%04"PRIxPTR": value\n", (uintptr_t)t - blob_off);
 			printf("%*s%s", depth * shift, "", s);
 			utilfdt_print_data(t, sz);
