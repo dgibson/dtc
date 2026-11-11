@@ -51,8 +51,6 @@ static void dump_blob(void *blob, bool debug)
 	uint32_t off_mem_rsvmap = fdt32_to_cpu(bph->off_mem_rsvmap);
 	uint32_t off_dt = fdt32_to_cpu(bph->off_dt_struct);
 	uint32_t off_str = fdt32_to_cpu(bph->off_dt_strings);
-	struct fdt_reserve_entry *p_rsvmap =
-		(struct fdt_reserve_entry *)((char *)blob + off_mem_rsvmap);
 	const char *p_struct = (const char *)blob + off_dt;
 	const char *p_strings = (const char *)blob + off_str;
 	uint32_t version = fdt32_to_cpu(bph->version);
@@ -89,8 +87,17 @@ static void dump_blob(void *blob, bool debug)
 	printf("\n");
 
 	for (i = 0; ; i++) {
-		addr = fdt64_to_cpu(p_rsvmap[i].address);
-		size = fdt64_to_cpu(p_rsvmap[i].size);
+		struct fdt_reserve_entry *re;
+		uint32_t off = off_mem_rsvmap + i * sizeof(*re);
+
+		if (off + sizeof(*re) > totalsize) {
+			printf("// Memory reservation block out of bounds\n");
+			break;
+		}
+
+		re = (struct fdt_reserve_entry *)((char *)blob + off);
+		addr = fdt64_to_cpu(re->address);
+		size = fdt64_to_cpu(re->size);
 		if (addr == 0 && size == 0)
 			break;
 
