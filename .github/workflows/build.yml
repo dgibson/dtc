@@ -101,10 +101,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { sys: mingw32, swig: false }
-          - { sys: mingw64, swig: true  }
-          - { sys: ucrt64,  swig: true  }
-          - { sys: clang64, swig: true  }
+          - { sys: mingw32, swig: false, yaml: false }
+          - { sys: mingw64, swig: true, yaml: true  }
+          - { sys: ucrt64,  swig: true, yaml: true  }
+          - { sys: clang64, swig: true, yaml: true  }
     name: ${{ matrix.sys }}
     defaults:
       run:
@@ -128,7 +128,7 @@ jobs:
           toolchain:p
           meson:p
           ninja:p
-          libyaml:p
+          ${{ matrix.yaml && 'libyaml:p' || '' }}
           ${{ matrix.swig && 'swig:p python-setuptools-scm:p' || '' }}
 
     - name: '🚧 Build'
