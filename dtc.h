@@ -13,15 +13,11 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <assert.h>
-#include <ctype.h>
-#include <errno.h>
 #include <unistd.h>
 #include <inttypes.h>
 
 #include <libfdt_env.h>
 #include <fdt.h>
-
-#include "util.h"
 
 #ifdef DEBUG
 #define debug(...)	printf(__VA_ARGS__)

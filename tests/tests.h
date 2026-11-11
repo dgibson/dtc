@@ -116,6 +116,4 @@ void *load_blob_arg(int argc, char *argv[]);
 void save_blob(const char *filename, void *blob);
 void *open_blob_rw(const void *blob);
 
-#include "util.h"
-
 #endif /* TESTS_H */

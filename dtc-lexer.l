@@ -19,6 +19,8 @@ COMMENT		"/*"([^*]|\*+[^*/])*\*+"/"
 LINECOMMENT	"//".*\n
 
 %{
+#include <ctype.h>
+
 #include "dtc.h"
 #include "srcpos.h"
 #include "dtc-parser.tab.h"

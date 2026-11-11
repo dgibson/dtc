@@ -17,6 +17,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 #define SPACE		65536
 
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
 	if (err != -FDT_ERR_TRUNCATED)
 		FAIL("fdt_del_mem_rsv() returned %d instead of -FDT_ERR_TRUNCATED",
 		     err);
-		
+
 	buf = xmalloc(SPACE);
 	err = fdt_open_into(fdt, buf, SPACE);
 	if (err != -FDT_ERR_TRUNCATED)

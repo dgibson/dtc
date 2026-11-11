@@ -5,10 +5,11 @@
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
 
-#include <stdlib.h>
+#include <ctype.h>
 #include <yaml.h>
+
 #include "dtc.h"
-#include "srcpos.h"
+#include "util.h"
 
 const char *yaml_error_name[] = {
 	[YAML_NO_ERROR] = "no error",

@@ -3,6 +3,7 @@
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
 
+#include <errno.h>
 #include <sys/stat.h>
 
 #include "dtc.h"

@@ -15,6 +15,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 static int nopulate_struct(char *buf, const char *fdt)
 {

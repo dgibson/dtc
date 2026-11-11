@@ -11,6 +11,7 @@
 #include <libfdt.h>
 
 #include "tests.h"
+#include "util.h"
 
 #define CHECK(code, expected)					\
 	{							\

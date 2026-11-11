@@ -7,6 +7,7 @@
 #define _GNU_SOURCE
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 
 #include "dtc.h"

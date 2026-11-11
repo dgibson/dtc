@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "util.h"
+
 #ifdef NO_VALGRIND
 static inline void VALGRIND_MAKE_MEM_UNDEFINED(void *p, size_t len)
 {

@@ -15,6 +15,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 #define SPACE		65536
 #define NEW_STRING	"here is quite a long test string, blah blah blah"
@@ -78,6 +79,6 @@ int main(int argc, char *argv[])
 		FAIL("Failed to set \"prop-u64\" to 0x%016llx: %s",
 		     TEST_VALUE64_1, fdt_strerror(err));
 	check_getprop_64(fdt, 0, "prop-u64", TEST_VALUE64_1);
-	
+
 	PASS();
 }

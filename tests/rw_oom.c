@@ -15,6 +15,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 /* This is not derived programmatically. May require adjustment to changes. */
 #define SPACE	285

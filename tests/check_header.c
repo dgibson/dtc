@@ -10,6 +10,7 @@
 #include <libfdt.h>
 
 #include "tests.h"
+#include "util.h"
 
 static void *dtdup(void *dt)
 {

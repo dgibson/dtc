@@ -2,8 +2,10 @@
 /*
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
+#include <errno.h>
 
 #include "dtc.h"
+#include "util.h"
 
 void data_free(struct data d)
 {

@@ -14,6 +14,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 static int expect_bad; /* = 0 */
 

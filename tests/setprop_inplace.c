@@ -16,6 +16,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 int main(int argc, char *argv[])
 {

@@ -17,8 +17,8 @@
 #include <libfdt_env.h>
 #include <fdt.h>
 
-#include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 /*
  * Buffer with write cursor.  Emit helpers write at the cursor, advance it, and

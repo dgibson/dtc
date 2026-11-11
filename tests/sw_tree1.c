@@ -15,6 +15,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 #define SPACE	65536
 
@@ -48,7 +49,7 @@ static void realloc_fdt(void **fdt, size_t *size, bool created)
 				     fdt_strerror(err));
 		} else {
 			FAIL("Ran out of space");
-		}		
+		}
 		return;
 
 	case REALLOC:
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
 			size = strtoul(argv[1], &endp, 0);
 			if (*endp == '\0')
 				alloc_mode = FIXED;
-			else 
+			else
 				CONFIG("Bad allocation mode \"%s\" specified",
 				       argv[1]);
 		}

@@ -2,6 +2,7 @@
 /*
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
+#include <ctype.h>
 
 #include "dtc.h"
 #include "srcpos.h"

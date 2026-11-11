@@ -3,10 +3,12 @@
  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
  */
 
-#include "dtc.h"
-
 #include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
+
+#include "dtc.h"
+#include "util.h"
 
 static struct node *read_fstree(const char *dirname)
 {

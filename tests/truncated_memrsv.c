@@ -14,6 +14,7 @@
 
 #include "tests.h"
 #include "testdata.h"
+#include "util.h"
 
 #define SPACE		65536
 
