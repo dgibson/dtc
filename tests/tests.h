@@ -7,6 +7,9 @@
  * Copyright (C) 2006 David Gibson, IBM Corporation.
  */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #define DEBUG
 
 /* Test return codes */
