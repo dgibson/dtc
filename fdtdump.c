@@ -22,7 +22,6 @@
 
 #define ALIGN(x, a)	(((x) + ((a) - 1)) & ~((a) - 1))
 #define PALIGN(p, a)	((void *)(ALIGN((uintptr_t)(p), (a))))
-#define GET_CELL(p)	(p += 4, *((const fdt32_t *)(p-4)))
 
 static const char *tagname(uint32_t tag)
 {
@@ -44,18 +43,27 @@ static const char *tagname(uint32_t tag)
 #define dumpf(fmt, args...) \
 	do { if (debug) printf("// " fmt, ## args); } while (0)
 
+static uint32_t next_cell(const void *blob, uint32_t *off, uint32_t limit)
+{
+	const uint32_t *p;
+
+	*off += sizeof(uint32_t);
+	if (*off >= limit)
+		die("** End of blob while reading cell\n");
+	p = (const uint32_t *)((const char *)blob + *off) - 1;
+	return fdt32_to_cpu(*p);
+}
+
 static void dump_blob(void *blob, bool debug)
 {
-	uintptr_t blob_off = (uintptr_t)blob;
 	struct fdt_header *bph = blob;
 	uint32_t off_mem_rsvmap = fdt32_to_cpu(bph->off_mem_rsvmap);
 	uint32_t off_dt = fdt32_to_cpu(bph->off_dt_struct);
 	uint32_t off_str = fdt32_to_cpu(bph->off_dt_strings);
-	const char *p_struct = (const char *)blob + off_dt;
 	uint32_t version = fdt32_to_cpu(bph->version);
 	uint32_t totalsize = fdt32_to_cpu(bph->totalsize);
 	uint32_t tag;
-	const char *p, *t;
+	uint32_t o;
 	int depth, shift;
 	int i;
 	uint64_t addr, size;
@@ -104,20 +112,28 @@ static void dump_blob(void *blob, bool debug)
 		       addr, size);
 	}
 
-	p = p_struct;
-	while ((tag = fdt32_to_cpu(GET_CELL(p))) != FDT_END) {
+	o = off_dt;
+	while ((tag = next_cell(blob, &o, totalsize)) != FDT_END) {
 
-		dumpf("%04"PRIxPTR": tag: 0x%08"PRIx32" (%s)\n",
-		        (uintptr_t)p - blob_off - 4, tag, tagname(tag));
+		dumpf("%04"PRIx32": tag: 0x%08"PRIx32" (%s)\n",
+		        o - 4, tag, tagname(tag));
 
 		if (tag == FDT_BEGIN_NODE) {
-			const char *s = p;
-			p = PALIGN(p + strlen(s) + 1, 4);
+			const char *p = (const char *)blob + o;
+			const char *e = memchr(p, '\0', totalsize - o);
+			size_t namelen;
 
-			if (*s == '\0')
-				s = "/";
+			if (!e)
+				die("** End of blob in node name\n");
 
-			printf("%*s%s {\n", depth * shift, "", s);
+			namelen = e - p;
+
+			o = ALIGN(o + namelen + 1, 4);
+
+			if (*p == '\0')
+				p = "/";
+
+			printf("%*s%s {\n", depth * shift, "", p);
 
 			depth++;
 			continue;
@@ -136,15 +152,15 @@ static void dump_blob(void *blob, bool debug)
 		}
 
 		if (tag == FDT_PROP) {
-			uint32_t sz = fdt32_to_cpu(GET_CELL(p));
-			uint32_t off = off_str + fdt32_to_cpu(GET_CELL(p));
+			uint32_t sz = next_cell(blob, &o, totalsize);
+			uint32_t off = off_str + next_cell(blob, &o, totalsize);
+			uint32_t valo;
 			const char *s;
 
 			if (version < 16 && sz >= 8)
-				p = PALIGN(p, 8);
-			t = p;
-
-			p = PALIGN(p + sz, 4);
+				o = ALIGN(o, 8);
+			valo = o;
+			o = ALIGN(o + sz, 4);
 
 			if (off >= totalsize) {
 				s = "<out of bounds>";
@@ -154,9 +170,11 @@ static void dump_blob(void *blob, bool debug)
 					s = "<unterminated>";
 			}
 			dumpf("%04"PRIx32": string: %s\n", off, s);
-			dumpf("%04"PRIxPTR": value\n", (uintptr_t)t - blob_off);
+			dumpf("%04"PRIx32": value\n", valo);
 			printf("%*s%s", depth * shift, "", s);
-			utilfdt_print_data(t, sz);
+			if (valo + sz > totalsize)
+				die("** End of blob in property value\n");
+			utilfdt_print_data((const char *)blob + valo, sz);
 			printf(";\n");
 			continue;
 		}
