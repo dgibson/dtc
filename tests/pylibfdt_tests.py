@@ -191,6 +191,7 @@ class PyLibfdtBasicTests(unittest.TestCase):
         root = 0
         poffset = self.fdt.first_property_offset(root)
         prop = self.fdt.get_property_by_offset(poffset)
+        self.assertIsInstance(prop, bytes)
         self.assertEqual(prop.name, 'compatible')
         self.assertEqual(prop, b'test_tree1\0')
         for copied in (copy.copy(prop), copy.deepcopy(prop)):

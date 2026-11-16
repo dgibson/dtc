@@ -492,7 +492,7 @@ class FdtRo(object):
 
         Returns:
             Value of property as a Property object (which can be used as a
-               bytearray/string), or -ve error number. On failure, returns an
+               bytes/string), or -ve error number. On failure, returns an
                integer error
 
         Raises:
@@ -502,7 +502,7 @@ class FdtRo(object):
                                quiet)
         if pdata[0] is None:
             return pdata[1]
-        return Property(prop_name, bytearray(pdata[0]))
+        return Property(prop_name, pdata[0])
 
     def hasprop(self, nodeoffset, prop_name, quiet=()):
         """Check if a node has a property
@@ -893,7 +893,7 @@ class Fdt(FdtRo):
         return check_err(fdt_del_node(self._fdt, nodeoffset), quiet)
 
 
-class Property(bytearray):
+class Property(bytes):
     """Holds a device tree property name and value.
 
     This holds a copy of a property taken from the device tree. It does not
@@ -902,11 +902,12 @@ class Property(bytearray):
 
     Properties:
         name: Property name
-        value: Property value as a bytearray
+        value: Property value as bytes
     """
-    def __init__(self, name, value):
-        bytearray.__init__(self, value)
-        self.name = name
+    def __new__(cls, name, value):
+        obj = super().__new__(cls, value)
+        obj.name = name
+        return obj
 
     def __copy__(self):
         return type(self)(self.name, self)
@@ -1275,7 +1276,7 @@ typedef uint32_t fdt32_t;
 	if ($1) {
 		resultobj = PyUnicode_FromString(
 			fdt_string(fdt1, fdt32_to_cpu($1->nameoff)));
-		buff = PyByteArray_FromStringAndSize(
+		buff = PyBytes_FromStringAndSize(
 			(const char *)($1 + 1), fdt32_to_cpu($1->len));
 		resultobj = SWIG_AppendOutput(resultobj, buff);
 	}
