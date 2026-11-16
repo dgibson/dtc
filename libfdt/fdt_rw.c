@@ -288,6 +288,7 @@ int fdt_setprop_placeholder_namelen(void *fdt, int nodeoffset, const char *name,
 	if (err)
 		return err;
 
+	memset(prop->data + len, 0, FDT_TAGALIGN(len) - len);
 	*prop_data = prop->data;
 	return 0;
 }
@@ -340,12 +341,14 @@ int fdt_appendprop(void *fdt, int nodeoffset, const char *name,
 			return err;
 		prop->len = cpu_to_fdt32(newlen);
 		memcpy(prop->data + oldlen, val, len);
+		memset(prop->data + newlen, 0, FDT_TAGALIGN(newlen) - newlen);
 	} else {
 		err = fdt_add_property_(fdt, nodeoffset, name, strlen(name),
 					len, &prop);
 		if (err)
 			return err;
 		memcpy(prop->data, val, len);
+		memset(prop->data + len, 0, FDT_TAGALIGN(len) - len);
 	}
 	return 0;
 }
