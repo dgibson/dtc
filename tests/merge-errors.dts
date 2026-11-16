@@ -1,0 +1,14 @@
+/dts-v1/;
+
+/ {
+	label: node {
+	};
+};
+
+/* Each fragment below refers to a missing node, and each is reported */
+&nosuchnode1 {
+	prop;
+};
+
+/delete-node/ &nosuchnode2;
+/omit-if-no-ref/ &nosuchnode3;

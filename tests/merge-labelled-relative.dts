@@ -1,0 +1,10 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+};
+
+/* A label outside the plugin cannot be used in a label-relative reference */
+newlabel: &{baselabel/subnode} {
+	prop;
+};

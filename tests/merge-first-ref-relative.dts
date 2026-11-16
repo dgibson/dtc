@@ -1,0 +1,7 @@
+/dts-v1/;
+/plugin/;
+
+/* A plugin cannot define a node using a label-relative reference */
+&{label/node} {
+	prop;
+};

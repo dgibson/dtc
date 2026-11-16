@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/* Only a plugin can start with a reference */
+&nosuchnode {
+	prop;
+};

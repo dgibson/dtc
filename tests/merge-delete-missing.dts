@@ -1,0 +1,9 @@
+/dts-v1/;
+
+/ {
+	label: node {
+	};
+};
+
+/* Try to delete a node using a non-existent label */
+/delete-node/ &nosuchnode;

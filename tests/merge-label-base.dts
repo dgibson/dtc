@@ -1,0 +1,10 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+};
+
+/* A label which is not in the plugin may be in the base tree */
+&{baselabel} {
+	prop;
+};

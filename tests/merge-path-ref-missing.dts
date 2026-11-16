@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/ {
+	node {
+	};
+};
+
+/* Try to redefine a node using a non-existent path */
+&{/nosuchnode} {
+	prop;
+};

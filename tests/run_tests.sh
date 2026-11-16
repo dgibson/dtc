@@ -771,6 +771,53 @@ dtc_tests () {
     run_sh_test "$SRCDIR/dtc-checkfails.sh" phandle_references -- -I dts -O dtb "$SRCDIR/nonexist-label-ref.dts"
     run_sh_test "$SRCDIR/dtc-fatal.sh" -m "Label or path nosuchnode not found" \
 	-I dts -O dtb "$SRCDIR/nonexist-node-ref2.dts"
+
+    # Check each error when merging the fragments of a dts file, with its
+    # position
+    run_wrap_error_msg_test "test_label_ref.dts:7.8-15 Label or path handle not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/test_label_ref.dts"
+    run_wrap_error_msg_test "nonexist-node-ref2.dts:9.1-12 Label or path nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/nonexist-node-ref2.dts"
+    run_wrap_error_msg_test "merge-first-ref.dts:4.13-6.3 Label or path nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-first-ref.dts"
+    run_wrap_error_msg_test "merge-first-ref-relative.dts:5.15-7.3 Label-relative reference label/node not supported in plugin" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-first-ref-relative.dts"
+    run_wrap_error_msg_test "merge-labelled-relative.dts:8.1-10 Label-relative reference baselabel/subnode not supported in plugin" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-labelled-relative.dts"
+    run_wrap_error_msg_test "merge-path-relative.dts:8.1-18 Label-relative reference baselabel/node not supported in plugin" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-path-relative.dts"
+    run_wrap_error_msg_test "merge-path-ref-missing.dts:9.1-15 Label or path /nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-path-ref-missing.dts"
+    run_wrap_error_msg_test "merge-delete-missing.dts:9.15-26 Label or path nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-delete-missing.dts"
+    run_wrap_error_msg_test "merge-omit-missing.dts:9.18-32 Label or path /nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-omit-missing.dts"
+    run_wrap_error_msg_test "merge-errors.dts:9.1-13 Label or path nosuchnode1 not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-errors.dts"
+    run_wrap_error_msg_test "merge-errors.dts:13.15-27 Label or path nosuchnode2 not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-errors.dts"
+    run_wrap_error_msg_test "merge-errors.dts:14.18-30 Label or path nosuchnode3 not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-errors.dts"
+
+    # A labelled reference to a node in a plugin adds the label to it
+    run_dtc_test -@ -I dts -O dtb -o merge-labelled-plugin.test.dtb \
+	"$SRCDIR/merge-labelled-plugin.dts"
+    run_fdtget_test "/node" merge-labelled-plugin.test.dtb /__symbols__ newlabel
+    run_fdtget_test "value" merge-labelled-plugin.test.dtb /node prop
+
+    # In a plugin, / { ... } and &{/} { ... } are not the same thing
+    run_dtc_test -I dts -O dtb -o merge-root-plugin.test.dtb \
+	"$SRCDIR/merge-root-plugin.dts"
+    run_fdtget_test "" merge-root-plugin.test.dtb / prop1
+    run_fdtget_test "/" merge-root-plugin.test.dtb /fragment@0 target-path
+    run_fdtget_test "" merge-root-plugin.test.dtb /fragment@0/__overlay__ prop2
+
+    # In a plugin, a label which is not found becomes an overlay fragment
+    run_dtc_test -I dts -O dtb -o merge-label-base.test.dtb \
+	"$SRCDIR/merge-label-base.dts"
+    run_fdtget_test "" merge-label-base.test.dtb /fragment@0/__overlay__ prop
+    run_fdtget_test "/fragment@0:target:0" merge-label-base.test.dtb /__fixups__ baselabel
+
     check_tests "$SRCDIR/bad-name-property.dts" name_properties
 
     check_tests "$SRCDIR/bad-ncells.dts" address_cells_is_cell size_cells_is_cell interrupts_extended_is_cell

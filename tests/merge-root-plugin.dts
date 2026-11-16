@@ -1,0 +1,12 @@
+/dts-v1/;
+/plugin/;
+
+/* This is in the root node of the plugin */
+/ {
+	prop1;
+};
+
+/* This is an overlay fragment for the root node of the base tree */
+&{/} {
+	prop2;
+};

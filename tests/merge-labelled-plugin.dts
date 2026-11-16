@@ -1,0 +1,12 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	label: node {
+	};
+};
+
+/* Add a label to a node defined in the plugin itself */
+newlabel: &label {
+	prop = "value";
+};

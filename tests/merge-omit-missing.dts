@@ -1,0 +1,9 @@
+/dts-v1/;
+
+/ {
+	label: node {
+	};
+};
+
+/* Try to mark a node using a non-existent path */
+/omit-if-no-ref/ &{/nosuchnode};
