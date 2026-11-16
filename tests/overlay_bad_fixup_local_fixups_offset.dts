@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+/dts-v1/;
+
+/ {
+	fragment@0 {
+		target-path = "/";
+
+		__overlay__ {
+			test-phandle = <0>;
+		};
+	};
+
+	/*
+	 * The overlay is well formed apart from this: the fixup asks for
+	 * a phandle at byte offset 0x1000 of a four byte property.
+	 */
+	__local_fixups__ {
+		fragment@0 {
+			__overlay__ {
+				test-phandle = <0x1000>;
+			};
+		};
+	};
+};

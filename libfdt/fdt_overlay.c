@@ -234,8 +234,16 @@ static int overlay_update_local_node_references(void *fdto,
 
 		for (i = 0; i < fixup_len; i++) {
 			fdt32_t *refp;
+			uint32_t off = fdt32_ld_(fixup_val + i);
 
-			refp = (fdt32_t *)(tree_val + fdt32_ld_(fixup_val + i));
+			/* the fixup must reference a whole cell inside the
+			 * target property value
+			 */
+			if ((uint32_t)tree_len < sizeof(fdt32_t) ||
+			    off > (uint32_t)tree_len - sizeof(fdt32_t))
+				return -FDT_ERR_BADOVERLAY;
+
+			refp = (fdt32_t *)(tree_val + off);
 
 			/*
 			 * phandles to fixup can be unaligned, so use
@@ -636,8 +644,16 @@ static int overlay_update_node_conflicting_references(void *fdto, int tree_node,
 		for (i = 0; i < fixup_len; i++) {
 			fdt32_t *refp;
 			uint32_t valp;
+			uint32_t off = fdt32_ld_(fixup_val + i);
 
-			refp = (fdt32_t *)(tree_val + fdt32_ld_(fixup_val + i));
+			/* the fixup must reference a whole cell inside the
+			 * target property value
+			 */
+			if ((uint32_t)tree_len < sizeof(fdt32_t) ||
+			    off > (uint32_t)tree_len - sizeof(fdt32_t))
+				return -FDT_ERR_BADOVERLAY;
+
+			refp = (fdt32_t *)(tree_val + off);
 			valp = fdt32_ld(refp);
 
 			if (valp == fdto_phandle)
