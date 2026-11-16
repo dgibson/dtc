@@ -112,6 +112,95 @@ $ meson setup -Dpython=disabled build
 More work remains to support all of libfdt, including access to numeric
 values.
 
+## dtc
+
+`dtc` compiles device tree source (`.dts`) into flattened device tree
+blobs (`.dtb`), decompiles `.dtb` blobs or `/proc/device-tree`-style
+filesystem trees (`fs`) back to `.dts`, emits YAML (`.yaml`, when built
+with `libyaml`) or assembly (`.S`), and runs semantic checks on the
+tree:
+
+```
+$ dtc -I dts -O dtb -o board.dtb board.dts
+$ dtc -I dtb -O dts -o board.dts board.dtb
+```
+
+See `Documentation/manual.txt` for full command-line reference
+documentation for `dtc` and the C utility tools below.
+
+## dtdiff
+
+`dtdiff` normalizes and sorts two device trees via `dtc -s -O dts` and
+prints a unified diff between them. Each input may be a `.dts` source
+file, a `.dtb` / `.dtbo` blob, or a `/proc/device-tree`-style directory:
+
+```
+$ dtdiff before.dtb after.dtb
+$ dtdiff board.dts /proc/device-tree
+```
+
+## fdtget
+
+`fdtget` reads property values (`<node> <property>` pairs), lists
+property names (`-p`, `--properties`), or lists subnode names (`-l`,
+`--list`) from a `.dtb` blob. Use `-t`, `--type` (e.g. `-ts` for
+strings, `-ti` / `-tu` / `-tx` for signed, unsigned, or hex integers, or
+`-tr` for raw bytes) to control formatting, and `-d`, `--default` to
+provide a fallback when a node or property is missing:
+
+```
+$ fdtget board.dtb / model /cpus/cpu@0 reg
+$ fdtget -tx board.dtb /soc/serial@1000 reg
+$ fdtget -l board.dtb /soc
+```
+
+## fdtput
+
+`fdtput` modifies a `.dtb` blob in place: writing property values,
+creating nodes (`-c`, `--create`), deleting nodes and their subnodes
+(`-r`, `--remove`), or deleting properties (`-d`, `--delete`). Pass
+`-t`, `--type` (e.g. `-ts` for strings or `-tx` for hex integers;
+default is decimal integers) to control value encoding, and `-p`,
+`--auto-path` to create any missing nodes along the target path:
+
+```
+$ fdtput -p -ts board.dtb /soc/i2c@3000 compatible vendor,i2c
+$ fdtput -tx board.dtb /soc/serial@1000 reg 1000 100
+$ fdtput -d board.dtb /soc/i2c@3000 compatible
+```
+
+## fdtdump
+
+`fdtdump` is a low-level debugging tool that dumps the FDT header,
+`/memreserve/` entries, and raw structure-block contents of a `.dtb`
+blob (`-d`, `--debug` prints tag offsets; `-s`, `--scan` scans a larger
+file for an embedded FDT). For general decompilation of a `.dtb` to
+`.dts`, use `dtc -I dtb -O dts` instead:
+
+```
+$ fdtdump -d board.dtb
+```
+
+## convert-dtsv0
+
+`convert-dtsv0` converts obsolete version 0 `.dts` source files to
+`/dts-v1/;` syntax, writing each output to `<filename>v1`:
+
+```
+$ convert-dtsv0 old-board.dts
+```
+
+## fdtoverlay
+
+`fdtoverlay` applies one or more compiled `.dtbo` overlays (`-v`,
+`--verbose` for progress) onto a base `.dtb` blob (`-i`, `--input`,
+compiled with `dtc -@` when overlays reference symbols) and writes the
+merged blob to `-o`, `--output`:
+
+```
+$ fdtoverlay -i base.dtb -o merged.dtb overlay1.dtbo overlay2.dtbo
+```
+
 ## Mailing lists
 
 * The [devicetree-compiler](mailto:devicetree-compiler@vger.kernel.org)
