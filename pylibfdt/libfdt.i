@@ -1026,6 +1026,7 @@ class FdtSw(FdtRo):
         fdtsw = bytearray(self._fdt)
         while self.check_space(fdt_finish(fdtsw)):
             fdtsw = bytearray(self._fdt)
+        del fdtsw[fdt_totalsize(fdtsw):]
         return Fdt(fdtsw)
 
     def check_space(self, val):

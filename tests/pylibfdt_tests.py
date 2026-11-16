@@ -684,6 +684,7 @@ class PyLibfdtSwTests(unittest.TestCase):
 
         # Make sure we did at least two resizes
         self.assertTrue(len(fdt.as_bytearray()) > FdtSw.INC_SIZE * 2)
+        self.assertEqual(fdt.totalsize(), len(fdt.as_bytearray()))
 
         # Check that as_fdt() resizes when fewer than 4 bytes remain for FDT_END
         sw_exact = FdtSw(76)
@@ -692,6 +693,7 @@ class PyLibfdtSwTests(unittest.TestCase):
         sw_exact.end_node()
         fdt_exact = sw_exact.as_fdt()
         self.assertEqual(80, fdt_exact.totalsize())
+        self.assertEqual(80, len(fdt_exact.as_bytearray()))
 
 
 class PyLibfdtRoTests(unittest.TestCase):
