@@ -348,12 +348,20 @@ int fdt_next_subnode(const void *fdt, int offset)
 const char *fdt_find_string_len_(const char *strtab, int tabsize, const char *s,
 				 int slen)
 {
-	const char *last = strtab + tabsize - (slen + 1);
-	const char *p;
+	const char *last;
+	const char *p = strtab;
 
-	for (p = strtab; p <= last; p++)
+	if (tabsize < slen + 1)
+		return NULL;
+	if (slen == 0)
+		return memchr(strtab, '\0', tabsize);
+
+	last = strtab + tabsize - (slen + 1);
+	while (p <= last && (p = memchr(p, s[0], last - p + 1)) != NULL) {
 		if (memcmp(p, s, slen) == 0 && p[slen] == '\0')
 			return p;
+		p++;
+	}
 	return NULL;
 }
 
