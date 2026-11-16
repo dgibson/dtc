@@ -962,6 +962,62 @@ class Property(bytes):
         parts = self[:-1].split(b'\x00')
         return list(map(lambda x: x.decode('utf-8'), parts))
 
+    @classmethod
+    def from_cell(cls, name, fmt, val):
+        return cls(name, struct.pack('>' + fmt, val))
+
+    @classmethod
+    def from_uint32(cls, name, val):
+        return cls.from_cell(name, 'L', val)
+
+    @classmethod
+    def from_int32(cls, name, val):
+        return cls.from_cell(name, 'l', val)
+
+    @classmethod
+    def from_uint64(cls, name, val):
+        return cls.from_cell(name, 'Q', val)
+
+    @classmethod
+    def from_int64(cls, name, val):
+        return cls.from_cell(name, 'q', val)
+
+    @classmethod
+    def from_list(cls, name, fmt, vals):
+        vals = list(vals)
+        return cls(name, struct.pack(f'>{len(vals)}{fmt}', *vals))
+
+    @classmethod
+    def from_uint32_list(cls, name, vals):
+        return cls.from_list(name, 'L', vals)
+
+    @classmethod
+    def from_int32_list(cls, name, vals):
+        return cls.from_list(name, 'l', vals)
+
+    @classmethod
+    def from_uint64_list(cls, name, vals):
+        return cls.from_list(name, 'Q', vals)
+
+    @classmethod
+    def from_int64_list(cls, name, vals):
+        return cls.from_list(name, 'q', vals)
+
+    @classmethod
+    def from_str(cls, name, val):
+        """Unicode is supported by encoding to UTF-8"""
+        if '\x00' in val:
+            raise ValueError('String value contains embedded nul characters')
+        return cls(name, val.encode('utf-8') + b'\x00')
+
+    @classmethod
+    def from_stringlist(cls, name, vals):
+        """Unicode is supported by encoding to UTF-8"""
+        vals = list(vals)
+        if any('\x00' in v for v in vals):
+            raise ValueError('String value contains embedded nul characters')
+        return cls(name, b''.join(v.encode('utf-8') + b'\x00' for v in vals))
+
 
 class FdtSw(FdtRo):
     """Software interface to create a device tree from scratch

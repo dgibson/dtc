@@ -414,6 +414,16 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEqual(9223372036854775807,
                           self.get_prop("prop-uint64").as_uint64())
         self.assertEqual(-2, self.get_prop("prop-int64").as_int64())
+        self.assertEqual(self.get_prop("prop-hex32"),
+                          libfdt.Property.from_uint32("prop-hex32", 0xdeadbeef))
+        self.assertEqual(self.get_prop("prop-int32"),
+                          libfdt.Property.from_int32("prop-int32", -2))
+        self.assertEqual(
+            self.get_prop("prop-uint64"),
+            libfdt.Property.from_uint64("prop-uint64", 9223372036854775807),
+        )
+        self.assertEqual(self.get_prop("prop-int64"),
+                          libfdt.Property.from_int64("prop-int64", -2))
 
     def testGetIntListProperties(self):
         """Test that we can access properties as integer lists"""
@@ -425,6 +435,28 @@ class PyLibfdtBasicTests(unittest.TestCase):
                          self.get_prop("prop-int64-array").as_int64_list())
         self.assertEqual([0x100000000, 0x1],
                          self.get_prop("prop-uint64-array").as_uint64_list())
+        self.assertEqual(
+            self.get_prop("prop-int32-array"),
+            libfdt.Property.from_int32_list("prop-int32-array", [128, -16, -2]),
+        )
+        self.assertEqual(
+            self.get_prop("prop-uint32-array"),
+            libfdt.Property.from_uint32_list(
+                "prop-uint32-array", [0x1, 0x98765432, 0xdeadbeef]
+            ),
+        )
+        self.assertEqual(
+            self.get_prop("prop-int64-array"),
+            libfdt.Property.from_int64_list(
+                "prop-int64-array", [0x100000000, -2]
+            ),
+        )
+        self.assertEqual(
+            self.get_prop("prop-uint64-array"),
+            libfdt.Property.from_uint64_list(
+                "prop-uint64-array", [0x100000000, 0x1]
+            ),
+        )
 
     def testGetStringlistProperties(self):
         """Test that we can access properties as string list"""
@@ -434,6 +466,17 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.assertEqual(["this is a placeholder string", "string2"],
                          self.fdt.getprop(node, "placeholder").as_stringlist())
         self.assertEqual([], libfdt.Property('empty', b'').as_stringlist())
+        self.assertEqual(
+            self.fdt.getprop(node, "compatible"),
+            libfdt.Property.from_stringlist(
+                "compatible", ["subsubnode1", "subsubnode"]
+            ),
+        )
+        self.assertEqual(
+            b'', libfdt.Property.from_stringlist("empty", [])
+        )
+        with self.assertRaises(ValueError):
+            libfdt.Property.from_stringlist("bad", ["embedded\x00nul"])
         with self.assertRaises(ValueError) as e:
             libfdt.Property('bad', b'no-nul').as_stringlist()
         self.assertIn('lacks nul termination', str(e.exception))
@@ -552,6 +595,12 @@ class PyLibfdtBasicTests(unittest.TestCase):
         self.fdt.setprop_str(node, prop, TEST_STRING_3)
         self.assertEqual(TEST_STRING_3,
                           self.fdt.getprop(node, prop).as_str())
+        self.assertEqual(
+            self.fdt.getprop(node, prop),
+            libfdt.Property.from_str(prop, TEST_STRING_3),
+        )
+        with self.assertRaises(ValueError):
+            libfdt.Property.from_str(prop, 'embedded\x00nul')
 
     def testHasProp(self):
         """Test that we can check if a node has a property"""
