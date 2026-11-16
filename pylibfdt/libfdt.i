@@ -931,7 +931,8 @@ class Property(bytes):
         return self.as_cell('q')
 
     def as_list(self, fmt):
-        return list(map(lambda x: x[0], struct.iter_unpack('>' + fmt, self)))
+        size = struct.calcsize('>' + fmt)
+        return list(struct.unpack(f'>{len(self) // size}{fmt}', self))
 
     def as_uint32_list(self):
         return self.as_list('L')
