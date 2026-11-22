@@ -230,6 +230,7 @@ int fdt_begin_node(void *fdt, const char *name)
 
 	nh->tag = cpu_to_fdt32(FDT_BEGIN_NODE);
 	memcpy(nh->name, name, namelen);
+	memset(nh->name + namelen, 0, FDT_TAGALIGN(namelen) - namelen);
 	return 0;
 }
 
@@ -319,6 +320,7 @@ int fdt_property_placeholder(void *fdt, const char *name, int len, void **valp)
 	prop->nameoff = cpu_to_fdt32(nameoff);
 	prop->len = cpu_to_fdt32(len);
 	*valp = prop->data;
+	memset(prop->data + len, 0, FDT_TAGALIGN(len) - len);
 	return 0;
 }
 
