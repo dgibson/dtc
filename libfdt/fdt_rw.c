@@ -270,6 +270,7 @@ int fdt_set_name(void *fdt, int nodeoffset, const char *name)
 		return err;
 
 	memcpy(namep, name, newlen+1);
+	memset(namep + newlen + 1, 0, FDT_TAGALIGN(newlen + 1) - (newlen + 1));
 	return 0;
 }
 
