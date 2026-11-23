@@ -219,7 +219,7 @@ int fdt_finish_reservemap(void *fdt)
 int fdt_begin_node(void *fdt, const char *name)
 {
 	struct fdt_node_header *nh;
-	int namelen;
+	size_t namelen;
 
 	FDT_SW_PROBE_STRUCT(fdt);
 
@@ -230,7 +230,8 @@ int fdt_begin_node(void *fdt, const char *name)
 
 	nh->tag = cpu_to_fdt32(FDT_BEGIN_NODE);
 	memcpy(nh->name, name, namelen);
-	memset(nh->name + namelen, 0, FDT_TAGALIGN(namelen) - namelen);
+	if (FDT_TAGALIGN(namelen) > namelen)
+		memset(nh->name + namelen, 0, FDT_TAGALIGN(namelen) - namelen);
 	return 0;
 }
 
@@ -294,8 +295,11 @@ static int fdt_find_add_string_(void *fdt, const char *s, int *allocated)
 int fdt_property_placeholder(void *fdt, const char *name, int len, void **valp)
 {
 	struct fdt_property *prop;
-	int nameoff;
-	int allocated;
+	unsigned int ulen = (unsigned int) len;
+	int nameoff, allocated;
+
+	if (!can_assume(VALID_INPUT) && len < 0)
+		return -FDT_ERR_BADOFFSET;
 
 	FDT_SW_PROBE_STRUCT(fdt);
 
@@ -309,7 +313,7 @@ int fdt_property_placeholder(void *fdt, const char *name, int len, void **valp)
 	if (nameoff == 0)
 		return -FDT_ERR_NOSPACE;
 
-	prop = fdt_grab_space_(fdt, sizeof(*prop) + FDT_TAGALIGN(len));
+	prop = fdt_grab_space_(fdt, sizeof(*prop) + FDT_TAGALIGN(ulen));
 	if (! prop) {
 		if (allocated)
 			fdt_del_last_string_(fdt, name);
@@ -318,9 +322,10 @@ int fdt_property_placeholder(void *fdt, const char *name, int len, void **valp)
 
 	prop->tag = cpu_to_fdt32(FDT_PROP);
 	prop->nameoff = cpu_to_fdt32(nameoff);
-	prop->len = cpu_to_fdt32(len);
+	prop->len = cpu_to_fdt32(ulen);
 	*valp = prop->data;
-	memset(prop->data + len, 0, FDT_TAGALIGN(len) - len);
+	if (FDT_TAGALIGN(ulen) > ulen)
+		memset(prop->data + ulen, 0, FDT_TAGALIGN(ulen) - ulen);
 	return 0;
 }
 

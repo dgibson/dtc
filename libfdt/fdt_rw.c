@@ -253,14 +253,17 @@ static int fdt_add_property_(void *fdt, int nodeoffset, const char *name,
 int fdt_set_name(void *fdt, int nodeoffset, const char *name)
 {
 	char *namep;
-	int oldlen, newlen;
-	int err;
+	int oldlen, err;
+	size_t newlen;
 
 	FDT_RW_PROBE(fdt);
 
 	namep = (char *)(uintptr_t)fdt_get_name(fdt, nodeoffset, &oldlen);
 	if (!namep)
 		return oldlen;
+
+	if (!can_assume(LIBFDT_FLAWLESS) && oldlen < 0)
+		return -FDT_ERR_BADOFFSET;
 
 	newlen = strlen(name);
 
@@ -270,7 +273,8 @@ int fdt_set_name(void *fdt, int nodeoffset, const char *name)
 		return err;
 
 	memcpy(namep, name, newlen+1);
-	memset(namep + newlen + 1, 0, FDT_TAGALIGN(newlen + 1) - (newlen + 1));
+	if (FDT_TAGALIGN(newlen + 1) > (newlen + 1))
+		memset(namep + newlen + 1, 0, FDT_TAGALIGN(newlen + 1) - (newlen + 1));
 	return 0;
 }
 
@@ -278,18 +282,23 @@ int fdt_setprop_placeholder_namelen(void *fdt, int nodeoffset, const char *name,
 				    int namelen, int len, void **prop_data)
 {
 	struct fdt_property *prop;
+	unsigned int ulen = (unsigned int)len;
 	int err;
+
+	if (!can_assume(VALID_INPUT) && len < 0)
+		return -FDT_ERR_BADOFFSET;
 
 	FDT_RW_PROBE(fdt);
 
-	err = fdt_resize_property_(fdt, nodeoffset, name, namelen, len, &prop);
+	err = fdt_resize_property_(fdt, nodeoffset, name, namelen, ulen, &prop);
 	if (err == -FDT_ERR_NOTFOUND)
-		err = fdt_add_property_(fdt, nodeoffset, name, namelen, len,
+		err = fdt_add_property_(fdt, nodeoffset, name, namelen, ulen,
 					&prop);
 	if (err)
 		return err;
 
-	memset(prop->data + len, 0, FDT_TAGALIGN(len) - len);
+	if (FDT_TAGALIGN(ulen) > ulen)
+		memset(prop->data + ulen, 0, FDT_TAGALIGN(ulen) - ulen);
 	*prop_data = prop->data;
 	return 0;
 }
