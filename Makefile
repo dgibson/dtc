@@ -22,9 +22,9 @@ CONFIG_LOCALVERSION =
 ASSUME_MASK ?= 0
 
 CPPFLAGS = -I libfdt -I . -DFDT_ASSUME_MASK=$(ASSUME_MASK)
-WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs -Wsign-compare \
-	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow \
-	-Wwrite-strings
+WARNINGS = -Wall -Wcast-qual -Wmissing-prototypes -Wnested-externs \
+	-Wpointer-arith -Wredundant-decls -Wshadow -Wsign-compare \
+	-Wstrict-prototypes -Wwrite-strings
 ifeq ($(shell $(CC) --version | grep -q gcc && echo gcc),gcc)
 WARNINGS += -Wsuggest-attribute=format
 endif

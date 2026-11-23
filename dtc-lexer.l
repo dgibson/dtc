@@ -48,6 +48,13 @@ static void push_input_file(const char *filename);
 static bool pop_input_file(void);
 static void PRINTF(1, 2) lexical_error(const char *fmt, ...);
 
+/*
+ * The MacOS versions of flex and clang trip warnings within the lex code we
+ * don't control (as of 23 Nov 2026).
+ */
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-compare"
+#endif
 %}
 
 %%

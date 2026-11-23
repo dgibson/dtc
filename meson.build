@@ -9,16 +9,17 @@ cc = meson.get_compiler('c')
 
 add_project_arguments(
   cc.get_supported_arguments([
-    '-Wpointer-arith',
     '-Wcast-qual',
-    '-Wnested-externs',
-    '-Wstrict-prototypes',
+    '-Wdiscarded-qualifiers',
     '-Wmissing-prototypes',
+    '-Wnested-externs',
+    '-Wpointer-arith',
     '-Wredundant-decls',
     '-Wshadow',
+    '-Wsign-compare',
+    '-Wstrict-prototypes',
     '-Wsuggest-attribute=format',
     '-Wwrite-strings',
-    '-Wdiscarded-qualifiers',
   ]),
   language: 'c'
 )

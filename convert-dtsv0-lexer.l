@@ -57,6 +57,14 @@ static const struct {
 	{ "reg", 16, 8 },
 	{ "ranges", 16, 8},
 };
+
+/*
+ * The MacOS versions of flex and clang trip warnings within the lex code we
+ * don't control (as of 23 Nov 2026).
+ */
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-compare"
+#endif
 %}
 
 %%
