@@ -28,3 +28,6 @@ ncscope.*
 build/
 dist/
 *.egg-info/
+
+# Used by clangd, possibly amongst others
+.cache/
