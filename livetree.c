@@ -544,6 +544,32 @@ bool is_ref_relative(const char *ref)
 }
 
 /*
+ * Merge a source layer which refers to a label into the node with that label.
+ * In a plugin, a label which is not found becomes an overlay fragment.
+ *
+ * Returns true on success, false on an error, which has been reported.
+ */
+bool merge_ref(struct node *dt, struct source_layer *layer, bool plugin)
+{
+	struct node *target = get_node_by_ref(dt, layer->ref);
+
+	assert(layer->type == LAYER_NODE);
+	if (target) {
+		merge_nodes(target, layer->node);
+		return true;
+	}
+	if (!plugin) {
+		srcpos_error(layer->ref_srcpos, "Error",
+			     "Label or path %s not found", layer->ref);
+		return false;
+	}
+	/* The label may be in the base tree, so add a fragment@N node for it */
+	add_orphan_node(dt, layer->node, layer->ref);
+
+	return true;
+}
+
+/*
  * Delete the node which a /delete-node/ source layer refers to
  *
  * Returns true on success, false on an error, which has been reported.
