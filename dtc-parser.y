@@ -234,14 +234,12 @@ devicetree:
 		}
 	| devicetree DT_DEL_NODE dt_ref ';'
 		{
-			struct node *target = get_node_by_ref($1, $3);
+			struct source_layer *layer;
 
-			if (target)
-				delete_node(target);
-			else
-				ERROR(&@3, "Label or path %s not found", $3);
-
-
+			layer = build_layer_delete_node($3, &@3);
+			if (!merge_delete_node($1, layer))
+				treesource_error = true;
+			free_layer(layer);
 			$$ = $1;
 		}
 	| devicetree DT_OMIT_NO_REF dt_ref ';'

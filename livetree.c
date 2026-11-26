@@ -544,6 +544,26 @@ bool is_ref_relative(const char *ref)
 }
 
 /*
+ * Delete the node which a /delete-node/ source layer refers to
+ *
+ * Returns true on success, false on an error, which has been reported.
+ */
+bool merge_delete_node(struct node *dt, struct source_layer *layer)
+{
+	struct node *target = get_node_by_ref(dt, layer->ref);
+
+	assert(layer->type == LAYER_DELETE_NODE);
+	if (!target) {
+		srcpos_error(layer->ref_srcpos, "Error",
+			     "Label or path %s not found", layer->ref);
+		return false;
+	}
+	delete_node(target);
+
+	return true;
+}
+
+/*
  * Tree accessor functions
  */
 
