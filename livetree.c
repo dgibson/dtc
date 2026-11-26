@@ -564,6 +564,27 @@ bool merge_delete_node(struct node *dt, struct source_layer *layer)
 }
 
 /*
+ * Mark the node which an /omit-if-no-ref/ source layer refers to, so that it is
+ * dropped if nothing refers to it
+ *
+ * Returns true on success, false on an error, which has been reported.
+ */
+bool merge_omit_if_no_ref(struct node *dt, struct source_layer *layer)
+{
+	struct node *target = get_node_by_ref(dt, layer->ref);
+
+	assert(layer->type == LAYER_OMIT_IF_NO_REF);
+	if (!target) {
+		srcpos_error(layer->ref_srcpos, "Error",
+			     "Label or path %s not found", layer->ref);
+		return false;
+	}
+	omit_node_if_unused(target);
+
+	return true;
+}
+
+/*
  * Tree accessor functions
  */
 

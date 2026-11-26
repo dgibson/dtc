@@ -244,14 +244,12 @@ devicetree:
 		}
 	| devicetree DT_OMIT_NO_REF dt_ref ';'
 		{
-			struct node *target = get_node_by_ref($1, $3);
+			struct source_layer *layer;
 
-			if (target)
-				omit_node_if_unused(target);
-			else
-				ERROR(&@3, "Label or path %s not found", $3);
-
-
+			layer = build_layer_omit_if_no_ref($3, &@3);
+			if (!merge_omit_if_no_ref($1, layer))
+				treesource_error = true;
+			free_layer(layer);
 			$$ = $1;
 		}
 	;

@@ -352,6 +352,7 @@ struct source_layer *build_layer_omit_if_no_ref(char *ref,
 						struct srcpos *ref_srcpos);
 void free_layer(struct source_layer *layer);
 bool merge_delete_node(struct node *dt, struct source_layer *layer);
+bool merge_omit_if_no_ref(struct node *dt, struct source_layer *layer);
 
 struct dt_info {
 	unsigned int dtsflags;
