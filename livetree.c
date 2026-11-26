@@ -448,6 +448,61 @@ struct reserve_info *add_reserve_entry(struct reserve_info *list,
 	return list;
 }
 
+/* Create a source layer of the given type, with its other fields NULL */
+static struct source_layer *new_layer(enum layer_type type, char *ref,
+				      struct srcpos *ref_srcpos)
+{
+	struct source_layer *new = xmalloc(sizeof(*new));
+
+	memset(new, 0, sizeof(*new));
+
+	new->type = type;
+	new->ref = ref;
+	new->ref_srcpos = srcpos_copy(ref_srcpos);
+
+	return new;
+}
+
+/*
+ * Create a source layer for [label:] &ref { ... }; where label is NULL if
+ * absent
+ */
+struct source_layer *build_layer_ref(char *label, char *ref,
+				     struct srcpos *ref_srcpos,
+				     struct node *node)
+{
+	struct source_layer *new = new_layer(LAYER_NODE, ref, ref_srcpos);
+
+	new->label = label;
+	new->node = node;
+
+	return new;
+}
+
+/* Create a source layer for /delete-node/ &ref; */
+struct source_layer *build_layer_delete_node(char *ref,
+					     struct srcpos *ref_srcpos)
+{
+	return new_layer(LAYER_DELETE_NODE, ref, ref_srcpos);
+}
+
+/* Create a source layer for /omit-if-no-ref/ &ref; */
+struct source_layer *build_layer_omit_if_no_ref(char *ref,
+						struct srcpos *ref_srcpos)
+{
+	return new_layer(LAYER_OMIT_IF_NO_REF, ref, ref_srcpos);
+}
+
+/*
+ * Free a source layer, but not its node, reference or label, since the tree may
+ * still use these
+ */
+void free_layer(struct source_layer *layer)
+{
+	srcpos_free(layer->ref_srcpos);
+	free(layer);
+}
+
 static void fill_fullpaths(struct node *tree, const char *prefix)
 {
 	struct node *child;

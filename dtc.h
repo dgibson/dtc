@@ -318,6 +318,39 @@ struct reserve_info *chain_reserve_entry(struct reserve_info *first,
 struct reserve_info *add_reserve_entry(struct reserve_info *list,
 				       struct reserve_info *new);
 
+/*
+ * A source layer is one top-level part of a dts file, after the header and any
+ * memory reservations, which refers to a node by label or path: a later
+ * definition of the node, or a /delete-node/ or /omit-if-no-ref/. The root
+ * node, / { ... };, is not held as a source layer.
+ *
+ * This is not the same as an overlay fragment (a fragment@N node), although in
+ * a plugin a source layer may become one when it is merged.
+ */
+
+enum layer_type {
+	LAYER_NODE,		/* [label:] &ref { ... }; */
+	LAYER_DELETE_NODE,	/* /delete-node/ &ref; */
+	LAYER_OMIT_IF_NO_REF,	/* /omit-if-no-ref/ &ref; */
+};
+
+/* The label and node are NULL if the source layer does not have them */
+struct source_layer {
+	enum layer_type type;
+	char *ref;			/* label or path referred to */
+	struct srcpos *ref_srcpos;	/* position of ref */
+	char *label;			/* label to add to the target */
+	struct node *node;		/* the node definition */
+};
+
+struct source_layer *build_layer_ref(char *label, char *ref,
+				     struct srcpos *ref_srcpos,
+				     struct node *node);
+struct source_layer *build_layer_delete_node(char *ref,
+					     struct srcpos *ref_srcpos);
+struct source_layer *build_layer_omit_if_no_ref(char *ref,
+						struct srcpos *ref_srcpos);
+void free_layer(struct source_layer *layer);
 
 struct dt_info {
 	unsigned int dtsflags;
