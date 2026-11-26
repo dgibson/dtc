@@ -6,7 +6,11 @@
 	prop1;
 };
 
-/* This is an overlay fragment for the root node of the base tree */
+/*
+ * This is an overlay fragment for the root node of the base tree. This is
+ * existing behaviour rather than a deliberate choice, and it is not clear that
+ * the two should differ.
+ */
 &{/} {
 	prop2;
 };
