@@ -798,6 +798,10 @@ dtc_tests () {
 	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-errors.dts"
     run_wrap_error_msg_test "merge-errors.dts:14.18-30 Label or path nosuchnode3 not found" \
 	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-errors.dts"
+    run_wrap_error_msg_test "merge-labelled-missing.dts:8.12-23 Label or path nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-labelled-missing.dts"
+    run_wrap_error_msg_test "merge-labelled-missing.dts:12.12-26 Label or path /nosuchnode not found" \
+	$DTC -I dts -O dtb -o /dev/null "$SRCDIR/merge-labelled-missing.dts"
 
     # A labelled reference to a node in a plugin adds the label to it
     run_dtc_test -@ -I dts -O dtb -o merge-labelled-plugin.test.dtb \

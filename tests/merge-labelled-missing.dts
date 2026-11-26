@@ -1,0 +1,14 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+};
+
+/* A label can only be added to a node in the plugin */
+newlabel1: &nosuchnode {
+	prop;
+};
+
+newlabel2: &{/nosuchnode} {
+	prop;
+};
