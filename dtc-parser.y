@@ -192,32 +192,7 @@ devicetree:
 				ERROR(&@3, "Label or path %s not found", $3);
 			$$ = $1;
 		}
-	| devicetree DT_PATH_REF nodedef
-		{
-			struct node *target = get_node_by_ref($1, $2);
-
-			/*
-			 * We rely on the rule being always:
-			 *   versioninfo plugindecl memreserves devicetree
-			 * so $-1 is what we want (plugindecl)
-			 */
-			if ($<flags>-1 & DTSF_PLUGIN) {
-				if (is_ref_relative($2))
-					ERROR(&@2, "Label-relative reference %s not supported in plugin", $2);
-				/* A path is in the base tree and a label may be */
-				if ($2[0] == '/' || !target)
-					add_orphan_node($1, $3, $2);
-				else
-					merge_nodes(target, $3);
-			} else {
-				if (target)
-					merge_nodes(target, $3);
-				else
-					ERROR(&@2, "Label or path %s not found", $2);
-			}
-			$$ = $1;
-		}
-	| devicetree DT_LABEL_REF nodedef
+	| devicetree dt_ref nodedef
 		{
 			struct source_layer *layer;
 
