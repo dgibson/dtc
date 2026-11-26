@@ -1,0 +1,17 @@
+/dts-v1/;
+/plugin/;
+
+&basenode {
+	label: foo {
+		p = "first";
+	};
+};
+
+/* The last definition wins */
+&{label} {
+	p = "second";
+};
+
+&label {
+	p = "third";
+};

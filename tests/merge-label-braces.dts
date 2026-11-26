@@ -1,0 +1,12 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	label: node {
+	};
+};
+
+/* A label in the plugin itself is merged, however it is written */
+&{label} {
+	prop;
+};

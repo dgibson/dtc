@@ -809,6 +809,18 @@ dtc_tests () {
     run_fdtget_test "/node" merge-labelled-plugin.test.dtb /__symbols__ newlabel
     run_fdtget_test "value" merge-labelled-plugin.test.dtb /node prop
 
+    # In a plugin, &{label} is the same as &label
+    run_dtc_test -I dts -O dtb -o merge-label-braces.test.dtb \
+	"$SRCDIR/merge-label-braces.dts"
+    run_fdtget_test "" merge-label-braces.test.dtb /node prop
+    run_fdtget_test "node" merge-label-braces.test.dtb -l /
+
+    # The last definition wins, with no fragment@N node for &{label}
+    run_dtc_test -I dts -O dtb -o merge-label-order.test.dtb \
+	"$SRCDIR/merge-label-order.dts"
+    run_fdtget_test "third" merge-label-order.test.dtb /fragment@0/__overlay__/foo p
+    run_fdtget_test "fragment@0\n__fixups__" merge-label-order.test.dtb -l /
+
     # In a plugin, / { ... } and &{/} { ... } are not the same thing
     run_dtc_test -I dts -O dtb -o merge-root-plugin.test.dtb \
 	"$SRCDIR/merge-root-plugin.dts"

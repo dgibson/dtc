@@ -194,6 +194,8 @@ devicetree:
 		}
 	| devicetree DT_PATH_REF nodedef
 		{
+			struct node *target = get_node_by_ref($1, $2);
+
 			/*
 			 * We rely on the rule being always:
 			 *   versioninfo plugindecl memreserves devicetree
@@ -202,10 +204,12 @@ devicetree:
 			if ($<flags>-1 & DTSF_PLUGIN) {
 				if (is_ref_relative($2))
 					ERROR(&@2, "Label-relative reference %s not supported in plugin", $2);
-				add_orphan_node($1, $3, $2);
+				/* A path is in the base tree and a label may be */
+				if ($2[0] == '/' || !target)
+					add_orphan_node($1, $3, $2);
+				else
+					merge_nodes(target, $3);
 			} else {
-				struct node *target = get_node_by_ref($1, $2);
-
 				if (target)
 					merge_nodes(target, $3);
 				else
